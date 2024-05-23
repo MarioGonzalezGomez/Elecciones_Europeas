@@ -1,0 +1,163 @@
+﻿<Window x:Class="Elecciones_Europeas.Config"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Title="Config" Height="460" Width="1150">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="330*"/>
+            <ColumnDefinition Width="319*"/>
+            <ColumnDefinition Width="284*"/>
+            <ColumnDefinition Width="217*"/>
+        </Grid.ColumnDefinitions>
+        <GroupBox Grid.Column="0" Margin="5,5,5,5" >
+            <Grid x:Name="gridConexiones">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="75*"/>
+                    <RowDefinition Height="77*"/>
+                    <RowDefinition Height="190*"/>
+                    <RowDefinition Height="27*"/>
+                    <RowDefinition Height="48*"/>
+                </Grid.RowDefinitions>
+                <Viewbox Grid.Row="0" HorizontalAlignment="Left" Width="192">
+                    <Label  Name="lblConexiones" Content="Conexiones" FontFamily="Century"/>
+                </Viewbox>
+                <ComboBox Name="cmbConexiones" Margin="8,53,8,0" SizeChanged="cmbConexiones_SizeChanged" Grid.RowSpan="2">
+                    <ComboBoxItem x:Name="cmbItem" Content="Todas las BD" ></ComboBoxItem>
+                </ComboBox>
+                <StackPanel Grid.Row="2" Margin="8,10,0,0" SizeChanged="StackPanel_SizeChanged">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="37*"/>
+                            <ColumnDefinition Width="200*"/>
+                        </Grid.ColumnDefinitions>
+                        <RadioButton x:Name="radioPrincipal" Grid.Column="0" Grid.Row="0" Padding="5" GroupName="TipoSeleccion" VerticalAlignment="Center"/>
+                        <RadioButton x:Name="radioReserva" Grid.Column="0" Grid.Row="1" Padding="5" GroupName="TipoSeleccion" VerticalAlignment="Center"/>
+                        <RadioButton x:Name="radioLocal" Grid.Column="0" Grid.Row="2" Padding="5" GroupName="TipoSeleccion" VerticalAlignment="Center"/>
+                        <Viewbox x:Name="radio1" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left">
+                            <Label Content="Principal"/>
+                        </Viewbox>
+                        <Viewbox x:Name="radio2" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left">
+                            <Label Content="Reserva"/>
+                        </Viewbox>
+                        <Viewbox x:Name="radio3" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left">
+                            <Label Content="Local"/>
+                        </Viewbox>
+                    </Grid>
+                </StackPanel>
+                <CheckBox x:Name="checkActualizacion" Content="Actualizacion Automática" Grid.Row="3" Margin="10,-45,0,0" Click="checkActualizacion_Click"/>
+                <CheckBox x:Name="checkRegional" Content="Modo Regional" Grid.Row="3" Margin="10,0,0,0"/>
+                <Button Content="GUARDAR CONFIGURACIÓN" Grid.Row="4" x:Name="btnGuardar" Click="btnGuardar_Click"  Margin="20,8,20,8"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Column="1" Margin="5,5,5,5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25*"/>
+                    <RowDefinition Height="114*"/>
+                </Grid.RowDefinitions>
+                <Viewbox Grid.Row="0" HorizontalAlignment="Left">
+                    <Label Name="lblBD" Content="Base de datos" FontFamily="Century" />
+                </Viewbox>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" FontSize="12" Content="IP DB Principal"/>
+                    <TextBox Grid.Row="1" x:Name="txtIpPrincipal" ></TextBox>
+                    <Label Grid.Row="2" FontSize="12" Content="IP DB Reserva"/>
+                    <TextBox Grid.Row="3" x:Name="txtIpReserva" ></TextBox>
+                    <Label Grid.Row="4" FontSize="12" Content="Puerto DB"/>
+                    <TextBox Grid.Row="5" x:Name="txtPuertoDB" ></TextBox>
+                    <Label Grid.Row="6" FontSize="12" Content="Nombre DB"/>
+                    <TextBox Grid.Row="7" x:Name="txtNombreDB1" ></TextBox>
+                    <Label Grid.Row="8" FontSize="12" x:Name="lblNombreDB2" Content="Nombre DB2"/>
+                    <TextBox Grid.Row="9" x:Name="txtNombreDB2" ></TextBox>
+                    <Label Grid.Row="10" FontSize="12" x:Name="lblNombreDB3"  Content="Nombre DB3"/>
+                    <TextBox Grid.Row="11" x:Name="txtNombreDB3" ></TextBox>
+                </Grid>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Column="2" Grid.ColumnSpan="2" Margin="5,5,5,5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25*"/>
+                    <RowDefinition Height="114*"/>
+                </Grid.RowDefinitions>
+                <Viewbox Grid.Row="0" HorizontalAlignment="Left">
+                    <Label Name="lblAdicionales" Content="Ajustes adicionales" FontFamily="Century" />
+                </Viewbox>
+                <Grid x:Name="gridAdicionales" Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" FontSize="12" Content="Ruta base para los archivos"/>
+                    <TextBox Grid.Row="1" x:Name="txtRuta" FontSize="12"></TextBox>
+                    <Label Grid.Row="2" FontSize="12" Content="Programas gráficos utilizados" Padding="1" Margin="0,5,0,0"/>
+                    <StackPanel  Grid.Row="3" Grid.RowSpan="3">
+                        <CheckBox x:Name="checkPrime" Content="PRIME" Margin="8" Click="checkPrime_Click"/>
+                        <CheckBox x:Name="checkIPF" Content="BRAINSTORM" Margin="8" Click="checkIPF_Click"/>
+                    </StackPanel>
+                    <Label x:Name="lblDBIpf" Grid.Row="6" FontSize="12" Content="BrainStorm Database" Visibility="Hidden"/>
+                    <TextBox  Grid.Row="7" x:Name="txtDBIpf" Visibility="Hidden"></TextBox>
+                    <Label x:Name="lblPuertoIpf" Grid.Row="8" FontSize="12" Content="Puerto BrainStorm" Visibility="Hidden"/>
+                    <TextBox Grid.Row="9" x:Name="txtPuertoIPF" Visibility="Hidden"></TextBox>
+                    <Label x:Name="lblPuertoPrime" Grid.Row="10" FontSize="12" Content="Puerto Prime" Visibility="Hidden"/>
+                    <TextBox  Grid.Row="11" x:Name="txtPuertoPrime" Visibility="Hidden"></TextBox>
+
+                    <Label Grid.Row="2" FontSize="12" Content="Theme" Padding="1" HorizontalAlignment="Center" Margin="100,5,0,0"/>
+                    <ComboBox  Grid.Row="3" Name="cmbThemes" HorizontalAlignment="Right" Margin="0,0,5,0" Width="200" SelectionChanged="cmbThemes_SelectionChanged">
+                        <ComboBoxItem x:Name="cmbItemLight" Content="Claro/Light"></ComboBoxItem>
+                        <ComboBoxItem x:Name="cmbItemDark" Content="Oscuro/Dark"></ComboBoxItem>
+                        <ComboBoxItem x:Name="cmbItemBlue" Content="Azulado/Blue"></ComboBoxItem>
+                    </ComboBox>
+
+                    <Label Grid.Row="4" FontSize="12" Content="Tipos de gráficos" Padding="1" HorizontalAlignment="Center" Margin="155,5,0,0"/>
+                    <ComboBox  Grid.Row="5" Name="cmbGraficos" HorizontalAlignment="Right" Margin="0,0,5,0" Width="200" SelectionChanged="cmbGraficos_SelectionChanged">
+                        <ComboBoxItem x:Name="cmbItemFaldones" Content="Faldones"></ComboBoxItem>
+                        <ComboBoxItem x:Name="cmbItemCartones" Content="Cartones"></ComboBoxItem>
+                        <ComboBoxItem x:Name="cmbItemRA" Content="Realidad Aumentada"></ComboBoxItem>
+                        <ComboBoxItem x:Name="cmbItemPantallas" Content="Pantallas"></ComboBoxItem>
+                    </ComboBox>
+
+                </Grid>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>

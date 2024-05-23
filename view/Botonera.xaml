@@ -1,0 +1,154 @@
+﻿<Window x:Class="Elecciones_Europeas.Botonera"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Elecciones_Europeas"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="#FFFAFAFA"
+        FontFamily="{DynamicResource MaterialDesignFont}" Height="220" Width="260" >
+    <Grid Cursor="">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="19*"/>
+            <RowDefinition Height="8*"/>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="0"/>
+        </Grid.RowDefinitions>
+
+        <!--#region Check box y Despliega -->
+        <Grid Grid.Row="0" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35*"/>
+                <RowDefinition Height="35*"/>
+                <RowDefinition Height="55*"/>
+            </Grid.RowDefinitions>
+
+            <CheckBox Grid.Row="0" Content="PRIMEROS RESULTADOS" x:Name="PrimerosResultadosCheck" Margin="15,10,0,0" IsChecked="True" Checked="PrimerosResultadosCheck_Checked" Unchecked="PrimerosResultadosCheck_Unchecked"/>
+            <CheckBox Grid.Row="1" Content="SONDEO CON ANIMACION" x:Name="SondeoAnimadoCheck" Margin="15,0,0,0" IsChecked="True" Checked="SondeoAnimadoCheck_Checked" Unchecked="SondeoAnimadoCheck_Unchecked"/>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Content="DESPLIEGA" Tag="ENTRA" Grid.Column="0"  Margin="5,10,5,0" Padding="1"  FontSize="12" x:Name="DespliegaButton" Click="DespliegaButton_Click"/>
+                <Button Content="REPLIEGA" Tag="SALE" Grid.Column="1" Margin="0,10,5,0"  Padding="1"  FontSize="12" x:Name="RepliegaButton" Click="RepliegaButton_Click" />
+            </Grid>
+        </Grid>
+        <!--#endregion-->
+
+        <!--#region TIMER -->
+        <GroupBox Grid.Column="1" Grid.Row="0" Margin="3,3,-3,3" Padding="3" Visibility="Hidden">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="TimerText" Grid.Row="0" Grid.Column="0" Margin="5,5,0,0" VerticalContentAlignment="Center" FontSize="30" Text="20:00"/>
+                <Viewbox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                    <StackPanel Orientation="Horizontal" >
+                        <Button Content="ENTRA" Tag="ENTRA" Margin="5,10,5,0" x:Name="EntraTimerButton" Click="EntraTimerButton_Click"/>
+                        <Button Content="SALE" Tag="SALE" Margin="0,10,5,0" x:Name="SaleTimerButton" Click="SaleTimerButton_Click" />
+                        <Button Content="PAUSAR" Tag="PREPARA" Margin="0,10,5,0" x:Name="PararTimerButton" Click="PararTimerButton_Click"/>
+                    </StackPanel>
+                </Viewbox>
+            </Grid>
+        </GroupBox>
+        <!--#endregion-->
+
+        <!--#region SEÑALES DE VIDEO -->
+        <GroupBox Grid.Row="3" Grid.Column="0" Padding="3" Margin="3,6,3,-8" Visibility="Hidden">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Button Grid.Column="0" Grid.Row="0" Content="ENTRA VIDEO" Margin="10,4,10,0" Padding="5"  Background="#90e38d" x:Name="EntraVideoButton" Click="EntraVideoButton_Click"/>
+                <Button Grid.Column="0" Grid.Row="1" Content="SALE VIDEO" Margin="10,4,10,0"  Padding="5"  Background="#ff7979" x:Name="SaleVideoButton" Click="SaleVideoButton_Click"/>
+                <Button Grid.Column="1" Grid.Row="0" Content="ENTRA DIRECTO" Margin="5,4,15,0" Padding="5"  FontSize="12"  Background="#90e38d" x:Name="EntraDirectoButton" Click="EntraDirectoButton_Click"/>
+                <Button Grid.Column="1" Grid.Row="1" Content="SALE DIRECTO" Margin="5,4,15,0" Padding="5" FontSize="12" Background="#ff7979" x:Name="SaleDirectoButton" Click="SaleDirectoButton_Click"/>
+
+                <TextBox Grid.Column="2" Grid.Row="0" Margin="99,4,0,0" Padding="7,0,0,0" x:Name="VideoTextBox"  VerticalContentAlignment="Center" FontSize="20" Text="*" GotFocus="VideoTextBox_GotFocus"/>
+                <Button Grid.Column="2" Grid.Row="0" Content="ES VIDEO" Margin="15,4,40,0" Padding="5"  Background="#97bcff" x:Name="EsVideoButton" Click="EsVideoButton_Click"/>
+
+                <Button Grid.Column="2" Grid.Row="1" Content="ES DIRECTO" Margin="15,4,5,0"  Padding="5"  Background="#97bcff" x:Name="EsDirectoButton" Click="EsDirectoButton_Click"/>
+                <Button Grid.Column="3" Grid.Row="0" Content="ENTRAN TODOS" Margin="10,4,10,0" Padding="5"  FontSize="12"  Background="#90e38d" x:Name="EntraTodosButton" Click="EntraTodosButton_Click"/>
+                <Button Grid.Column="3" Grid.Row="1" Content="SALEN TODOS" Margin="10,4,10,0" Padding="5" FontSize="12" Background="#ff7979" x:Name="SaleTodosButton" Click="SaleTodosButton_Click"/>
+            </Grid>
+        </GroupBox>
+        <!--#endregion-->
+
+        <!--#region MILLONES/ESCAÑOS/HISTORICOS -->
+        <Viewbox Grid.Row="1" Grid.Column="0" Margin="5,5,0,5">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Button Content="ENTRA % VOTO"  Background="#ffb038"  Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Margin="0,0,2,0" Padding="1" x:Name="EntraPVotoButton" Click="EntraPVotoButton_Click"/>
+                <Button Content="SALE % VOTO"  Background="#ff7979"  Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" Margin="2,0,3,0" Padding="1" x:Name="EntraHistButton" Click="EntraHistButton_Click"/>
+            </Grid>
+        </Viewbox>
+
+        <!--#endregion-->
+
+        <!--#region FOTOS -->
+        <Grid Grid.Row="2" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="ENTRAN FOTOS"  Background="#90e38d"  Grid.Column="0" Margin="5" Padding="1" x:Name="EntraFotosButton" Click="EntraFotosButton_Click"/>
+            <Button Content="SALEN FOTOS"  Background="#ff7979"  Grid.Column="1" Margin="5" Padding="1" x:Name="SaleFotosButton" Click="SaleFotosButton_Click"/>
+        </Grid>
+        <!--#endregion-->
+
+        <!-- #region EN DESPLEGADO -->
+        <Viewbox Grid.Row="3" Grid.Column="0" Margin="5,5,0,-5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!--   <Button Content="DESPLIEGA ESC/MILLON" Background="#90e38d" Grid.Column="0" Grid.Row="0" Margin="2,0,2,3" x:Name="DespEscMillButton" Click="DespEscMillButton_Click"/>     -->
+                <!--   <Button Content="DESPLIEGA ESC/HISTORICO" Background="#90e38d" Grid.Column="1" Grid.Row="0" Margin="2,0,2,3"  x:Name="ReplEscMillButton" Click="ReplEscMillButton_Click"/> -->
+                <!--   <Button Content="REPLIEGA ESC/HISTORICO"  Background="#ff7979" Grid.Column="0" Grid.Row="1" Margin="2,0,2,3"  x:Name="DespEscHistButton" Click="DespEscHistButton_Click"/> -->
+                <!--   <Button Content="REPLIEGA ESC/HISTORICO" Background="#ff7979" Grid.Column="1" Grid.Row="1" Margin="2,0,2,3"  x:Name="ReplEscHistButton" Click="ReplEscHistButton_Click"/>  -->
+            </Grid>
+        </Viewbox>
+        <!--#endregion-->
+    </Grid>
+</Window>

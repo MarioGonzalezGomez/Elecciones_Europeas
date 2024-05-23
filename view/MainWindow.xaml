@@ -1,0 +1,149 @@
+﻿<Window x:Class="Elecciones_Europeas.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Elecciones_Europeas"
+        mc:Ignorable="d"
+        FontFamily="{DynamicResource MaterialDesignFont}" Height="650" Width="1200">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="132*"/>
+            <RowDefinition Height="257*"/>
+            <RowDefinition Height="45*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="74*"/>
+            <ColumnDefinition Width="151*"/>
+            <ColumnDefinition Width="175*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Row="0" Grid.Column="0" Margin="0,5,0,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Viewbox  Grid.Row="0" Grid.Column="0" Margin="1,1,1,1">
+                <Image Name="imgConfig"  Width="40" Height="40" Source="/Elecciones_Europeas;component/iconos/tuerca.png" 
+               MouseEnter="imgConfig_MouseEnter" MouseLeave="imgConfig_MouseLeave" MouseLeftButtonUp="imgConfig_Click"/>
+            </Viewbox>
+
+
+            <Viewbox  Grid.Row="1" Grid.Column="0" Margin="1,1,1,1">
+                <TextBlock x:Name="txtConexiones"  TextWrapping="Wrap" TextAlignment="Center" Margin="10,3,10,3"/>
+            </Viewbox>
+        </Grid>
+
+        <Grid x:Name="gridSondeoOficial" Grid.Row="0" Grid.Column="1" Margin="0,10,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Content="SONDEO" Grid.Column="0" Grid.Row="1" x:Name="btnSondeoCentral" Click="btnSondeoCentral_Click"  Margin="4"/>
+            <Button Content="OFICIALES" Grid.Column="1" Grid.Row="1" x:Name="btnOficialesCentral" Click="btnOficialesCentral_Click"   Margin="4"/>
+
+            <Button Content="SONDEO 2" Visibility="Hidden" Grid.Column="0" Grid.Row="2" x:Name="btnSondeoInferior" Click="btnSondeoInferior_Click" Margin="4"/>
+            <Button Content="OFICIALES 2" Visibility="Hidden" Grid.Column="1" Grid.Row="2" x:Name="btnOficialesInferior" Click="btnOficialesInferior_Click" Margin="4"/>
+
+            <Button Content="SONDEO 3" Visibility="Hidden" Grid.Column="0" Grid.Row="0" x:Name="btnSondeoSuperior" Click="btnSondeoSuperior_Click" Margin="4"/>
+            <Button Content="OFICIALES 3" Visibility="Hidden" Grid.Column="1" Grid.Row="0" x:Name="btnOficialesSuperior" Click="btnOficialesSuperior_Click" Margin="4"/>
+        </Grid>
+        <Grid Grid.Row="0" Grid.Column="2" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="158*"/>
+                <ColumnDefinition Width="47*"/>
+                <ColumnDefinition Width="125*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Label  Grid.Row="0" Grid.Column="0" Content="Escaños Totales" FontSize="15" Margin="10,0,0,0"/>
+            <Label  Grid.Row="1 " Grid.Column="0" Content="Escrutado"  FontSize="15"  Margin="10,0,0,0" />
+            <Label Grid.Row="2" Grid.Column="0"  Content="Participación" FontSize="15"  Margin="10,0,0,0" />
+            <Label  Grid.Row="3" Grid.Column="0" Content="Participación Histórica" FontSize="15" Margin="10,0,0,0" />
+
+            <Label Name="lblEscanios" Grid.Row="0" Grid.Column="1" Content="---" FontSize="15"  Margin="1"/>
+            <Label Name="lblEscrutado" Grid.Row="1" Grid.Column="1" Content="---" FontSize="15"  Margin="1"/>
+            <Label Name="lblParticipacion" Grid.Row="2" Grid.Column="1" Content="---" FontSize="15"  Margin="1"/>
+            <Label Name="lblParticipacionHist" Grid.Row="3" Grid.Column="1" Content="---" FontSize="15"  Margin="1"/>
+
+            <Button Content="AVANCE 1" x:Name="btnAvance1" Click="btnAvance1_Click" Grid.Row="0" Grid.Column="2"  Margin="10,3,10,3"/>
+            <Button Content="AVANCE 2" x:Name="btnAvance2" Click="btnAvance2_Click" Grid.Row="1" Grid.Column="2" Margin="10,3,10,3"/>
+            <Button Content="AVANCE 3" x:Name="btnAvance3" Click="btnAvance3_Click" Grid.Row="2" Grid.Column="2" Margin="10,3,10,3"/>
+            <Button Content="FINAL" x:Name="btnAvance4" Click="btnAvance4_Click" Grid.Row="3" Grid.Column="2"  Margin="10,3,10,3"/>
+        </Grid>
+        <Grid Name="gridTablas" Grid.Row="1" Grid.Column="0" Margin="5,0,5,0">
+            <ListView Name="graficosListView" Margin="0,0,0,5" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden" SelectionChanged="graficosListView_SelectionChanged">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn x:Name="graficosHeader" Width="{Binding ActualWidth, ElementName=graficosListView}" DisplayMemberBinding="{Binding}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="1" Margin="5,0,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ListView Name="autonomiasListView" Grid.Column="0"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden" SelectionChanged="autonomiasListView_SelectionChanged">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="AUTONOMÍAS"  Width="{Binding ActualWidth, ElementName=autonomiasListView}" DisplayMemberBinding="{Binding}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <ListView Name="circunscripcionesListView" Margin="5,0,0,0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden"  SelectionChanged="circunscripcionesListView_SelectionChanged" d:ItemsSource="{d:SampleData ItemCount=5}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="CIRCUNSCRIPCIONES"  Width="{Binding ActualWidth, ElementName=circunscripcionesListView}" DisplayMemberBinding="{Binding}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+        <ListView Name="datosListView" Margin="5,0,5,0" Grid.Row="1" Grid.Column="2"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden" SizeChanged="datosListView_SizeChanged" SelectionChanged="datosListView_SelectionChanged">
+            <ListView.View>
+                <GridView>
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}" >
+                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            <Setter Property="Padding" Value="3,10,0,10"/>
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
+                    <GridViewColumn x:Name="columna1" Header="CÓDIGO" DisplayMemberBinding="{Binding codigo}"/>
+                    <GridViewColumn x:Name="columna2" Header="SIGLAS" DisplayMemberBinding="{Binding siglas}"/>
+                    <GridViewColumn x:Name="columna3" Header="ESC. DESDE" DisplayMemberBinding="{Binding escaniosDesde}"/>
+                    <GridViewColumn x:Name="columna4" Header="ESC. HASTA" DisplayMemberBinding="{Binding escaniosHasta}" />
+                    <GridViewColumn x:Name="columna5" Header="% VOTO" DisplayMemberBinding="{Binding porcentajeVoto}"/>
+                    <GridViewColumn x:Name="columna6" Header="VOTANTES" DisplayMemberBinding="{Binding votantes}"  />
+                    <GridViewColumn x:Name="columna7" Header="DIF VOT" DisplayMemberBinding="{Binding diferenciaVotantes}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button Content="RESET" x:Name="btnReset" Tag="RESET" Click="btnReset_Click"  Grid.Row="2" Grid.Column="0" Foreground="White" FontSize="17" Margin="15"/>
+        <Grid  Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="PREPARA" Tag="PREPARA" x:Name="btnPrepara" Click="btnPrepara_Click"  Grid.Column="0" FontSize="17" Margin="15"/>
+            <Button Content="ENTRA" Tag="ENTRA" x:Name="btnEntra" Click="btnEntra_Click"  Grid.Column="1" FontSize="17" Margin="8"/>
+            <Button Content="SALE" Tag="SALE" x:Name="btnSale" Click="btnSale_Click"  Grid.Column="2" FontSize="17" Margin="8"/>
+            <Button Content="ACTUALIZA" x:Name="btnActualiza" Click="btnActualiza_Click"  Grid.Column="3" FontSize="17" Margin="15"/>
+            <Button Content="PACTOS" x:Name="btnPactos" Click="btnPactos_Click"  Grid.Column="4" FontSize="17" Margin="15"/>
+        </Grid>
+    </Grid>
+</Window>

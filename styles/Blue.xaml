@@ -1,0 +1,66 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:local="clr-namespace:Elecciones_Europeas">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+        <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/MaterialDesignColor.BlueGrey.Primary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="PrimaryHueLightBrush" Color="{DynamicResource Primary900}" />
+            <SolidColorBrush x:Key="PrimaryHueLightForegroundBrush"  Color="{DynamicResource Primary200Foreground}" />
+            <SolidColorBrush x:Key="PrimaryHueMidBrush"  Color="{DynamicResource Primary400}" />
+            <SolidColorBrush x:Key="PrimaryHueMidForegroundBrush" Color="{DynamicResource Primary500Foreground}" />
+            <SolidColorBrush x:Key="PrimaryHueDarkBrush"  Color="{DynamicResource Primary100}" />
+            <SolidColorBrush x:Key="PrimaryHueDarkForegroundBrush"  Color="{DynamicResource Primary700Foreground}" />
+        </ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize"  Value="12"/>
+        <Setter Property="Padding"  Value="0"/>
+        <Setter Property="Margin"  Value="3"/>
+        <Style.Triggers>
+            <Trigger Property="Button.Tag" Value="ENTRA">
+                <Setter Property="Button.Background" Value="#5d7894" />
+            </Trigger>
+
+            <Trigger Property="Button.Tag" Value="SALE">
+                <Setter Property="Button.Background" Value="#ff6d54" />
+
+            </Trigger>
+
+            <Trigger Property="Button.Tag" Value="PREPARA">
+                <Setter Property="Button.Background" Value="#ffffff" />
+                <Setter Property="Button.Foreground" Value="#263238" />
+            </Trigger>
+
+            <Trigger Property="Button.Tag" Value="RESET">
+                <Setter Property="Button.Background" Value="#263238" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="GroupBox" BasedOn="{StaticResource MaterialDesignGroupBox}">
+        <Setter Property="Margin" Value="3"/>
+        <Setter Property="Padding" Value="4"/>
+    </Style>
+
+    <Style TargetType="Label" BasedOn="{StaticResource MaterialDesignLabel}">
+        <Setter Property="Foreground" Value="#59656a"/>
+    </Style>
+    
+    <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="Padding" Value="1"/>
+    </Style>
+
+    <Style  TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
+        <Setter Property="Foreground" Value="#263238"/>
+    </Style>
+
+</ResourceDictionary>

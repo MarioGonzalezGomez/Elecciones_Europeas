@@ -46,9 +46,9 @@ namespace Elecciones_Europeas.src.controller
             return _service.FindAllFromBD();
         }
 
-        public List<Circunscripcion> FindAllAutonomias()
+        public List<Circunscripcion> FindAllAutonomias(int db)
         {
-            return _service.FindAllAutonomias();
+            return _service.FindAllAutonomias(db);
         }
 
         public List<Circunscripcion> FindAllCircunscripcionesByNameAutonomia(string nombreAutonomia)

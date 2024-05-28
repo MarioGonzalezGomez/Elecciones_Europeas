@@ -178,7 +178,7 @@ namespace Elecciones_Europeas
         }
         private void CargarCircunscripciones()
         {
-            CCAA = CircunscripcionController.GetInstance(conexionActiva).FindAllAutonomias();
+            CCAA = CircunscripcionController.GetInstance(conexionActiva).FindAllAutonomias(conexionActiva.db);
         }
         //Por ahora, se modifican manualmente, pero se podría implementar un modo de introducir
         //los tipos de gráficos en la ventana de configuración Avanzada

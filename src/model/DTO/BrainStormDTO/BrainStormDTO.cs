@@ -67,7 +67,7 @@ namespace Elecciones_Europeas.src.model.DTO.BrainStormDTO
             foreach (var p in partidos)
             {
                 string codigo = p.padre;
-                string codigoPadre = p.padre.StartsWith("09") ? $"00{p.padre.Substring(2)}" : p.padre;
+                string codigoPadre = p.padre.StartsWith(configuration.GetValue("codigoRegionalBD1")) || p.padre.StartsWith(configuration.GetValue("codigoRegionalBD2")) ? $"00{p.padre.Substring(2)}" : p.padre;
                 int difVotos = p.numVotantes - p.numVotantesHistoricos;
                 string tendenciaVotos = p.numVotantesHistoricos == 0 ? "*" :
                   difVotos > 0 ? "+" :

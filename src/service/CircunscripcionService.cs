@@ -43,11 +43,15 @@ namespace Elecciones_Europeas.src.service
             return _rep.GetAllFromBD();
         }
 
-        public List<Circunscripcion> FindAllAutonomias()
+        public List<Circunscripcion> FindAllAutonomias(int db)
         {
-            List<Circunscripcion> circunscripciones = _rep.GetAll()
+            List<Circunscripcion> circunscripciones = db == 1 ? _rep.GetAll()
                .Where(cir => cir.codigo.EndsWith("00000"))
-               // .Where(cir => !cir.codigo.StartsWith("99"))
+               .Where(cir => cir.codigo.StartsWith("99"))
+               .OrderBy(cir => cir.codigo)
+               .ToList() :
+               _rep.GetAll()
+               .Where(cir => cir.codigo.EndsWith("00000"))
                .OrderBy(cir => cir.codigo)
                .ToList();
             Circunscripcion spain = circunscripciones[circunscripciones.Count - 1];

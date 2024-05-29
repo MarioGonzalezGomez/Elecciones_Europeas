@@ -33,6 +33,10 @@ namespace Elecciones_Europeas.src.controller
             {
                 instance = new CircunscripcionController(con);
             }
+            else if (!_con._database.Equals(con._database))
+            {
+                instance = new CircunscripcionController(con);
+            }
             return instance;
         }
 

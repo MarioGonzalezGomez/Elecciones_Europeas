@@ -28,6 +28,10 @@ namespace Elecciones_Europeas.src.repository
             {
                 instance = new PartidoRepository(con);
             }
+            else if (!_con._database.Equals(con._database))
+            {
+                instance = new PartidoRepository(con);
+            }
             return instance;
         }
 

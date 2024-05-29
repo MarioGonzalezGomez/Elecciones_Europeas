@@ -17,10 +17,7 @@ namespace Elecciones_Europeas.src.logic
 
         public Escuchador(conexion.ConexionEntityFramework conexionActiva)
         {
-            cirController = CircunscripcionController.GetInstance(conexionActiva);
-            circunscripciones = cirController.FindAll();
-            salir = false;
-            EjecutarCadaDosSegundos();
+            IniciarEscuchador(conexionActiva);
         }
 
         public async Task EjecutarCadaDosSegundos()
@@ -49,6 +46,14 @@ namespace Elecciones_Europeas.src.logic
                 }
 
             }
+        }
+
+        public async Task IniciarEscuchador(conexion.ConexionEntityFramework conexionActiva)
+        {
+            cirController = CircunscripcionController.GetInstance(conexionActiva);
+            circunscripciones = cirController.FindAll();
+            salir = false;
+            await EjecutarCadaDosSegundos();
         }
     }
 }

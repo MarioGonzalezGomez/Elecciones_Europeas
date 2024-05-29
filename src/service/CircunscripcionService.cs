@@ -30,6 +30,10 @@ namespace Elecciones_Europeas.src.service
             {
                 instance = new CircunscripcionService(con);
             }
+            else if (!_con._database.Equals(con._database))
+            {
+                instance = new CircunscripcionService(con);
+            }
             return instance;
         }
 

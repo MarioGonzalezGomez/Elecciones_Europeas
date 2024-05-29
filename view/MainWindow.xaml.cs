@@ -45,7 +45,7 @@ namespace Elecciones_Europeas
         bool regional;
 
         //Escuchador
-        Escuchador escuchador;
+        public Escuchador escuchador;
         //Bool para ver si mando actualización de datos o no
         public bool actualizacionActiva;
 
@@ -56,7 +56,7 @@ namespace Elecciones_Europeas
         private ObservableInt eleccionSeleccionada;
 
         //Si tenemos algún partido seleccionado con el que se deba hacer algo
-        PartidoDTO? partidoSeleccionado;
+        private PartidoDTO? partidoSeleccionado;
 
         //Bool para hacer giro
         bool sondeoEnElAire;
@@ -549,15 +549,16 @@ namespace Elecciones_Europeas
         private void CambioDeElecciones()
         {
             conexionActiva.CloseConection();
+            conexionActiva.Dispose();
             conexionActiva = new ConexionEntityFramework(int.Parse(configuration.GetValue($"conexionDefault{eleccionSeleccionada.Valor + 1}")), eleccionSeleccionada.Valor + 1);
             CCAA.Clear();
             CargarCircunscripciones();
             autonomiasListView.ItemsSource = CCAA.Select(cir => cir.nombre).ToList();
             circunscripcionNames.Clear();
             listaDeDatos.Clear();
-            IniciarEscuchadores();
             EscribirConexiones();
             DesplegarCircunscripciones();
+            escuchador.IniciarEscuchador(conexionActiva);
         }
 
         private void btnAvance1_Click(object sender, RoutedEventArgs e)

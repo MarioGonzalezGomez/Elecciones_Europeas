@@ -31,6 +31,10 @@ namespace Elecciones_Europeas.src.controller
             {
                 instance = new CPController(con);
             }
+            else if (!_con._database.Equals(con._database))
+            {
+                instance = new CPController(con);
+            }
             return instance;
         }
 

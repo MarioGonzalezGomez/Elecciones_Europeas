@@ -186,7 +186,9 @@ namespace Elecciones_Europeas
         {
             if (main != null)
             {
-                main.actualizacionActiva = (bool)checkActualizacion.IsChecked;
+                bool activa = (bool)checkActualizacion.IsChecked;
+                main.escuchador.salir = !activa;
+                main.actualizacionActiva = activa;
             }
         }
 

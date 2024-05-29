@@ -264,6 +264,7 @@ namespace Elecciones_Europeas.src.conexion
         {
             if (connection != null)
                 connection.Close();
+                connection = null;
         }
     }
 }

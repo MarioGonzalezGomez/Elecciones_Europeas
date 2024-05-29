@@ -39,6 +39,10 @@ namespace Elecciones_Europeas.src.controller
             {
                 instance = new BrainStormController(con);
             }
+            else if (!_con._database.Equals(con._database))
+            {
+                instance = new BrainStormController(con);
+            }
             return instance;
         }
 

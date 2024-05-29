@@ -30,6 +30,10 @@ namespace Elecciones_Europeas.src.service
             {
                 instance = new PartidoService(con);
             }
+            else if (!_con._database.Equals(con._database))
+            {
+                instance = new PartidoService(con);
+            }
             return instance;
         }
 

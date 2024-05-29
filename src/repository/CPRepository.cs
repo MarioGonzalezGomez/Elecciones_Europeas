@@ -1,4 +1,5 @@
 ﻿using Elecciones_Europeas.src.conexion;
+using Elecciones_Europeas.src.controller;
 using Elecciones_Europeas.src.model.IPF;
 using Elecciones_Europeas.src.service;
 using System.Collections.Generic;
@@ -25,6 +26,10 @@ namespace Elecciones_Europeas.src.repository
                 instance = new CPRepository(con);
             }
             else if (_con._tipoConexion != con._tipoConexion)
+            {
+                instance = new CPRepository(con);
+            }
+            else if (!_con._database.Equals(con._database))
             {
                 instance = new CPRepository(con);
             }

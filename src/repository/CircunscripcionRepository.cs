@@ -28,6 +28,10 @@ namespace Elecciones_Europeas.src.repository
             {
                 instance = new CircunscripcionRepository(con);
             }
+            else if (!_con._database.Equals(con._database))
+            {
+                instance = new CircunscripcionRepository(con);
+            }
             return instance;
         }
 

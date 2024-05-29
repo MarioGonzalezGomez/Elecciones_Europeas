@@ -32,6 +32,10 @@ namespace Elecciones_Europeas.src.service
             {
                 instance = new CPService(con);
             }
+            else if (!_con._database.Equals(con._database))
+            {
+                instance = new CPService(con);
+            }
             return instance;
         }
 

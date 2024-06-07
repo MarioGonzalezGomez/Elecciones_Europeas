@@ -128,7 +128,7 @@ namespace Elecciones_Europeas
             string numElecciones = configuration.GetValue("numEleccionesSimultaneas");
             if (numElecciones == "2")
             {
-                btnSondeoInferior.Visibility = Visibility.Visible;
+                btnSondeoInferior.Visibility = Visibility.Hidden;
                 btnOficialesInferior.Visibility = Visibility.Visible;
             }
             if (numElecciones == "3")
@@ -179,6 +179,11 @@ namespace Elecciones_Europeas
         private void CargarCircunscripciones()
         {
             CCAA = CircunscripcionController.GetInstance(conexionActiva).FindAllAutonomias(conexionActiva.db);
+            if (eleccionSeleccionada.Valor == 1)
+            {
+                CCAA.Clear();
+                CCAA.Add(CircunscripcionController.GetInstance(conexionActiva).FindById("9900000"));
+            }
         }
         //Por ahora, se modifican manualmente, pero se podría implementar un modo de introducir
         //los tipos de gráficos en la ventana de configuración Avanzada
@@ -559,6 +564,18 @@ namespace Elecciones_Europeas
             EscribirConexiones();
             DesplegarCircunscripciones();
             escuchador.IniciarEscuchador(conexionActiva);
+            bool europa = eleccionSeleccionada.Valor == 1;
+            graficos.CambioElecciones(europa);
+            autonomiasListView.SelectedIndex = 0;
+
+            if (eleccionSeleccionada.Valor == 1)
+            {
+                graficosListView.Items.Remove("SEDES");
+            }
+            else
+            {
+                graficosListView.Items.Add("SEDES");
+            }
         }
 
         private void btnAvance1_Click(object sender, RoutedEventArgs e)
@@ -798,7 +815,7 @@ namespace Elecciones_Europeas
                     SedesDTO sede = SedesDTO.FromPartidoDTO(partidoSeleccionado, conexionActiva);
                     await sede.ToCsv();
                 }
-                
+
                 if (graficos.primeActivo.Valor == 1)
                 {
                     if (oficiales) { dto = BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones); }
@@ -1009,8 +1026,11 @@ namespace Elecciones_Europeas
 
         private void graficosListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            AdaptarTablaDatos(graficosListView.SelectedValue.ToString());
-            if (dto != null) { ActualizarInfoInterfaz(dto); }
+            if (graficosListView.SelectedIndex != -1)
+            {
+                AdaptarTablaDatos(graficosListView.SelectedValue.ToString());
+                if (dto != null) { ActualizarInfoInterfaz(dto); }
+            }
         }
         private void AdaptarTablaDatos(string tipoGrafico)
         {

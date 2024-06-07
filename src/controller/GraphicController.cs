@@ -102,8 +102,14 @@ namespace Elecciones_Europeas.src.controller
         public string RecibirPrimerosResultados() { if (ipfActivo.Valor == 1) { return ipf.RecibirPrimerosResultados(); } else { return null; } }
         public string RecibirAnimacionSondeo() { if (ipfActivo.Valor == 1) { return ipf.RecibirPrimerosResultados(); } else { return null; } }
 
+        //PROYECCION
+        public void Proyeccion(bool activa) { if (ipfActivo.Valor == 1) { ipf.Proyeccion(activa); } }
+
         //GIROS
         public void DeSondeoAOficiales() { if (ipfActivo.Valor == 1) { ipf.DeSondeoAOficiales(); } }
+
+        //CAMBIO DE ELECCIONES
+        public void CambioElecciones(bool europa) { if (ipfActivo.Valor == 1) { ipf.CambioElecciones(europa); } }
 
         //RELOJ
         public void EntraReloj() { if (ipfActivo.Valor == 1) { ipf.RelojEntra(); } }
@@ -132,6 +138,18 @@ namespace Elecciones_Europeas.src.controller
 
         public void TickerFotosEntra() { if (ipfActivo.Valor == 1) { ipf.TickerFotosEntra(); } }
         public void TickerFotosSale() { if (ipfActivo.Valor == 1) { ipf.TickerFotosSale(); } }
+
+        //PP_PSOE
+        public void PP_PSOEEntra() { if (ipfActivo.Valor == 1) { ipf.PP_PSOEEntra(); } }
+        public void PP_PSOESale() { if (ipfActivo.Valor == 1) { ipf.PP_PSOESale(); } }
+
+        public void PP_PSOEaGenerales() { if (ipfActivo.Valor == 1) { ipf.PP_PSOEaGenerales(); } }
+        public void PP_PSOEaEuropeas() { if (ipfActivo.Valor == 1) { ipf.PP_PSOEaEuropeas(); } }
+
+        //DESPLIEGAS
+        public void Despliega4() { if (ipfActivo.Valor == 1) { ipf.Despliega4(); } }
+        public void Despliega5() { if (ipfActivo.Valor == 1) { ipf.Despliega5(); } }
+        public void RecuperaTodos() { if (ipfActivo.Valor == 1) { ipf.RecuperaTodos(); } }
 
         //PACTOS
         public void pactosEntra() { if (ipfActivo.Valor == 1) { ipf.pactosEntra(); } }

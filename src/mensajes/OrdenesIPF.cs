@@ -53,8 +53,14 @@ namespace Elecciones_Europeas.src.mensajes
         public string RecibirPrimerosResultados() { return c.RecibirMensaje(builder.RecibirPrimerosResultados()); }
         public string RecibirAnimacionSondeo() { return c.RecibirMensaje(builder.RecibirAnimacionSondeo()); }
 
+        //PROYECCION
+        public void Proyeccion(bool activo) { c.EnviarMensaje(builder.Proyeccion(activo)); }
+
         //GIROS
         public void DeSondeoAOficiales() { c.EnviarMensaje(builder.DeSondeoAOficiales()); }
+
+        //CAMBIO DE ELECCIONES
+        public void CambioElecciones(bool europa) { c.EnviarMensaje(builder.CambioElecciones(europa)); }
 
         //TIMER
         public void RelojEntra() { c.EnviarMensaje(builder.EntraReloj()); }
@@ -83,6 +89,18 @@ namespace Elecciones_Europeas.src.mensajes
 
         public void TickerFotosEntra() { c.EnviarMensaje(builder.TickerFotosEntra()); }
         public void TickerFotosSale() { c.EnviarMensaje(builder.TickerFotosSale()); }
+
+        //PP_PSOE
+        public void PP_PSOEEntra() { c.EnviarMensaje(builder.PP_PSOEEntra()); }
+        public void PP_PSOESale() { c.EnviarMensaje(builder.PP_PSOESale()); }
+
+        public void PP_PSOEaGenerales() { c.EnviarMensaje(builder.PP_PSOEaGenerales()); }
+        public void PP_PSOEaEuropeas() { c.EnviarMensaje(builder.PP_PSOEaEuropeas()); }
+
+        //DESPLIEGAS
+        public void Despliega4() { c.EnviarMensaje(builder.Despliega4()); }
+        public void Despliega5() { c.EnviarMensaje(builder.Despliega5()); }
+        public void RecuperaTodos() { c.EnviarMensaje(builder.RecuperaTodos()); }
 
         //PACTOS
         public void pactosEntra() { c.EnviarMensaje(builder.pactosEntra()); }

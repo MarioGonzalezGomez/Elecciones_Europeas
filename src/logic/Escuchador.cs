@@ -1,8 +1,10 @@
 ﻿using Elecciones_Europeas.src.controller;
 using Elecciones_Europeas.src.model.IPF;
+using MaterialDesignThemes.Wpf.Transitions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Printing.IndexedProperties;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -41,7 +43,8 @@ namespace Elecciones_Europeas.src.logic
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"El escuchador ha sufrido un error, es posible que no se detecten los cambios en vivo \n{ex}", "Error BDD", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Console.WriteLine($"El escuchador ha sufrido un error, es posible que no se detecten los cambios en vivo \n{ex}");
+                   // MessageBox.Show($"El escuchador ha sufrido un error, es posible que no se detecten los cambios en vivo \n{ex}", "Error BDD", MessageBoxButton.OK, MessageBoxImage.Error);
                     break;
                 }
 

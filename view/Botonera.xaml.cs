@@ -39,7 +39,7 @@ namespace Elecciones_Europeas
             InitializeVariables();
             AdaptarEntorno();
             AdaptarColores();
-           // AdaptarChecks();
+            // AdaptarChecks();
         }
 
         private void InitializeVariables()
@@ -128,6 +128,15 @@ namespace Elecciones_Europeas
             if (gController != null && gController.ipfActivo.Valor == 1) { gController.AnimacionSondeo(false); }
         }
 
+        private void ProyeccionCheck_Checked(object sender, RoutedEventArgs e)
+        {
+            if (gController != null && gController.ipfActivo.Valor == 1) { gController.Proyeccion(true); }
+        }
+        private void ProyeccionCheck_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (gController != null && gController.ipfActivo.Valor == 1) { gController.Proyeccion(false); }
+        }
+
         private void DespliegaButton_Click(object sender, RoutedEventArgs e)
         {
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
@@ -169,129 +178,6 @@ namespace Elecciones_Europeas
             }
         }
 
-        private void EntraTimerButton_Click(object sender, RoutedEventArgs e)
-        {
-            gController.EntraReloj();
-        }
-        private void SaleTimerButton_Click(object sender, RoutedEventArgs e)
-        {
-            gController.SaleReloj();
-
-        }
-        private void PararTimerButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (relojPausado)
-            {
-                //Accion de continuar el reloj
-                relojPausado = false;
-                PararTimerButton.Content = "PAUSAR";
-            }
-            else
-            {
-                //Accion de pausar el reloj
-                relojPausado = true;
-                PararTimerButton.Content = "CONTINUAR";
-            }
-        }
-
-        private void EntraVideoButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            var partido = mainWindow.datosListView.SelectedItem as CPDataDTO;
-            if (partido != null)
-            {
-                //   gController.EsDirecto(oficial, false, partido.codigo);
-                //   gController.EntraVideo(partido.codigo);
-            }
-            else
-            {
-                MessageBox.Show($"Debes seleccionar un partido para desplegar su video vivo", "Seleccionar Partido", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-        private void SaleVideoButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            var partido = mainWindow.datosListView.SelectedItem as CPDataDTO;
-            //  if (partido != null) { gController.SaleVideo(partido.codigo); }
-        }
-        private void EntraDirectoButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            var partido = mainWindow.datosListView.SelectedItem as CPDataDTO;
-            if (partido != null)
-            {
-                //   gController.EsDirecto(oficial, true, partido.codigo);
-                //   gController.EntraVideo(partido.codigo);
-            }
-            else
-            {
-                MessageBox.Show($"Debes seleccionar un partido para desplegar su directo", "Seleccionar Partido", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
-        }
-        private void SaleDirectoButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            var partido = mainWindow.datosListView.SelectedItem as CPDataDTO;
-            //  if (partido != null) { gController.SaleVideo(partido.codigo); }
-        }
-
-        private void EsVideoButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            var partido = mainWindow.datosListView.SelectedItem as CPDataDTO;
-            if (partido != null)
-            {
-                if (!string.IsNullOrEmpty(VideoTextBox.Text) && VideoTextBox.Text != "*")
-                {
-                    //    gController.CambiaRuta(partido.codigo, $"{partido.siglas}{VideoTextBox.Text}");
-                    VideoTextBox.Text = "*";
-                }
-                //  gController.EsDirecto(oficial, false, partido.codigo);
-            }
-            else { MessageBox.Show($"Debes seleccionar un partido para asignarle su video vivo", "Seleccionar Partido", MessageBoxButton.OK, MessageBoxImage.Error); }
-        }
-        private void EsDirectoButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            var partido = mainWindow.datosListView.SelectedItem as CPDataDTO;
-            //  if (partido != null) { gController.EsDirecto(oficial, true, partido.codigo); }
-            //  else { MessageBox.Show($"Debes seleccionar un partido para asignarle su video vivo", "Seleccionar Partido", MessageBoxButton.OK, MessageBoxImage.Error); }
-        }
-        private void EntraTodosButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            var partidos = mainWindow.datosListView.SelectedItems;
-            if (partidos != null)
-            {
-                foreach (var p in partidos)
-                {
-                    CPDataDTO data = p as CPDataDTO;
-                    //  gController.EntraVideo(data.codigo);
-                }
-            }
-            else { MessageBox.Show($"Debes seleccionar almenos un partido para desplegar su video vivo", "Seleccionar Partido", MessageBoxButton.OK, MessageBoxImage.Error); }
-        }
-        private void SaleTodosButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            var partidos = mainWindow.datosListView.SelectedItems as List<CPDataDTO>;
-            if (partidos != null)
-            {
-                foreach (var p in partidos)
-                {
-                    CPDataDTO data = p as CPDataDTO;
-                    // gController.SaleVideo(data.codigo);
-                }
-            }
-            else { MessageBox.Show($"Debes seleccionar almenos un partido para replegar su video vivo", "Seleccionar Partido", MessageBoxButton.OK, MessageBoxImage.Error); }
-        }
-
-        private void VideoTextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            VideoTextBox.Text = "";
-        }
-
         private void EntraMillonesButton_Click(object sender, RoutedEventArgs e)
         {
             if (oficial)
@@ -321,14 +207,35 @@ namespace Elecciones_Europeas
 
         }
 
-        private void EntraFotosButton_Click(object sender, RoutedEventArgs e)
+        private void EntraPP_PSOEButton_Click(object sender, RoutedEventArgs e)
         {
-            gController.TickerFotosEntra();
+            gController.PP_PSOEEntra();
+        }
+        private void SalePP_PSOEButton_Click(object sender, RoutedEventArgs e)
+        {
+            gController.PP_PSOESale();
+        }
+        private void EspaniaPP_PSOEButton_Click(object sender, RoutedEventArgs e)
+        {
+            gController.PP_PSOEaGenerales();
+        }
+        private void EuropaPP_PSOEButton_Click(object sender, RoutedEventArgs e)
+        {
+            gController.PP_PSOEaEuropeas();
         }
 
-        private void SaleFotosButton_Click(object sender, RoutedEventArgs e)
+        private void Despliega4Button_Click(object sender, RoutedEventArgs e)
         {
-            gController.TickerFotosSale();
+            gController.Despliega4();
         }
+        private void Despliega5Button_Click(object sender, RoutedEventArgs e)
+        {
+            gController.Despliega5();
+        }
+        private void RecuperaTodosButton_Click(object sender, RoutedEventArgs e)
+        {
+            gController.RecuperaTodos();
+        }
+
     }
 }

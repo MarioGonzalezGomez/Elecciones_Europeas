@@ -47,8 +47,14 @@ namespace Elecciones_Europeas.src.mensajes.builders
         public string RecibirPrimerosResultados() { return EventBuild("PRIMEROS", "MAP_INT_PAR", 3); }
         public string RecibirAnimacionSondeo() { return EventBuild("SONDEO", "MAP_INT_PAR", 3); }
 
+        //PROYECCION
+        public string Proyeccion(bool activo) { return activo ? EventBuild("TICKER/PROYECCION", "MAP_INT_PAR", "1", 1) : EventBuild("TICKER/PROYECCION", "MAP_INT_PAR", "0", 1); }
+
         //GIROS
         public string DeSondeoAOficiales() { return EventRunBuild("SONDEOaOFICIALES"); }
+
+        //CAMBIO DE ELECCIONES
+        public string CambioElecciones(bool europa) { return europa ? EventBuild("TICKER/EUROPA", "MAP_INT_PAR", "1", 1) : EventBuild("TICKER/EUROPA", "MAP_INT_PAR", "0", 1); }
 
         //RELOJ
         public string EntraReloj() { return EventRunBuild("EntraReloj"); }
@@ -98,6 +104,19 @@ namespace Elecciones_Europeas.src.mensajes.builders
 
         public string TickerFotosEntra() { return EventRunBuild("TICKER/FOTOS/ENTRA"); }
         public string TickerFotosSale() { return EventRunBuild("TICKER/FOTOS/SALE"); }
+
+        //PP_PSOE
+        public string PP_PSOEEntra() { return Entra("TICKER/PP_PSOE"); }
+        public string PP_PSOESale() { return Sale("TICKER/PP_PSOE"); }
+
+        public string PP_PSOEaGenerales() { return EventRunBuild("TICKER/PP_PSOE/A_GENERALES"); }
+        public string PP_PSOEaEuropeas() { return EventRunBuild("TICKER/PP_PSOE/A_EUROPEAS"); }
+
+        //DESPLIEGAS
+        public string Despliega4() { return EventRunBuild("TICKER/DESPLIEGA_4"); }
+        public string Despliega5() { return EventRunBuild("TICKER/DESPLIEGA_5"); }
+
+        public string RecuperaTodos() { return EventRunBuild("TICKER/RECUPERO_TODOS"); }
 
         //PACTOMETRO
         public string pactosEntra() { return Entra("PACTOMETRO"); }

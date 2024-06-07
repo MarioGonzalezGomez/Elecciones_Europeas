@@ -12,7 +12,7 @@ namespace Elecciones_Europeas.src.repository
     {
         public static CPRepository? instance;
 
-        private static ConexionEntityFramework? _con;
+        private static ConexionEntityFramework _con;
 
         private CPRepository(ConexionEntityFramework con)
         {

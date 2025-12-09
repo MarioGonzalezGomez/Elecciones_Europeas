@@ -51,7 +51,7 @@ namespace Elecciones_Europeas.src.model.DTO.BrainStormDTO
                 dto.numVotantesHistoricos = cp.numVotantesHist;
                 dto.independentismo = partido.independentismo.ToString();
 
-                int dif = cp.escaniosHastaHist == 0 ? 0 : dto.escaniosHasta - cp.escaniosHastaHist;
+                int dif = cp.escaniosHastaHist == 0 ? dto.escaniosHasta : dto.escaniosHasta - cp.escaniosHastaHist;
                 dto.diferenciaEscanios = int.Abs(dif);
                 string tendencia = cp.escaniosHastaHist == 0 ? "*" :
                        dif > 0 ? "+" :

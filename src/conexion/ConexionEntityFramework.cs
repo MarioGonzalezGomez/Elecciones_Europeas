@@ -33,7 +33,7 @@ namespace Elecciones_Europeas.src.conexion
             _database = configuration.GetValue("dataDB1");
             _user = configuration.GetValue("user");
             _pass = configuration.GetValue("password");
-            this.main = (MainWindow)Application.Current.MainWindow;
+            this.main = Application.Current.MainWindow as MainWindow;
         }
         //Constructor por defecto a Principal y DB1
         public ConexionEntityFramework()
@@ -46,7 +46,7 @@ namespace Elecciones_Europeas.src.conexion
             _database = configuration.GetValue("dataDB1");
             _user = configuration.GetValue("user");
             _pass = configuration.GetValue("password");
-            this.main = (MainWindow)Application.Current.MainWindow;
+            this.main = Application.Current.MainWindow as MainWindow;
         }
         //1:Principal 2:Reserva 3:Local
         public ConexionEntityFramework(int tipoConexion, MainWindow mainWindow)
@@ -92,7 +92,7 @@ namespace Elecciones_Europeas.src.conexion
             };
             _user = configuration.GetValue("user");
             _pass = configuration.GetValue("password");
-            this.main = (MainWindow)Application.Current.MainWindow;
+            this.main = Application.Current.MainWindow as MainWindow;
         }
 
         public virtual DbSet<Partido> Partidos { get; set; }
@@ -188,7 +188,7 @@ namespace Elecciones_Europeas.src.conexion
 
             try
             {
-                connectionServer = $"server ={_server}";
+                connectionServer = $"server={_server}";
                 TestConnection(connectionServer + connectionEnd);
             }
             catch (Exception exMain)
@@ -199,20 +199,20 @@ namespace Elecciones_Europeas.src.conexion
                     if (_tipoConexion != 1)
                     {
                         _server = configuration.GetValue("dataServer");
-                        connectionServer = $"server ={_server}";
+                        connectionServer = $"server={_server}";
                         TestConnection(connectionServer + connectionEnd);
                         _tipoConexion = 1;
                         configuration.SetValue("conexionDefault1", "1");
-                        main.EscribirConexiones();
+                        main?.EscribirConexiones();
                     }
                     else
                     {
                         _server = configuration.GetValue("dataServerBackup");
-                        connectionServer = $"server ={_server}";
+                        connectionServer = $"server={_server}";
                         TestConnection(connectionServer + connectionEnd);
                         _tipoConexion = 2;
                         configuration.SetValue("conexionDefault1", "2");
-                        main.EscribirConexiones();
+                        main?.EscribirConexiones();
                     }
 
                 }
@@ -224,20 +224,20 @@ namespace Elecciones_Europeas.src.conexion
                         if (_tipoConexion == 3)
                         {
                             _server = configuration.GetValue("dataServerBackup");
-                            connectionServer = $"server ={_server}";
+                            connectionServer = $"server={_server}";
                             TestConnection(connectionServer + connectionEnd);
                             _tipoConexion = 2;
                             configuration.SetValue("conexionDefault1", "2");
-                            main.EscribirConexiones();
+                            main?.EscribirConexiones();
                         }
                         else
                         {
                             _server = "127.0.0.1";
-                            connectionServer = $"server ={_server}";
+                            connectionServer = $"server={_server}";
                             TestConnection(connectionServer + connectionEnd);
                             _tipoConexion = 3;
                             configuration.SetValue("conexionDefault1", "3");
-                            main.EscribirConexiones();
+                            main?.EscribirConexiones();
                         }
                     }
                     catch (Exception exLocal)

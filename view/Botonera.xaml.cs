@@ -1,4 +1,4 @@
-ï»¿using Elecciones_Europeas.src.controller;
+using Elecciones_Europeas.src.controller;
 using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
 using Elecciones_Europeas.src.model.IPF.DTO;
 using Elecciones_Europeas.src.utils;
@@ -44,8 +44,8 @@ namespace Elecciones_Europeas
 
         private void InitializeVariables()
         {
-            var window = (MainWindow)Application.Current.MainWindow;
-            oficial = window.oficiales;
+            var window = Application.Current.MainWindow as MainWindow;
+            oficial = window?.oficiales ?? false;
             gController = GraphicController.GetInstance();
             configuration = ConfigManager.GetInstance();
             configuration.ReadConfig();
@@ -54,14 +54,14 @@ namespace Elecciones_Europeas
 
         public void AdaptarEntorno()
         {
-            var window = (MainWindow)Application.Current.MainWindow;
-            oficial = window.oficiales;
+            var window = Application.Current.MainWindow as MainWindow;
+            oficial = window?.oficiales ?? false;
             Brush color;
             if (oficial)
             {
                 color = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#cb96f8"));
                 EntraHistButton.Background = color;
-                EntraHistButton.Content = "ENTRA HISTÃ“RICO";
+                EntraHistButton.Content = "ENTRA HISTÓRICO";
                 // EntraMillonesButton.Visibility = Visibility.Visible;
                 // EntraEscanosButton.Visibility = Visibility.Visible;
             }
@@ -139,7 +139,7 @@ namespace Elecciones_Europeas
 
         private void DespliegaButton_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
             var partido = mainWindow.datosListView.SelectedItem as CPDataDTO;
             if (partido != null)
             {
@@ -160,12 +160,12 @@ namespace Elecciones_Europeas
             }
             else
             {
-                MessageBox.Show($"No hay ningÃºn partido desplegado", "AcciÃ³n no permitida", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"No hay ningún partido desplegado", "Acción no permitida", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         private void EncadenaButton_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
             var partido = mainWindow.datosListView.SelectedItem as CPDataDTO;
             if (partido != null && partidoDesplegado != null)
             {
@@ -191,7 +191,7 @@ namespace Elecciones_Europeas
         private void EntraPVotoButton_Click(object sender, RoutedEventArgs e)
         {
             gController.TickerVotosEntra(oficial);
-            // MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            // MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
             // var desplegado = mainWindow.desplegado;
         }
         private void EntraHistButton_Click(object sender, RoutedEventArgs e)
@@ -239,3 +239,5 @@ namespace Elecciones_Europeas
 
     }
 }
+
+

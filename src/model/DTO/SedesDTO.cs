@@ -88,13 +88,20 @@ namespace Elecciones_Europeas.src.model.IPF.DTO
         {
             SedesDTO dto = new SedesDTO();
             ConfigManager cm = ConfigManager.GetInstance();
-            string codigoRegional = cm.GetValue("codigoRegional") + pdto.codigo.Substring(2);
+            string codigoRegional = pdto.codigo;
             Partido partido = PartidoController.GetInstance(con).FindById(codigoRegional);
             dto.codigo = pdto.codigo;
-            dto.padre = partido.codigoPadre;
-            dto.siglas = partido.siglas;
-            dto.literalPartido = partido.nombre;
-            dto.candidato = partido.candidato;
+            if (partido != null)
+            {
+                dto.padre = partido.codigoPadre;
+                dto.siglas = partido.siglas;
+                dto.literalPartido = partido.nombre;
+                dto.candidato = partido.candidato;
+            }
+            else
+            {
+                dto.padre = pdto.codigo;
+            }
             dto.escaniosDesde = pdto.escaniosDesde;
             dto.escaniosHasta = pdto.escaniosHasta;
             dto.escaniosHistoricos = pdto.escaniosHistoricos;

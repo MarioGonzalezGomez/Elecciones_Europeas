@@ -113,8 +113,8 @@ namespace Elecciones_Europeas.src.mensajes.builders
         public string PP_PSOEaEuropeas() { return EventRunBuild("TICKER/PP_PSOE/A_EUROPEAS"); }
 
         //DESPLIEGAS
-        public string Despliega4() { return EventRunBuild("TICKER/DESPLIEGA_4"); }
-        public string Despliega5() { return EventRunBuild("TICKER/DESPLIEGA_5"); }
+        public string Despliega4() { return EventRunBuild("TICKER/DESPLIEGO_4"); }
+        public string Despliega5() { return EventRunBuild("TICKER/DESPLIEGO_5"); }
 
         public string RecuperaTodos() { return EventRunBuild("TICKER/RECUPERO_TODOS"); }
 

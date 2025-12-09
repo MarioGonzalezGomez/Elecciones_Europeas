@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Elecciones_Europeas.src.service;
 
 namespace Elecciones_Europeas.src.conexion
 {
@@ -18,11 +19,16 @@ namespace Elecciones_Europeas.src.conexion
         private Socket client;
         private string _ip;
         private int _port;
+        public bool conectado = false;
 
         ConfigManager configuration;
+        private INotificationService _notificationService;
+        private ILoggerService _loggerService;
 
         private ConexionGraficos(string programaGrafico)
         {
+            _notificationService = NotificationService.GetInstance();
+            _loggerService = FileLoggerService.GetInstance();
             configuration = ConfigManager.GetInstance();
             if (String.Equals(programaGrafico, "prime", StringComparison.OrdinalIgnoreCase))
             {
@@ -38,6 +44,8 @@ namespace Elecciones_Europeas.src.conexion
         }
         private ConexionGraficos(string ip, int port)
         {
+            _notificationService = NotificationService.GetInstance();
+            _loggerService = FileLoggerService.GetInstance();
             configuration = ConfigManager.GetInstance();
             _ip = ip;
             _port = port;
@@ -78,22 +86,27 @@ namespace Elecciones_Europeas.src.conexion
             {
                 client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 client.Connect(_ip, _port);
+                conectado = true;
             }
             catch (Exception ex)
             {
+                _loggerService.LogError($"Error connecting to {programaGrafico} at {_ip}:{_port}", ex);
                 if (String.Equals(programaGrafico, "prime", StringComparison.OrdinalIgnoreCase))
                 {
-                    MessageBox.Show($"Error al conectar con PRIME en la IP: {_ip}", "Error de conexión Prime", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _notificationService.ShowError($"Error al conectar con PRIME en la IP: {_ip}", "Error de conexión Prime");
                     configuration.SetValue("activoPrime", "0");
+                    conectado = false;
                 }
                 else if (String.Equals(programaGrafico, "ipf", StringComparison.OrdinalIgnoreCase))
                 {
-                    MessageBox.Show($"Error al conectar con BRAINSTORM en la IP: {_ip}", "Error de conexión Brainstorm", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _notificationService.ShowError($"Error al conectar con BRAINSTORM en la IP: {_ip}", "Error de conexión Brainstorm");
                     configuration.SetValue("activoIPF", "0");
+                    conectado = false;
                 }
                 else
                 {
-                    MessageBox.Show($"Error al conectar con el programa gráfico en la IP: {_ip}", "Error de conexión", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _notificationService.ShowError($"Error al conectar con el programa gráfico en la IP: {_ip}", "Error de conexión");
+                    conectado = false;
                 }
 
             }
@@ -123,19 +136,21 @@ namespace Elecciones_Europeas.src.conexion
             }
             catch (SocketException ex)
             {
+                _loggerService.LogError("SocketException in RecibirMensaje", ex);
                 if (ex.SocketErrorCode == SocketError.TimedOut)
                 {
-                    MessageBox.Show("Se agotó el tiempo de espera al recibir datos.", "Error de tiempo de espera", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _notificationService.ShowError("Se agotó el tiempo de espera al recibir datos.", "Error de tiempo de espera");
                 }
                 else
                 {
-                    MessageBox.Show($"Error al recibir mensaje itemget desde IPF: {ex.Message}", "Error Itemget", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _notificationService.ShowError($"Error al recibir mensaje itemget desde IPF: {ex.Message}", "Error Itemget");
                 }
                 return null;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al recibir mensaje itemget desde IPF: {ex}", "Error Itemget", MessageBoxButton.OK, MessageBoxImage.Error);
+                _loggerService.LogError("Exception in RecibirMensaje", ex);
+                _notificationService.ShowError($"Error al recibir mensaje itemget desde IPF: {ex}", "Error Itemget");
                 return null;
             }
         }

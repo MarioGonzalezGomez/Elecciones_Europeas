@@ -1,4 +1,4 @@
-﻿using Elecciones_Europeas.src.controller;
+using Elecciones_Europeas.src.controller;
 using Elecciones_Europeas.src.logic;
 using Elecciones_Europeas.src.model;
 using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
@@ -63,7 +63,7 @@ namespace Elecciones_Europeas
 
         private void InitializeVariables()
         {
-            var main = (MainWindow)Application.Current.MainWindow;
+            var main = Application.Current.MainWindow as MainWindow;
             independentismo = main.graficosListView.SelectedItem != null && string.Equals(main.graficosListView.SelectedValue, "INDEPENDENTISMO");
             totalIzq = 0;
             totalDer = 0;
@@ -81,9 +81,9 @@ namespace Elecciones_Europeas
         private void InitializeInfo()
         {
             lblCircunscripcion.Content = dto.circunscripcionDTO.nombre;
-            lblMayoria.Content = $"Mayoría absoluta: {mayoriaAbsoluta}";
-            lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq}%" : $"Total escaños: {totalIzq}";
-            lblEscaniosDer.Content = independentismo ? $"Total: {totalDer}%" : $"Total escaños: {totalDer}";
+            lblMayoria.Content = $"Mayor�a absoluta: {mayoriaAbsoluta}";
+            lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq}%" : $"Total esca�os: {totalIzq}";
+            lblEscaniosDer.Content = independentismo ? $"Total: {totalDer}%" : $"Total esca�os: {totalDer}";
             CargarPartidos();
             partidosIzqListView.ItemsSource = partidosDisponibles;
             partidosDerListView.ItemsSource = partidosDisponibles;
@@ -95,24 +95,24 @@ namespace Elecciones_Europeas
         {
             if (oficiales)
             {
-                escDesdeIzq.Header = "ESCAÑOS";
+                escDesdeIzq.Header = "ESCA�OS";
                 Binding binding1 = new Binding("escaniosHasta");
                 escDesdeIzq.DisplayMemberBinding = binding1;
                 escHastaIzq.Header = "% VOTO";
                 Binding binding2 = new Binding("porcentajeVoto");
                 escHastaIzq.DisplayMemberBinding = binding2;
 
-                escDesdeDentroIzq.Header = "ESCAÑOS";
+                escDesdeDentroIzq.Header = "ESCA�OS";
                 escDesdeDentroIzq.DisplayMemberBinding = binding1;
                 escHastaDentroIzq.Header = "% VOTO";
                 escHastaDentroIzq.DisplayMemberBinding = binding2;
 
-                escDesdeDentroDer.Header = "ESCAÑOS";
+                escDesdeDentroDer.Header = "ESCA�OS";
                 escDesdeDentroDer.DisplayMemberBinding = binding1;
                 escHastaDentroDer.Header = "% VOTO";
                 escHastaDentroDer.DisplayMemberBinding = binding2;
 
-                escDesdeDer.Header = "ESCAÑOS";
+                escDesdeDer.Header = "ESCA�OS";
                 escDesdeDer.DisplayMemberBinding = binding1;
                 escHastaDer.Header = "% VOTO";
                 escHastaDer.DisplayMemberBinding = binding2;
@@ -183,7 +183,7 @@ namespace Elecciones_Europeas
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalIzq += independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total escaños: {totalIzq}";
+                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total esca�os: {totalIzq}";
                 preparado = false;
                 //Mandar mensaje de despliegue individualizado IZQ
                 int index = partidosTotales.IndexOf(seleccionado);
@@ -200,7 +200,7 @@ namespace Elecciones_Europeas
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalIzq += independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total escaños: {totalIzq}";
+                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total esca�os: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado IZQ
                 int index = partidosTotales.IndexOf(seleccionado);
                 if (independentismo) { graficos.independentismoEntraIzquierda(index); } else { graficos.pactosEntraIzquierda(index); }
@@ -214,7 +214,7 @@ namespace Elecciones_Europeas
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalDer += independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total escaños: {totalDer}";
+                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total esca�os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 if (independentismo) { graficos.independentismoEntraDerecha(index); } else { graficos.pactosEntraDerecha(index); }
@@ -229,7 +229,7 @@ namespace Elecciones_Europeas
                 partidosDentroIzq.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalIzq -= independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total escaños: {totalIzq}";
+                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total esca�os: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 if (independentismo) { graficos.independentismoSaleIzquierda(index); } else { graficos.pactosSaleIzquierda(index); }
@@ -244,7 +244,7 @@ namespace Elecciones_Europeas
                 partidosDentroDer.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalDer -= independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total escaños: {totalDer}";
+                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total esca�os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 if (independentismo) { graficos.independentismoSaleDerecha(index); } else { graficos.pactosSaleDerecha(index); }
@@ -275,7 +275,7 @@ namespace Elecciones_Europeas
                 partidosDentroIzq.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalIzq -= independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total escaños: {totalIzq}";
+                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total esca�os: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 if (independentismo) { graficos.independentismoSaleIzquierda(index); } else { graficos.pactosSaleIzquierda(index); }
@@ -324,7 +324,7 @@ namespace Elecciones_Europeas
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalDer += independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total escaños: {totalDer}";
+                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total esca�os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 if (independentismo) { graficos.independentismoEntraDerecha(index); } else { graficos.pactosEntraDerecha(index); }
@@ -347,7 +347,7 @@ namespace Elecciones_Europeas
                 partidosDentroDer.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalDer -= independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total escaños: {totalDer}";
+                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total esca�os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 if (independentismo) { graficos.independentismoSaleDerecha(index); } else { graficos.pactosSaleDerecha(index); }
@@ -363,8 +363,8 @@ namespace Elecciones_Europeas
             CargarPartidos();
             totalIzq = 0;
             totalDer = 0;
-            lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq}%" : $"Total escaños: {totalIzq}";
-            lblEscaniosDer.Content = independentismo ? $"Total: {totalDer}%" : $"Total escaños: {totalDer}";
+            lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq}%" : $"Total esca�os: {totalIzq}";
+            lblEscaniosDer.Content = independentismo ? $"Total: {totalDer}%" : $"Total esca�os: {totalDer}";
 
             if (independentismo) { graficos.independentismoReinicio(); } else { graficos.pactosReinicio(); }
 
@@ -389,7 +389,7 @@ namespace Elecciones_Europeas
         {
             graficos.pactosSale();
             pactoDentro = false;
-            var main = (MainWindow)Application.Current.MainWindow;
+            var main = Application.Current.MainWindow as MainWindow;
             main.Update();
 
         }
@@ -411,7 +411,7 @@ namespace Elecciones_Europeas
 
         private void WindowClosing(object? sender, CancelEventArgs e)
         {
-            var window = (MainWindow)Application.Current.MainWindow;
+            var window = Application.Current.MainWindow as MainWindow;
             window.pactos = null;
         }
 
@@ -419,3 +419,4 @@ namespace Elecciones_Europeas
     }
 
 }
+

@@ -1,0 +1,104 @@
+<Window x:Class="Elecciones_Europeas.SplashWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Elecciones Europeas" 
+        Height="300" 
+        Width="500"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="True"
+        Background="Transparent">
+    
+    <Window.Resources>
+        <Style x:Key="SpinnerStyle" TargetType="Ellipse">
+            <Setter Property="Fill" Value="#2196F3"/>
+            <Setter Property="Width" Value="15"/>
+            <Setter Property="Height" Value="15"/>
+            <Setter Property="Margin" Value="5"/>
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard RepeatBehavior="Forever">
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                           From="1" To="0.3" Duration="0:0:0.8"
+                                           AutoReverse="True"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
+    <Border Background="#1E1E2E" 
+            CornerRadius="10"
+            BorderBrush="#4A90E2"
+            BorderThickness="2">
+        <Border.Effect>
+            <DropShadowEffect ShadowDepth="0" BlurRadius="20" Opacity="0.5" Color="#4A90E2"/>
+        </Border.Effect>
+        
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Logo/Title Area -->
+            <StackPanel Grid.Row="0" 
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Center">
+                <TextBlock Text="Elecciones TRD"
+                          FontSize="32"
+                          FontWeight="Bold"
+                          Foreground="White"
+                          HorizontalAlignment="Center"
+                          Margin="0,0,0,10"/>
+                <TextBlock Text="Iniciando aplicación..."
+                          FontSize="16"
+                          Foreground="#B0B0B0"
+                          HorizontalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Progress Indicator -->
+            <StackPanel Grid.Row="1" 
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Orientation="Horizontal">
+                <Ellipse Style="{StaticResource SpinnerStyle}">
+                    <Ellipse.RenderTransform>
+                        <RotateTransform Angle="0" CenterX="7.5" CenterY="7.5"/>
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+                <Ellipse Style="{StaticResource SpinnerStyle}">
+                    <Ellipse.RenderTransform>
+                        <RotateTransform Angle="45" CenterX="7.5" CenterY="7.5"/>
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+                <Ellipse Style="{StaticResource SpinnerStyle}">
+                    <Ellipse.RenderTransform>
+                        <RotateTransform Angle="90" CenterX="7.5" CenterY="7.5"/>
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+                <Ellipse Style="{StaticResource SpinnerStyle}">
+                    <Ellipse.RenderTransform>
+                        <RotateTransform Angle="135" CenterX="7.5" CenterY="7.5"/>
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+            </StackPanel>
+
+            <!-- Status Text -->
+            <TextBlock x:Name="StatusText"
+                      Grid.Row="2"
+                      Text="Conectando a la base de datos..."
+                      FontSize="14"
+                      Foreground="#E0E0E0"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Top"
+                      Margin="20,10,20,20"
+                      TextWrapping="Wrap"
+                      TextAlignment="Center"/>
+        </Grid>
+    </Border>
+</Window>

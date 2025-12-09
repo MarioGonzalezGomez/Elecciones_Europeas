@@ -34,8 +34,8 @@ namespace Elecciones_Europeas.src.logic
 
                     if (!escrutados.SequenceEqual(escrutadosNew))
                     {
-                        MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-                        mainWindow.Update();
+                        MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+                        mainWindow?.Update();
                         circunscripciones = circunscripcionesNew;
                     }
                     await Task.Delay(TimeSpan.FromSeconds(2));

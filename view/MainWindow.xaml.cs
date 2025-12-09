@@ -43,6 +43,7 @@ namespace Elecciones_Europeas
         bool preparado;
         public bool oficiales;
         bool regional;
+        private string autonomiasHeader;
 
         //Escuchador
         public Escuchador escuchador;
@@ -178,13 +179,33 @@ namespace Elecciones_Europeas
         }
         private void CargarCircunscripciones()
         {
-            CCAA = CircunscripcionController.GetInstance(conexionActiva).FindAllAutonomias(conexionActiva.db);
-            
-            // Solo cargar código nacional (9900000) si NO son elecciones autonómicas
-            if (eleccionSeleccionada.Valor == 1 && tipoElecciones != 2)
+            if (tipoElecciones == 1) // Elecciones generales
             {
-                CCAA.Clear();
-                CCAA.Add(CircunscripcionController.GetInstance(conexionActiva).FindById("9900000"));
+                // Cargar todas las autonomías (España ya está incluida al principio por el método FindAllAutonomias)
+                CCAA = CircunscripcionController.GetInstance(conexionActiva).FindAllAutonomias(eleccionSeleccionada.Valor + 1);
+                autonomiasHeader = "AUTONOMÍAS";
+            }
+            else if (tipoElecciones == 2) // Elecciones autonómicas
+            {
+                // Cargar solo la autonomía correspondiente (codigoRegional + 5 ceros)
+                string codigoRegional = configuration.GetValue($"codigoRegionalBD{eleccionSeleccionada.Valor + 1}");
+                string codigoAutonomia = $"{codigoRegional}00000";
+                Circunscripcion autonomia = CircunscripcionController.GetInstance(conexionActiva).FindById(codigoAutonomia);
+                CCAA = new List<Circunscripcion>();
+                if (autonomia != null)
+                {
+                    CCAA.Add(autonomia);
+                }
+                autonomiasHeader = "AUTONOMÍA";
+            }
+        }
+
+        private void ActualizarHeaderAutonomias()
+        {
+            // Buscar el GridViewColumn en el XAML y actualizar su Header
+            if (autonomiasListView.View is GridView gridView && gridView.Columns.Count > 0)
+            {
+                gridView.Columns[0].Header = autonomiasHeader;
             }
         }
         //Por ahora, se modifican manualmente, pero se podría implementar un modo de introducir
@@ -226,6 +247,7 @@ namespace Elecciones_Europeas
                     break;
             }
             autonomiasListView.ItemsSource = CCAA.Select(cir => cir.nombre).ToList();
+            ActualizarHeaderAutonomias();
             circunscripcionesListView.ItemsSource = circunscripcionNames;
             datosListView.ItemsSource = listaDeDatos;
         }
@@ -561,6 +583,7 @@ namespace Elecciones_Europeas
             CCAA.Clear();
             CargarCircunscripciones();
             autonomiasListView.ItemsSource = CCAA.Select(cir => cir.nombre).ToList();
+            ActualizarHeaderAutonomias();
             circunscripcionNames.Clear();
             listaDeDatos.Clear();
             EscribirConexiones();

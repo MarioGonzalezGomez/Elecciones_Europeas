@@ -42,11 +42,28 @@ namespace Elecciones_Europeas.src.utils
             var lines = File.ReadAllLines(path);
             foreach (var line in lines)
             {
-                if (!line.StartsWith('#') && line.Split("=").Length == 2)
+                // Skip empty or whitespace-only lines
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                // Skip comment lines
+                if (line.TrimStart().StartsWith('#'))
+                    continue;
+
+                // Split only once and store result
+                var parts = line.Split('=');
+                
+                // Validate that we have exactly 2 parts (key and value)
+                if (parts.Length == 2)
                 {
-                    var key = line.Split('=')[0].Trim();
-                    var value = line.Split("=")[1].Trim();
-                    config[key] = value;
+                    var key = parts[0].Trim();
+                    var value = parts[1].Trim();
+                    
+                    // Only add if key is not empty
+                    if (!string.IsNullOrWhiteSpace(key))
+                    {
+                        config[key] = value;
+                    }
                 }
             }
             return config;

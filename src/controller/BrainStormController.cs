@@ -46,6 +46,11 @@ namespace Elecciones_Europeas.src.controller
             return instance;
         }
 
+        /// <summary>
+        /// Obtiene los partidos más votados por autonomías (datos oficiales).
+        /// NOTA: Este método es para elecciones NACIONALES únicamente (tipoElecciones != 2).
+        /// Consulta el código nacional 9900000.
+        /// </summary>
         public BrainStormDTO FindMasVotadosAutonomiasOficial(int avanceActual)
         {
             Circunscripcion esp = circunscripcionController.FindById("9900000");
@@ -53,6 +58,11 @@ namespace Elecciones_Europeas.src.controller
             BrainStormDTO dto = new BrainStormDTO(esp, avanceActual, 1, cps, true, _con);
             return dto;
         }
+        /// <summary>
+        /// Obtiene los partidos más votados por autonomías (datos de sondeo).
+        /// NOTA: Este método es para elecciones NACIONALES únicamente (tipoElecciones != 2).
+        /// Consulta el código nacional 9900000.
+        /// </summary>
         public BrainStormDTO FindMasVotadosAutonomiasSondeo(int avanceActual)
         {
             Circunscripcion esp = circunscripcionController.FindById("9900000");
@@ -122,6 +132,11 @@ namespace Elecciones_Europeas.src.controller
             return dto;
         }
 
+        /// <summary>
+        /// Obtiene datos de un partido específico por autonomías (datos oficiales).
+        /// NOTA: Este método es para elecciones NACIONALES únicamente (tipoElecciones != 2).
+        /// Consulta el código nacional 9900000.
+        /// </summary>
         public BrainStormDTO FindPartidoPorAutonomiasOficial(string codPartido, int avanceActual)
         {
             Circunscripcion esp = circunscripcionController.FindById("9900000");
@@ -129,6 +144,11 @@ namespace Elecciones_Europeas.src.controller
             BrainStormDTO dto = new BrainStormDTO(esp, avanceActual, 1, cps, true, _con);
             return dto;
         }
+        /// <summary>
+        /// Obtiene datos de un partido específico por autonomías (datos de sondeo).
+        /// NOTA: Este método es para elecciones NACIONALES únicamente (tipoElecciones != 2).
+        /// Consulta el código nacional 9900000.
+        /// </summary>
         public BrainStormDTO FindPartidoPorAutonomiasSondeo(string codPartido, int avanceActual)
         {
             Circunscripcion esp = circunscripcionController.FindById("9900000");

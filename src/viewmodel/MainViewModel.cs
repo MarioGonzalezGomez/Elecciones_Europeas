@@ -86,7 +86,9 @@ namespace Elecciones_Europeas.src.viewmodel
         private void CargarCircunscripciones()
         {
             CCAA = CircunscripcionController.GetInstance(_conexionActiva).FindAllAutonomias(_conexionActiva.db);
-            if (EleccionSeleccionada.Valor == 1)
+            
+            // Solo cargar código nacional (9900000) si NO son elecciones autonómicas
+            if (EleccionSeleccionada.Valor == 1 && _tipoElecciones != 2)
             {
                 CCAA.Clear();
                 CCAA.Add(CircunscripcionController.GetInstance(_conexionActiva).FindById("9900000"));

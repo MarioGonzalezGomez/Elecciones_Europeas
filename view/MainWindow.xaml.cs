@@ -70,6 +70,11 @@ namespace Elecciones_Europeas
         bool mayoriasDentro;
         bool fichaDentro;
         bool superfaldonDentro;
+        bool sfFichasDentro;
+        bool sfPactometroDentro;
+        bool sfMayoriasDentro;
+        bool sfBipartidismoDentro;
+        bool sfGanadorDentro;
 
         //Estas conexiones serán null si no están activadas por Configuración
         OrdenesIPF? ipf;
@@ -115,6 +120,11 @@ namespace Elecciones_Europeas
             mayoriasDentro = false;
             fichaDentro = false;
             superfaldonDentro = false;
+            sfFichasDentro = false;
+            sfPactometroDentro = false;
+            sfMayoriasDentro = false;
+            sfBipartidismoDentro = false;
+            sfGanadorDentro = false;
             circunscripcionNames = new ObservableCollection<string>();
             listaDeDatos = new ObservableCollection<CPDataDTO>();
             tipoElecciones = int.Parse(configuration.GetValue("tipoElecciones"));
@@ -1099,19 +1109,29 @@ namespace Elecciones_Europeas
                 switch (graficosListView.SelectedValue.ToString())
                 {
                     case "FICHAS":
-
+                        if (sfFichasDentro) { graficos.sfFichasEncadena(); }
+                        else { graficos.sfFichasEntra(); }
+                        sfFichasDentro = true;
                         break;
                     case "PACTÓMETRO":
-
+                        if (sfPactometroDentro) { graficos.sfPactometroEncadena(); }
+                        else { graficos.sfPactometroEntra(); }
+                        sfPactometroDentro = true;
                         break;
                     case "MAYORÍAS":
-
+                        if (sfMayoriasDentro) { graficos.sfMayoriasEncadena(); }
+                        else { graficos.sfMayoriasEntra(); }
+                        sfMayoriasDentro = true;
                         break;
                     case "BIPARTIDISMO":
-
+                        if (sfBipartidismoDentro) { graficos.sfBipartidismoEncadena(); }
+                        else { graficos.sfBipartidismoEntra(); }
+                        sfBipartidismoDentro = true;
                         break;
                     case "GANADOR":
-
+                        if (sfGanadorDentro) { graficos.sfGanadorEncadena(); }
+                        else { graficos.sfGanadorEntra(); }
+                        sfGanadorDentro = true;
                         break;
 
                     default: break;
@@ -1195,26 +1215,29 @@ namespace Elecciones_Europeas
                 switch (graficosListView.SelectedValue.ToString())
                 {
                     case "FICHAS":
-                       
+                        graficos.sfFichasSale();
+                        sfFichasDentro = false;
                         break;
                     case "PACTÓMETRO":
-                       
+                        graficos.sfPactometroSale();
+                        sfPactometroDentro = false;
                         break;
                     case "MAYORÍAS":
-                        
+                        graficos.sfMayoriasSale();
+                        sfMayoriasDentro = false;
                         break;
                     case "BIPARTIDISMO":
-                        
+                        graficos.sfBipartidismoSale();
+                        sfBipartidismoDentro = false;
                         break;
                     case "GANADOR":
-                       
+                        graficos.sfGanadorSale();
+                        sfGanadorDentro = false;
                         break;
 
                     default: break;
                 }
             }
-            // graficosListView.Items.Add("PACTÓMETRO");
-            // graficosListView.Items.Add("SUPERFALDÓN");
         }
 
         //LOGICA DE CIERRE DE VENTANA

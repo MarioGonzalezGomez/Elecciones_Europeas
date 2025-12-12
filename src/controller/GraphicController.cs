@@ -215,5 +215,30 @@ namespace Elecciones_Europeas.src.controller
         public void superfaldonSedesEntra() { if (ipfActivo.Valor == 1) { ipf.superfaldonSedesEntra(); } }
         public void superfaldonSedesEncadena() { if (ipfActivo.Valor == 1) { ipf.superfaldonSedesEncadena(); } }
         public void superfaldonSedesSale() { if (ipfActivo.Valor == 1) { ipf.superfaldonSedesSale(); } }
+
+        //SUPERFALDON - FICHAS
+        public void sfFichasEntra() { if (ipfActivo.Valor == 1) { ipf.sfFichasEntra(); } }
+        public void sfFichasEncadena() { if (ipfActivo.Valor == 1) { ipf.sfFichasEncadena(); } }
+        public void sfFichasSale() { if (ipfActivo.Valor == 1) { ipf.sfFichasSale(); } }
+
+        //SUPERFALDON - PACTOMETRO
+        public void sfPactometroEntra() { if (ipfActivo.Valor == 1) { ipf.sfPactometroEntra(); } }
+        public void sfPactometroEncadena() { if (ipfActivo.Valor == 1) { ipf.sfPactometroEncadena(); } }
+        public void sfPactometroSale() { if (ipfActivo.Valor == 1) { ipf.sfPactometroSale(); } }
+
+        //SUPERFALDON - MAYORIAS
+        public void sfMayoriasEntra() { if (ipfActivo.Valor == 1) { ipf.sfMayoriasEntra(); } }
+        public void sfMayoriasEncadena() { if (ipfActivo.Valor == 1) { ipf.sfMayoriasEncadena(); } }
+        public void sfMayoriasSale() { if (ipfActivo.Valor == 1) { ipf.sfMayoriasSale(); } }
+
+        //SUPERFALDON - BIPARTIDISMO
+        public void sfBipartidismoEntra() { if (ipfActivo.Valor == 1) { ipf.sfBipartidismoEntra(); } }
+        public void sfBipartidismoEncadena() { if (ipfActivo.Valor == 1) { ipf.sfBipartidismoEncadena(); } }
+        public void sfBipartidismoSale() { if (ipfActivo.Valor == 1) { ipf.sfBipartidismoSale(); } }
+
+        //SUPERFALDON - GANADOR
+        public void sfGanadorEntra() { if (ipfActivo.Valor == 1) { ipf.sfGanadorEntra(); } }
+        public void sfGanadorEncadena() { if (ipfActivo.Valor == 1) { ipf.sfGanadorEncadena(); } }
+        public void sfGanadorSale() { if (ipfActivo.Valor == 1) { ipf.sfGanadorSale(); } }
     }
 }

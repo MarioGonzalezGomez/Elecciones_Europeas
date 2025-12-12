@@ -262,6 +262,46 @@ namespace Elecciones_Europeas.src.mensajes.builders
         public string superfaldonSedesEncadena() { return Entra("SEDES/ENCADENA"); }
         public string superfaldonSedesSale() { return Sale("SEDES"); }
 
+        //SUPERFALDON - FICHAS
+        // TODO: Construir señal para entrada del gráfico FICHAS en SUPERFALDÓN
+        public string sfFichasEntra() { return ""; }
+        // TODO: Construir señal para encadenar entre gráficos FICHAS en SUPERFALDÓN
+        public string sfFichasEncadena() { return ""; }
+        // TODO: Construir señal para salida del gráfico FICHAS en SUPERFALDÓN
+        public string sfFichasSale() { return ""; }
+
+        //SUPERFALDON - PACTOMETRO
+        // TODO: Construir señal para entrada del gráfico PACTÓMETRO en SUPERFALDÓN
+        public string sfPactometroEntra() { return ""; }
+        // TODO: Construir señal para encadenar entre gráficos PACTÓMETRO en SUPERFALDÓN
+        public string sfPactometroEncadena() { return ""; }
+        // TODO: Construir señal para salida del gráfico PACTÓMETRO en SUPERFALDÓN
+        public string sfPactometroSale() { return ""; }
+
+        //SUPERFALDON - MAYORIAS
+        // TODO: Construir señal para entrada del gráfico MAYORÍAS en SUPERFALDÓN
+        public string sfMayoriasEntra() { return ""; }
+        // TODO: Construir señal para encadenar entre gráficos MAYORÍAS en SUPERFALDÓN
+        public string sfMayoriasEncadena() { return ""; }
+        // TODO: Construir señal para salida del gráfico MAYORÍAS en SUPERFALDÓN
+        public string sfMayoriasSale() { return ""; }
+
+        //SUPERFALDON - BIPARTIDISMO
+        // TODO: Construir señal para entrada del gráfico BIPARTIDISMO en SUPERFALDÓN
+        public string sfBipartidismoEntra() { return ""; }
+        // TODO: Construir señal para encadenar entre gráficos BIPARTIDISMO en SUPERFALDÓN
+        public string sfBipartidismoEncadena() { return ""; }
+        // TODO: Construir señal para salida del gráfico BIPARTIDISMO en SUPERFALDÓN
+        public string sfBipartidismoSale() { return ""; }
+
+        //SUPERFALDON - GANADOR
+        // TODO: Construir señal para entrada del gráfico GANADOR en SUPERFALDÓN
+        public string sfGanadorEntra() { return ""; }
+        // TODO: Construir señal para encadenar entre gráficos GANADOR en SUPERFALDÓN
+        public string sfGanadorEncadena() { return ""; }
+        // TODO: Construir señal para salida del gráfico GANADOR en SUPERFALDÓN
+        public string sfGanadorSale() { return ""; }
+
 
         //CONSTRUCTORES
 

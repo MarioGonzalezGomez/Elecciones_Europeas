@@ -164,5 +164,30 @@ namespace Elecciones_Europeas.src.mensajes
         public void superfaldonSedesEntra() { c.EnviarMensaje(builder.superfaldonSedesEntra()); }
         public void superfaldonSedesEncadena() { c.EnviarMensaje(builder.superfaldonSedesEncadena()); }
         public void superfaldonSedesSale() { c.EnviarMensaje(builder.superfaldonSedesSale()); }
+
+        //SUPERFALDON - FICHAS
+        public void sfFichasEntra() { c.EnviarMensaje(builder.sfFichasEntra()); }
+        public void sfFichasEncadena() { c.EnviarMensaje(builder.sfFichasEncadena()); }
+        public void sfFichasSale() { c.EnviarMensaje(builder.sfFichasSale()); }
+
+        //SUPERFALDON - PACTOMETRO
+        public void sfPactometroEntra() { c.EnviarMensaje(builder.sfPactometroEntra()); }
+        public void sfPactometroEncadena() { c.EnviarMensaje(builder.sfPactometroEncadena()); }
+        public void sfPactometroSale() { c.EnviarMensaje(builder.sfPactometroSale()); }
+
+        //SUPERFALDON - MAYORIAS
+        public void sfMayoriasEntra() { c.EnviarMensaje(builder.sfMayoriasEntra()); }
+        public void sfMayoriasEncadena() { c.EnviarMensaje(builder.sfMayoriasEncadena()); }
+        public void sfMayoriasSale() { c.EnviarMensaje(builder.sfMayoriasSale()); }
+
+        //SUPERFALDON - BIPARTIDISMO
+        public void sfBipartidismoEntra() { c.EnviarMensaje(builder.sfBipartidismoEntra()); }
+        public void sfBipartidismoEncadena() { c.EnviarMensaje(builder.sfBipartidismoEncadena()); }
+        public void sfBipartidismoSale() { c.EnviarMensaje(builder.sfBipartidismoSale()); }
+
+        //SUPERFALDON - GANADOR
+        public void sfGanadorEntra() { c.EnviarMensaje(builder.sfGanadorEntra()); }
+        public void sfGanadorEncadena() { c.EnviarMensaje(builder.sfGanadorEncadena()); }
+        public void sfGanadorSale() { c.EnviarMensaje(builder.sfGanadorSale()); }
     }
 }

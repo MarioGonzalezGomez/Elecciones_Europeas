@@ -1,4 +1,4 @@
-using Elecciones.src.utils;
+Ôªøusing Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -81,7 +81,7 @@ namespace Elecciones.src.conexion
 
         private void AbrirConexion(string programaGrafico = "")
         {
-            Console.WriteLine("Iniciando conexiÛn...");
+            Console.WriteLine("Iniciando conexi√≥n...");
             try
             {
                 client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -93,19 +93,19 @@ namespace Elecciones.src.conexion
                 _loggerService.LogError($"Error connecting to {programaGrafico} at {_ip}:{_port}", ex);
                 if (String.Equals(programaGrafico, "prime", StringComparison.OrdinalIgnoreCase))
                 {
-                    _notificationService.ShowError($"Error al conectar con PRIME en la IP: {_ip}", "Error de conexiÛn Prime");
+                    _notificationService.ShowError($"Error al conectar con PRIME en la IP: {_ip}", "Error de conexi√≥n Prime");
                     configuration.SetValue("activoPrime", "0");
                     conectado = false;
                 }
                 else if (String.Equals(programaGrafico, "ipf", StringComparison.OrdinalIgnoreCase))
                 {
-                    _notificationService.ShowError($"Error al conectar con BRAINSTORM en la IP: {_ip}", "Error de conexiÛn Brainstorm");
+                    _notificationService.ShowError($"Error al conectar con BRAINSTORM en la IP: {_ip}", "Error de conexi√≥n Brainstorm");
                     configuration.SetValue("activoIPF", "0");
                     conectado = false;
                 }
                 else
                 {
-                    _notificationService.ShowError($"Error al conectar con el programa gr·fico en la IP: {_ip}", "Error de conexiÛn");
+                    _notificationService.ShowError($"Error al conectar con el programa gr√°fico en la IP: {_ip}", "Error de conexi√≥n");
                     conectado = false;
                 }
 
@@ -126,7 +126,7 @@ namespace Elecciones.src.conexion
                 byte[] solicitudBuffer = Encoding.UTF8.GetBytes(solicitud);
                 client.Send(solicitudBuffer);
 
-                // Establecer un tiempo de espera de 5 segundos para la operaciÛn de recepciÛn
+                // Establecer un tiempo de espera de 5 segundos para la operaci√≥n de recepci√≥n
                 client.ReceiveTimeout = 500;
 
                 byte[] receivedBuffer = new byte[1024];
@@ -139,7 +139,7 @@ namespace Elecciones.src.conexion
                 _loggerService.LogError("SocketException in RecibirMensaje", ex);
                 if (ex.SocketErrorCode == SocketError.TimedOut)
                 {
-                    _notificationService.ShowError("Se agotÛ el tiempo de espera al recibir datos.", "Error de tiempo de espera");
+                    _notificationService.ShowError("Se agot√≥ el tiempo de espera al recibir datos.", "Error de tiempo de espera");
                 }
                 else
                 {
@@ -191,8 +191,51 @@ namespace Elecciones.src.conexion
                 client.Close();
                 instance = null;
             }
-
         }
 
+        /// <summary>
+        /// Env√≠a un mensaje puntual a IPF2 (conexi√≥n bajo demanda: abrir -> enviar -> cerrar)
+        /// Usado para se√±ales espec√≠ficas como TickerFotosEntra desde sfFichas
+        /// </summary>
+        public static void EnviarMensajePuntualIPF2(string mensaje)
+        {
+            var config = ConfigManager.GetInstance();
+            var loggerService = FileLoggerService.GetInstance();
+
+            string ip = config.GetValue("ipIPF2");
+            string puertoStr = config.GetValue("puertoIPF2");
+
+            if (string.IsNullOrEmpty(ip) || string.IsNullOrEmpty(puertoStr))
+            {
+                loggerService.LogError("IPF2 configuration missing (ipIPF2 or puertoIPF2)", null);
+                return;
+            }
+
+            try
+            {
+                int port = int.Parse(puertoStr);
+                using var client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                client.Connect(ip, port);
+                client.Send(Encoding.UTF8.GetBytes(mensaje));
+                client.Close();
+                Console.WriteLine($"[IPF2] {mensaje}");
+            }
+            catch (Exception ex)
+            {
+                loggerService.LogError($"Error sending message to IPF2 at {ip}:{puertoStr}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Env√≠a TickerFotosEntra a IPF2 (para superfald√≥n fichas)
+        /// </summary>
+        public static void EnviarTickerFotosIPF2()
+        {
+            var config = ConfigManager.GetInstance();
+            string bd = config.GetValue("bdIPF2");
+            string mensaje = $"itemset('<{bd}>TICKER/FOTOS/ENTRA','EVENT_RUN');";
+            EnviarMensajePuntualIPF2(mensaje);
+        }
     }
 }
+

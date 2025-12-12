@@ -1,4 +1,4 @@
-using Elecciones.src.controller;
+ï»¿using Elecciones.src.controller;
 using Elecciones.src.model.DTO.BrainStormDTO;
 using Elecciones.src.model.IPF.DTO;
 using Elecciones.src.utils;
@@ -61,7 +61,7 @@ namespace Elecciones
             {
                 color = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#cb96f8"));
                 EntraHistButton.Background = color;
-                EntraHistButton.Content = "ENTRA HISTÓRICO";
+                EntraHistButton.Content = "ENTRA HISTï¿½RICO";
                 // EntraMillonesButton.Visibility = Visibility.Visible;
                 // EntraEscanosButton.Visibility = Visibility.Visible;
             }
@@ -151,7 +151,7 @@ namespace Elecciones
             }
             else
             {
-                MessageBox.Show($"No hay ningún partido desplegado", "Acción no permitida", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"No hay ningï¿½n partido desplegado", "Acciï¿½n no permitida", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -195,9 +195,11 @@ namespace Elecciones
 
         private void btnSubirRotulosTd_Click(object sender, RoutedEventArgs e)
         {
-
+            // Enviar SubirRotulos a Prime para TeleDirecciones
+            gController.SubirRotulosPrime();
         }
     }
 }
+
 
 

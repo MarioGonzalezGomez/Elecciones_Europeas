@@ -1246,9 +1246,7 @@ namespace Elecciones
         }
 
 
-        // =========================================
         // EVENTOS DE CONFIGURACIÓN AVANZADA
-        // =========================================
         private bool primerosResultadosActivo = true;
         private bool sondeoAnimadoActivo = true;
         private void chkPrimerosResultados_Checked(object sender, RoutedEventArgs e)

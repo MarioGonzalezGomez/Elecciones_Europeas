@@ -1,6 +1,7 @@
-using Elecciones.src.logic;
+ï»¿using Elecciones.src.logic;
 using Elecciones.src.mensajes;
 using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.conexion;
 using Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
@@ -56,7 +57,7 @@ namespace Elecciones.src.controller
             }
         }
 
-        //SEÑALES ESPECIALES
+        //SEï¿½ALES ESPECIALES
         public void ReiniciarConexionPrime() { if (prime != null) { prime.ReiniciarConexion(); } }
         public void ReiniciarConexionIpf() { if (ipf != null) { ipf.ReiniciarConexion(); } }
 
@@ -65,6 +66,9 @@ namespace Elecciones.src.controller
             if (primeActivo.Valor == 1) { prime.Reset(); }
             if (ipfActivo.Valor == 1) { ipf.Reset(); }
         }
+        //PRIME - ROTULOS TD
+        public void SubirRotulosPrime() { if (primeActivo.Valor == 1) { prime.SubirRotulos(); } }
+        public void BajarRotulosPrime() { if (primeActivo.Valor == 1) { prime.BajarRotulos(); } }
 
         private void PrimeActivoChange(object? sender, EventArgs e)
         {
@@ -217,8 +221,18 @@ namespace Elecciones.src.controller
         public void superfaldonSedesSale() { if (ipfActivo.Valor == 1) { ipf.superfaldonSedesSale(); } }
 
         //SUPERFALDON - FICHAS
-        public void sfFichasEntra() { if (ipfActivo.Valor == 1) { ipf.sfFichasEntra(); } }
-        public void sfFichasEncadena() { if (ipfActivo.Valor == 1) { ipf.sfFichasEncadena(); } }
+        public void sfFichasEntra() 
+        { 
+            if (ipfActivo.Valor == 1) { ipf.sfFichasEntra(); }
+            // Enviar TickerFotosEntra a IPF2 (equipo secundario con Faldones)
+            ConexionGraficos.EnviarTickerFotosIPF2();
+        }
+        public void sfFichasEncadena() 
+        { 
+            if (ipfActivo.Valor == 1) { ipf.sfFichasEncadena(); }
+            // Enviar TickerFotosEntra a IPF2 (equipo secundario con Faldones)
+            ConexionGraficos.EnviarTickerFotosIPF2();
+        }
         public void sfFichasSale() { if (ipfActivo.Valor == 1) { ipf.sfFichasSale(); } }
 
         //SUPERFALDON - PACTOMETRO
@@ -242,3 +256,6 @@ namespace Elecciones.src.controller
         public void sfGanadorSale() { if (ipfActivo.Valor == 1) { ipf.sfGanadorSale(); } }
     }
 }
+
+
+

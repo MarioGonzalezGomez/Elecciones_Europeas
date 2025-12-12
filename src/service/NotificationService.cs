@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace Elecciones_Europeas.src.service
+namespace Elecciones.src.service
 {
     public class NotificationService : INotificationService
     {

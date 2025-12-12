@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Elecciones_Europeas.src.service
+namespace Elecciones.src.service
 {
     public class FileLoggerService : ILoggerService
     {
@@ -11,7 +11,7 @@ namespace Elecciones_Europeas.src.service
         private FileLoggerService()
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string folder = Path.Combine(appData, "Elecciones_Europeas", "Logs");
+            string folder = Path.Combine(appData, "Elecciones", "Logs");
             if (!Directory.Exists(folder))
             {
                 Directory.CreateDirectory(folder);

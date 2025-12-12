@@ -1,4 +1,4 @@
-namespace Elecciones_Europeas.src.service
+namespace Elecciones.src.service
 {
     public interface INotificationService
     {

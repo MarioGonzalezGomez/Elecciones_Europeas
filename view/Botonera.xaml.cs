@@ -1,7 +1,7 @@
-using Elecciones_Europeas.src.controller;
-using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
-using Elecciones_Europeas.src.model.IPF.DTO;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.controller;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.IPF.DTO;
+using Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -17,7 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Elecciones_Europeas
+namespace Elecciones
 {
     /// <summary>
     /// Interaction logic for Botonera.xaml

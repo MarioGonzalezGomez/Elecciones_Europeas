@@ -1,5 +1,5 @@
-锘縰sing Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.model.IPF;
+using Elecciones.src.utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
@@ -7,7 +7,7 @@ using System;
 using System.Configuration;
 using System.Windows;
 
-namespace Elecciones_Europeas.src.conexion
+namespace Elecciones.src.conexion
 {
     public class ConexionEntityFramework : DbContext
     {
@@ -68,7 +68,7 @@ namespace Elecciones_Europeas.src.conexion
 
             main = mainWindow;
         }
-        //Para elegir la DB a la que conectarnos en caso de conexi贸n m煤ltiple
+        //Para elegir la DB a la que conectarnos en caso de conexi髇 m鷏tiple
         public ConexionEntityFramework(int tipoConexion, int db)
         {
             this.db = db;
@@ -193,7 +193,7 @@ namespace Elecciones_Europeas.src.conexion
             }
             catch (Exception exMain)
             {
-                MessageBox.Show($"Error al conectar con la base de datos en la ip {_server}. Buscando nueva conexi贸n.", "Error de conexi贸n", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error al conectar con la base de datos en la ip {_server}. Buscando nueva conexi髇.", "Error de conexi髇", MessageBoxButton.OK, MessageBoxImage.Error);
                 try
                 {
                     if (_tipoConexion != 1)
@@ -218,7 +218,7 @@ namespace Elecciones_Europeas.src.conexion
                 }
                 catch (Exception exBackup)
                 {
-                    MessageBox.Show($"Error al conectar con la base de datos en la ip {_server}. Buscando nueva conexi贸n.", "Error de conexi贸n", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Error al conectar con la base de datos en la ip {_server}. Buscando nueva conexi髇.", "Error de conexi髇", MessageBoxButton.OK, MessageBoxImage.Error);
                     try
                     {
                         if (_tipoConexion == 3)
@@ -242,8 +242,8 @@ namespace Elecciones_Europeas.src.conexion
                     }
                     catch (Exception exLocal)
                     {
-                        // Maneja el error o lanza una excepci贸n si no se puede establecer ninguna conexi贸n
-                        MessageBox.Show($"No se ha podido conectar a la BD de ninguna de las IP facilitadas. Revise que est谩n en funcionamiento y que las IP est谩n bien escritas en el fichero de configuraci贸n", "Error de conexi贸n", MessageBoxButton.OK, MessageBoxImage.Error);
+                        // Maneja el error o lanza una excepci髇 si no se puede establecer ninguna conexi髇
+                        MessageBox.Show($"No se ha podido conectar a la BD de ninguna de las IP facilitadas. Revise que est醤 en funcionamiento y que las IP est醤 bien escritas en el fichero de configuraci髇", "Error de conexi髇", MessageBoxButton.OK, MessageBoxImage.Error);
                         throw new ApplicationException("Error al conectar con la base de datos.", exLocal);
                     }
                 }

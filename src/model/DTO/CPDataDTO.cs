@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.utils;
 
-namespace Elecciones_Europeas.src.model.IPF.DTO
+namespace Elecciones.src.model.IPF.DTO
 {
     public class CPDataDTO
     {

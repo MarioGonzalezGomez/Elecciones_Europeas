@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.logic
+namespace Elecciones.src.logic
 {
     public class ObservableInt : INotifyPropertyChanged
     {

@@ -1,6 +1,6 @@
-﻿using Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.conexion;
+using Elecciones.src.model.IPF;
+using Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.model.DTO.BrainStormDTO
+namespace Elecciones.src.model.DTO.BrainStormDTO
 {
     public class BrainStormDTO
     {
@@ -61,9 +61,9 @@ namespace Elecciones_Europeas.src.model.DTO.BrainStormDTO
             else {
                 fileName = $"{configuration.GetValue("rutaArchivos")}\\{ruta}.csv";
             }
-            string resultado = "Codigo;Nombre;Escrutado;Escaños;Mayoría;Avance;Participacion;Participacion Historica;Media de Participacion;Votantes;Últimas Elecciones;Numero de partidos\n";
+            string resultado = "Codigo;Nombre;Escrutado;Esca�os;Mayor�a;Avance;Participacion;Participacion Historica;Media de Participacion;Votantes;�ltimas Elecciones;Numero de partidos\n";
             resultado += $"{circunscripcionDTO.codigo};{circunscripcionDTO.nombre};{circunscripcionDTO.escrutado.ToString("F2")};{circunscripcionDTO.escaniosTotales};{circunscripcionDTO.mayoria};{circunscripcionDTO.numAvance};{circunscripcionDTO.participacion.ToString("F2")};{circunscripcionDTO.participacionHistorica.ToString("F2")};{circunscripcionDTO.participacionMedia.ToString("F2")};{circunscripcionDTO.numVotantesTotales};{circunscripcionDTO.anioUltimasElecciones};{numPartidos}\n";
-            resultado += $"Código;Padre;Siglas;Candidato;Escaños Desde;Hasta;Históricos;% Voto;Votantes;Diferencia de escaños;Tendencia;Diferencia de votos;Tendendia;Votantes Historico\n";
+            resultado += $"C�digo;Padre;Siglas;Candidato;Esca�os Desde;Hasta;Hist�ricos;% Voto;Votantes;Diferencia de esca�os;Tendencia;Diferencia de votos;Tendendia;Votantes Historico\n";
             foreach (var p in partidos)
             {
                 string codigo = p.padre;

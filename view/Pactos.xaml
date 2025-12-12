@@ -1,4 +1,4 @@
-﻿<Window x:Class="Elecciones_Europeas.Pactos"
+﻿<Window x:Class="Elecciones.Pactos"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -78,7 +78,7 @@
                 </Grid.RowDefinitions>
 
                 <Viewbox  Grid.Row="1" Grid.Column="0" Margin="1">
-                    <Image Name="imgFlechaEntraIzq"  Width="30" Height="40" Source="/Elecciones_Europeas;component/iconos/flecha.png"
+                    <Image Name="imgFlechaEntraIzq"  Width="30" Height="40" Source="/Elecciones;component/iconos/flecha.png"
                        MouseEnter="imgFlechaEntraIzq_MouseEnter"  MouseLeave="imgFlechaEntraIzq_MouseLeave"  MouseLeftButtonUp="imgFlechaEntraIzq_MouseLeftButtonUp">
                         <Image.RenderTransform>
                             <TransformGroup>
@@ -91,7 +91,7 @@
                     </Image>
                 </Viewbox>
                 <Viewbox  Grid.Row="2" Grid.Column="0" Margin="1">
-                    <Image Name="imgFlechaSaleIzq"  Width="30" Height="40" Source="/Elecciones_Europeas;component/iconos/flecha.png" 
+                    <Image Name="imgFlechaSaleIzq"  Width="30" Height="40" Source="/Elecciones;component/iconos/flecha.png" 
                        MouseEnter="imgFlechaSaleIzq_MouseEnter"  MouseLeave="imgFlechaSaleIzq_MouseLeave"  MouseLeftButtonUp="imgFlechaSaleIzq_MouseLeftButtonUp"/>
                 </Viewbox>
             </Grid>
@@ -134,11 +134,11 @@
                 </Grid.RowDefinitions>
 
                 <Viewbox  Grid.Row="1" Grid.Column="0" Margin="1">
-                    <Image Name="imgFlechaEntraDer"  Width="30" Height="40" Source="/Elecciones_Europeas;component/iconos/flecha.png" 
+                    <Image Name="imgFlechaEntraDer"  Width="30" Height="40" Source="/Elecciones;component/iconos/flecha.png" 
                        MouseEnter="imgFlechaEntraDer_MouseEnter"  MouseLeave="imgFlechaEntraDer_MouseLeave"  MouseLeftButtonUp="imgFlechaEntraDer_MouseLeftButtonUp"/>
                 </Viewbox>
                 <Viewbox  Grid.Row="2" Grid.Column="0" Margin="1">
-                    <Image Name="imgFlechaSaleDer"  Width="30" Height="40" Source="/Elecciones_Europeas;component/iconos/flecha.png"
+                    <Image Name="imgFlechaSaleDer"  Width="30" Height="40" Source="/Elecciones;component/iconos/flecha.png"
                        MouseEnter="imgFlechaSaleDer_MouseEnter"  MouseLeave="imgFlechaSaleDer_MouseLeave"  MouseLeftButtonUp="imgFlechaSaleDer_MouseLeftButtonUp">
                         <Image.RenderTransform>
                             <TransformGroup>

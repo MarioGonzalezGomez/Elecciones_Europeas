@@ -1,12 +1,12 @@
-﻿using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.model.IPF.DTO;
+using Elecciones.src.model.IPF;
+using Elecciones.src.model.IPF.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.logic.comparators
+namespace Elecciones.src.logic.comparators
 {
     internal class CPDataComparer: IComparer<CPDataDTO>
     {

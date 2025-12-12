@@ -1,7 +1,7 @@
-﻿using Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.controller;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.conexion;
+using Elecciones.src.controller;
+using Elecciones.src.model.IPF;
+using Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.model.DTO.BrainStormDTO
+namespace Elecciones.src.model.DTO.BrainStormDTO
 {
     public class Recuentos
     {

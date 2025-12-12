@@ -1,14 +1,14 @@
-ï»¿using Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.controller;
-using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.conexion;
+using Elecciones.src.controller;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.utils;
 using System;
 using System.Configuration;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.model.IPF.DTO
+namespace Elecciones.src.model.IPF.DTO
 {
     public class SedesDTO
     {
@@ -150,7 +150,7 @@ namespace Elecciones_Europeas.src.model.IPF.DTO
             difVotos = difVotos < 0 ? difVotos * (-1) : difVotos;
             double porcentajeVotoTruncado = Math.Truncate(porcentajeVoto * 10) / 10;
 
-            string csv = $"CÃ³digo;Padre;Siglas;Candidato;EscaÃ±os Desde;Hasta;HistÃ³ricos;% Voto;Votantes;Diferencia de escaÃ±os;Tendencia;Diferencia de votos;Tendendia\n";
+            string csv = $"Código;Padre;Siglas;Candidato;Escaños Desde;Hasta;Históricos;% Voto;Votantes;Diferencia de escaños;Tendencia;Diferencia de votos;Tendendia\n";
             csv += $"{codigo};{codigoPadre};{this.siglas};{this.candidato};{this.escaniosDesde};{this.escaniosHasta};{this.escaniosHistoricos};{porcentajeVotoTruncado.ToString()};{numVotantes.ToString("#,##0").Replace(",", ".")};{diferenciaEscanios};{tendencia};{difVotos.ToString("#,##0").Replace(",", ".")};{tendenciaVotos}\n";
             await File.WriteAllTextAsync(fileName, csv);
         }

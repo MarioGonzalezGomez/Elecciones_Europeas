@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Elecciones_Europeas.src.viewmodel.MvvmBase
+namespace Elecciones.src.viewmodel.MvvmBase
 {
     public class ViewModelBase : INotifyPropertyChanged
     {

@@ -1,13 +1,13 @@
-Ôªøusing Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.controller;
-using Elecciones_Europeas.src.logic.comparators;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.repository;
+using Elecciones.src.conexion;
+using Elecciones.src.controller;
+using Elecciones.src.logic.comparators;
+using Elecciones.src.model.IPF;
+using Elecciones.src.repository;
 using System.Collections.Generic;
 using System.Linq;
 
 
-namespace Elecciones_Europeas.src.service
+namespace Elecciones.src.service
 {
     internal class CPService : IBaseService<CircunscripcionPartido, Clave>
     {
@@ -44,7 +44,7 @@ namespace Elecciones_Europeas.src.service
             return _rep.GetAll();
         }
 
-        //Datos de los partidos m√°s votados en cada autonom√≠a
+        //Datos de los partidos m·s votados en cada autonomÌa
         public List<CircunscripcionPartido> FindMasVotadosAutonomiasOficial()
         {
             return FindAll()
@@ -63,7 +63,7 @@ namespace Elecciones_Europeas.src.service
                 .Select(group => group.OrderByDescending(cp => cp, new CPComparerSondeo()).First())
                 .ToList();
         }
-        //Datos de los partidos m√°s votados en cada provincia de una autonom√≠a determinada
+        //Datos de los partidos m·s votados en cada provincia de una autonomÌa determinada
         public List<CircunscripcionPartido> FindMasVotadosProvinciasOficial(string codAutonomia)
         {
             return FindAll()
@@ -89,7 +89,7 @@ namespace Elecciones_Europeas.src.service
             return _rep.GetById(id);
         }
 
-        //Datos de todos los partidos con representaci√≥n en una circunscipci√≥n
+        //Datos de todos los partidos con representaciÛn en una circunscipciÛn
         private List<CircunscripcionPartido> FindByIdCircunscripcion(string cod)
         {
             return FindAll().Where(cp => cp.codCircunscripcion == cod).ToList();
@@ -126,7 +126,7 @@ namespace Elecciones_Europeas.src.service
             return FindAll().Where(cp => cp.codPartido == cod).ToList();
         }
 
-        //Datos de un partido en las distintas autonom√≠as
+        //Datos de un partido en las distintas autonomÌas
         public List<CircunscripcionPartido> FindPartidoPorAutonomiasOficial(string codPartido)
         {
             return FindByIdPartido(codPartido)
@@ -143,7 +143,7 @@ namespace Elecciones_Europeas.src.service
                 .OrderByDescending(cp => cp, new CPComparerSondeo())
                 .ToList();
         }
-        //Datos de un partido en las provincias de una autonom√≠a dada
+        //Datos de un partido en las provincias de una autonomÌa dada
         public List<CircunscripcionPartido> FindPartidoPorProvinciasOficial(string codAutonomia, string codPartido)
         {
             return FindByIdPartido(codPartido)

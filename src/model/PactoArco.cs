@@ -1,4 +1,4 @@
-﻿using Elecciones_Europeas.src.utils;
+using Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -9,7 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Elecciones_Europeas.src.model
+namespace Elecciones.src.model
 {
     public class PactoArco
     {

@@ -1,5 +1,5 @@
-﻿using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
-using Elecciones_Europeas.src.model.IPF;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.IPF;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.logic.comparators
+namespace Elecciones.src.logic.comparators
 {
     public class PartidoDTOComparer : IEqualityComparer<PartidoDTO>
     {

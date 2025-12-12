@@ -1,14 +1,14 @@
-using Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.controller;
-using Elecciones_Europeas.src.logic;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.model.IPF.DTO;
-using Elecciones_Europeas.src.service;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.conexion;
+using Elecciones.src.controller;
+using Elecciones.src.logic;
+using Elecciones.src.model.IPF;
+using Elecciones.src.model.IPF.DTO;
+using Elecciones.src.service;
+using Elecciones.src.utils;
 using System.Collections.ObjectModel;
-using Elecciones_Europeas.src.viewmodel.MvvmBase;
+using Elecciones.src.viewmodel.MvvmBase;
 
-namespace Elecciones_Europeas.src.viewmodel
+namespace Elecciones.src.viewmodel
 {
     public class MainViewModel : ViewModelBase
     {

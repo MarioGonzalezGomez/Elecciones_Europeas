@@ -1,4 +1,4 @@
-ï»¿using Elecciones_Europeas.src.utils;
+using Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.model.DTO.Cartones
+namespace Elecciones.src.model.DTO.Cartones
 {
     public class DatosMayorias
     {
@@ -36,7 +36,7 @@ namespace Elecciones_Europeas.src.model.DTO.Cartones
         public async Task ToCsv()
         {
             string fileName = $"{configuration.GetValue("rutaArchivos")}\\CSV\\DatosMayorias.csv";
-            //    string csv = $"CircunscripciÃ³n;Partido;EscaÃ±os Desde;Hasta;Diferencia;Tendencia;HistÃ³ricos\n";
+            //    string csv = $"Circunscripción;Partido;Escaños Desde;Hasta;Diferencia;Tendencia;Históricos\n";
             // csv += $"{this.circunscripcion};{this.partido};{this.escanosDesde};{this.escanosHasta};{this.diferencia};{this.tendencia};{this.escanosHistoricos}\n";
             //  await File.WriteAllTextAsync(fileName, csv);
         }

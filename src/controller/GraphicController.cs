@@ -1,7 +1,7 @@
-﻿using Elecciones_Europeas.src.logic;
-using Elecciones_Europeas.src.mensajes;
-using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.logic;
+using Elecciones.src.mensajes;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.controller
+namespace Elecciones.src.controller
 {
     public class GraphicController
     {
@@ -56,7 +56,7 @@ namespace Elecciones_Europeas.src.controller
             }
         }
 
-        //SEÑALES ESPECIALES
+        //SE�ALES ESPECIALES
         public void ReiniciarConexionPrime() { if (prime != null) { prime.ReiniciarConexion(); } }
         public void ReiniciarConexionIpf() { if (ipf != null) { ipf.ReiniciarConexion(); } }
 

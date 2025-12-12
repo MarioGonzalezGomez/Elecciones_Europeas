@@ -1,10 +1,10 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Configuration;
 using System.Threading.Tasks;
 using System.IO;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.utils;
 
-namespace Elecciones_Europeas.src.model.IPF
+namespace Elecciones.src.model.IPF
 {
     public class CircunscripcionPartido
     {

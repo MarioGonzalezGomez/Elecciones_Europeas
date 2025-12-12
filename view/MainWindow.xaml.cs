@@ -1,11 +1,11 @@
-Ôªøusing Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.controller;
-using Elecciones_Europeas.src.logic;
-using Elecciones_Europeas.src.mensajes;
-using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
-using Elecciones_Europeas.src.model.IPF.DTO;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.conexion;
+using Elecciones.src.controller;
+using Elecciones.src.logic;
+using Elecciones.src.mensajes;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.IPF.DTO;
+using Elecciones.src.model.IPF;
+using Elecciones.src.utils;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
@@ -17,7 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Elecciones_Europeas.src.logic.comparators;
+using Elecciones.src.logic.comparators;
 using System.ComponentModel;
 using System.IO;
 using System.Collections.Generic;
@@ -25,7 +25,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas
+namespace Elecciones
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -47,7 +47,7 @@ namespace Elecciones_Europeas
 
         //Escuchador
         public Escuchador escuchador;
-        //Bool para ver si mando actualizaci√≥n de datos o no
+        //Bool para ver si mando actualizaciÛn de datos o no
         public bool actualizacionActiva;
 
         //1 Nacionales, 2 Autonomia X
@@ -56,7 +56,7 @@ namespace Elecciones_Europeas
         //0 Si utilizamos datos de la DB1, 1 de la DB2...
         private ObservableInt eleccionSeleccionada;
 
-        //Si tenemos alg√∫n partido seleccionado con el que se deba hacer algo
+        //Si tenemos alg˙n partido seleccionado con el que se deba hacer algo
         private PartidoDTO? partidoSeleccionado;
 
         //Bool para hacer giro
@@ -76,7 +76,7 @@ namespace Elecciones_Europeas
         bool sfBipartidismoDentro;
         bool sfGanadorDentro;
 
-        //Estas conexiones ser√°n null si no est√°n activadas por Configuraci√≥n
+        //Estas conexiones ser·n null si no est·n activadas por ConfiguraciÛn
         OrdenesIPF? ipf;
         OrdenesPrime? prime;
         GraphicController graficos;
@@ -191,13 +191,13 @@ namespace Elecciones_Europeas
         {
             if (tipoElecciones == 1) // Elecciones generales
             {
-                // Cargar todas las autonom√≠as (Espa√±a ya est√° incluida al principio por el m√©todo FindAllAutonomias)
+                // Cargar todas las autonomÌas (EspaÒa ya est· incluida al principio por el mÈtodo FindAllAutonomias)
                 CCAA = CircunscripcionController.GetInstance(conexionActiva).FindAllAutonomias(eleccionSeleccionada.Valor + 1);
-                autonomiasHeader = "AUTONOM√çAS";
+                autonomiasHeader = "AUTONOMÕAS";
             }
-            else if (tipoElecciones == 2) // Elecciones auton√≥micas
+            else if (tipoElecciones == 2) // Elecciones autonÛmicas
             {
-                // Cargar solo la autonom√≠a correspondiente (codigoRegional + 5 ceros)
+                // Cargar solo la autonomÌa correspondiente (codigoRegional + 5 ceros)
                 string codigoRegional = configuration.GetValue($"codigoRegionalBD{eleccionSeleccionada.Valor + 1}");
                 string codigoAutonomia = $"{codigoRegional}00000";
                 Circunscripcion autonomia = CircunscripcionController.GetInstance(conexionActiva).FindById(codigoAutonomia);
@@ -206,7 +206,7 @@ namespace Elecciones_Europeas
                 {
                     CCAA.Add(autonomia);
                 }
-                autonomiasHeader = "AUTONOM√çA";
+                autonomiasHeader = "AUTONOMÕA";
             }
         }
 
@@ -218,8 +218,8 @@ namespace Elecciones_Europeas
                 gridView.Columns[0].Header = autonomiasHeader;
             }
         }
-        //Por ahora, se modifican manualmente, pero se podr√≠a implementar un modo de introducir
-        //los tipos de gr√°ficos en la ventana de configuraci√≥n Avanzada
+        //Por ahora, se modifican manualmente, pero se podrÌa implementar un modo de introducir
+        //los tipos de gr·ficos en la ventana de configuraciÛn Avanzada
         public void InitializeListView()
         {
             graficosListView.Items.Clear();
@@ -228,23 +228,23 @@ namespace Elecciones_Europeas
             switch (tablaPrincipal)
             {
                 case 1:
-                    graficosListView.Items.Add("CUENTA ATR√ÅS");
+                    graficosListView.Items.Add("CUENTA ATR¡S");
                     graficosListView.Items.Add("FICHAS");
                     graficosListView.Items.Add("SEDES");
                     //  graficosListView.Items.Add("INDEPENDENTISMO");
                     break;
                 case 2:
-                    graficosListView.Items.Add("PARTICIPACI√ìN");
+                    graficosListView.Items.Add("PARTICIPACI”N");
                     //graficosListView.Items.Add("CCAA");
                     graficosListView.Items.Add("FICHAS");
-                    //graficosListView.Items.Add("PACT√ìMETRO");
-                    graficosListView.Items.Add("MAYOR√çAS");
+                    //graficosListView.Items.Add("PACT”METRO");
+                    graficosListView.Items.Add("MAYORÕAS");
                     //graficosListView.Items.Add("VS");
                     break;
                 case 3:
                     graficosListView.Items.Add("FICHAS");
-                    graficosListView.Items.Add("PACT√ìMETRO");
-                    graficosListView.Items.Add("MAYOR√çAS");
+                    graficosListView.Items.Add("PACT”METRO");
+                    graficosListView.Items.Add("MAYORÕAS");
                     graficosListView.Items.Add("BIPARTIDISMO");
                     graficosListView.Items.Add("GANADOR");
                     break;
@@ -380,12 +380,12 @@ namespace Elecciones_Europeas
         //LOGICA CONFIG
         private void imgConfig_MouseEnter(object sender, MouseEventArgs e)
         {
-            // Cambiar la imagen a la versi√≥n azul cuando el rat√≥n entra
-            imgConfig.Source = new BitmapImage(new Uri("/Elecciones_Europeas;component/iconos/tuerca_pulsada.png", UriKind.Relative));
+            // Cambiar la imagen a la versiÛn azul cuando el ratÛn entra
+            imgConfig.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/tuerca_pulsada.png", UriKind.Relative));
         }
         private void imgConfig_MouseLeave(object sender, MouseEventArgs e)
         {
-            imgConfig.Source = new BitmapImage(new Uri("/Elecciones_Europeas;component/iconos/tuerca.png", UriKind.Relative));
+            imgConfig.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/tuerca.png", UriKind.Relative));
         }
         private void imgConfig_Click(object sender, MouseButtonEventArgs e)
         {
@@ -555,7 +555,7 @@ namespace Elecciones_Europeas
             Binding bindingCol4;
             if (oficiales)
             {
-                columna3.Header = "ESCA√ëOS";
+                columna3.Header = "ESCA—OS";
                 bindingCol3 = new Binding("escaniosHasta");
                 columna3.DisplayMemberBinding = bindingCol3;
 
@@ -693,7 +693,7 @@ namespace Elecciones_Europeas
             datosListView.SelectedItem = null;
             if (autonomiasListView.SelectedItem != null)
             {
-                //A√ëADIR CIRCUNSCRIPCIONES SI LAS TIENE
+                //A—ADIR CIRCUNSCRIPCIONES SI LAS TIENE
                 string elementoSeleccionado = autonomiasListView.SelectedItem.ToString();
                 List<Circunscripcion> circunscripcionesSeleccionadas;
                 if (regional)
@@ -711,7 +711,7 @@ namespace Elecciones_Europeas
                     circunscripcionNames.Add(cir.nombre);
                 });
 
-                //PONER LA INFORMACI√ìN EN LA INTERFAZ
+                //PONER LA INFORMACI”N EN LA INTERFAZ
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
                 {
@@ -737,7 +737,7 @@ namespace Elecciones_Europeas
                 string elementoSeleccionado = circunscripcionesListView.SelectedItem.ToString();
                 autonomiasListView.SelectedItem = null;
 
-                //PONER LA INFORMACI√ìN EN LA INTERFAZ
+                //PONER LA INFORMACI”N EN LA INTERFAZ
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
                 {
@@ -818,7 +818,7 @@ namespace Elecciones_Europeas
             switch (tipoGrafico)
             {
                 case "SEDES":
-                    columna3.Header = "ESCA√ëOS";
+                    columna3.Header = "ESCA—OS";
                     Binding binding3 = new Binding("escaniosHasta");
                     columna3.DisplayMemberBinding = binding3;
                     columna4.Header = "DIF ESC";
@@ -972,18 +972,18 @@ namespace Elecciones_Europeas
         private void btnEntra_Click(object sender, RoutedEventArgs e)
         {
             if (!preparado) { EscribirFichero(); }
-            if (string.Equals(graficosHeader.Header, "FALD√ìN")) { EntraFaldon(); }
-            if (string.Equals(graficosHeader.Header, "CART√ìN")) { EntraCarton(); }
-            if (string.Equals(graficosHeader.Header, "SUPERFALD√ìN")) { EntraSuperfaldon(); }
+            if (string.Equals(graficosHeader.Header, "FALD”N")) { EntraFaldon(); }
+            if (string.Equals(graficosHeader.Header, "CART”N")) { EntraCarton(); }
+            if (string.Equals(graficosHeader.Header, "SUPERFALD”N")) { EntraSuperfaldon(); }
             if (string.Equals(graficosHeader.Header, "PANTALLA")) { EntraSuperfaldon(); }
             if (string.Equals(graficosHeader.Header, "REALIDAD AUMENTADA")) { EntraSuperfaldon(); }
             if (string.Equals(graficosHeader.Header, "DRON")) { EntraSuperfaldon(); }
         }
         private void btnSale_Click(object sender, RoutedEventArgs e)
         {
-            if (string.Equals(graficosHeader.Header, "FALD√ìN")) { SaleFaldon(); }
-            if (string.Equals(graficosHeader.Header, "CART√ìN")) { SaleCarton(); }
-            if (string.Equals(graficosHeader.Header, "SUPERFALD√ìN")) { SaleSuperfaldon(); }
+            if (string.Equals(graficosHeader.Header, "FALD”N")) { SaleFaldon(); }
+            if (string.Equals(graficosHeader.Header, "CART”N")) { SaleCarton(); }
+            if (string.Equals(graficosHeader.Header, "SUPERFALD”N")) { SaleSuperfaldon(); }
         }
         private void btnActualiza_Click(object sender, RoutedEventArgs e)
         {
@@ -1017,19 +1017,24 @@ namespace Elecciones_Europeas
             }
             else
             {
-                MessageBox.Show($"Seleccione alguna circunscripci√≥n para ver su pesta√±a de pactos", "Circunscipci√≥n no seleccionada", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Seleccione alguna circunscripciÛn para ver su pestaÒa de pactos", "CircunscipciÛn no seleccionada", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        //LOGICA PARA LOS TIPOS DE GR√ÅFICOS DISTINTOS
+        //LOGICA PARA LOS TIPOS DE GR¡FICOS DISTINTOS
         private void EntraFaldon()
         {
             if (dto != null && graficosListView.SelectedIndex != -1)
             {
                 switch (graficosListView.SelectedValue.ToString())
                 {
-                    case "CUENTA ATR√ÅS":
-                        graficos.EntraReloj();
+                    case "CUENTA ATR¡S":
+                        int segundos = CalcularSegundosHastaHora();
+                        if (segundos > 0)
+                        {
+                            // TODO: Modificar graficos.EntraReloj() para aceptar segundos
+                            graficos.EntraReloj();
+                        }
                         break;
                     case "FICHAS":
                         if (sondeoEnElAire && oficiales)
@@ -1074,7 +1079,7 @@ namespace Elecciones_Europeas
             {
                 switch (graficosListView.SelectedValue.ToString())
                 {
-                    case "PARTICIPACI√ìN":
+                    case "PARTICIPACI”N":
                         if (participacionDentro) { graficos.participacionEncadena(); }
                         else { graficos.participacionEntra(); }
                         break;
@@ -1082,7 +1087,7 @@ namespace Elecciones_Europeas
                         if (fichaDentro) { graficos.fichaEncadena(); }
                         else { graficos.fichaEntra(); }
                         break;
-                    case "MAYOR√çAS":
+                    case "MAYORÕAS":
                         if (mayoriasDentro) { graficos.mayoriasEncadena(); }
                         else { graficos.mayoriasEntra(); }
                         break;
@@ -1090,7 +1095,7 @@ namespace Elecciones_Europeas
                         if (ccaaDentro) { graficos.ccaaEncadena(); }
                         else { graficos.ccaaEntra(); }
                         break;
-                    case "SUPERFALD√ìN":
+                    case "SUPERFALD”N":
                         if (superfaldonDentro) { graficos.superfaldonEntra(); }
                         else { graficos.superfaldonEntra(); }
                         break;
@@ -1113,12 +1118,12 @@ namespace Elecciones_Europeas
                         else { graficos.sfFichasEntra(); }
                         sfFichasDentro = true;
                         break;
-                    case "PACT√ìMETRO":
+                    case "PACT”METRO":
                         if (sfPactometroDentro) { graficos.sfPactometroEncadena(); }
                         else { graficos.sfPactometroEntra(); }
                         sfPactometroDentro = true;
                         break;
-                    case "MAYOR√çAS":
+                    case "MAYORÕAS":
                         if (sfMayoriasDentro) { graficos.sfMayoriasEncadena(); }
                         else { graficos.sfMayoriasEntra(); }
                         sfMayoriasDentro = true;
@@ -1145,7 +1150,7 @@ namespace Elecciones_Europeas
             {
                 switch (graficosListView.SelectedValue.ToString())
                 {
-                    case "CUENTA ATR√ÅS":
+                    case "CUENTA ATR¡S":
                         graficos.SaleReloj();
                         break;
                     case "FICHAS":
@@ -1181,7 +1186,7 @@ namespace Elecciones_Europeas
             {
                 switch (graficosListView.SelectedValue.ToString())
                 {
-                    case "PARTICIPACI√ìN":
+                    case "PARTICIPACI”N":
                         graficos.participacionSale();
                         participacionDentro = false;
                         break;
@@ -1189,7 +1194,7 @@ namespace Elecciones_Europeas
                         graficos.ccaaSale();
                         ccaaDentro = false;
                         break;
-                    case "MAYOR√çAS":
+                    case "MAYORÕAS":
                         graficos.mayoriasSale();
                         mayoriasDentro = false;
                         break;
@@ -1197,7 +1202,7 @@ namespace Elecciones_Europeas
                         graficos.fichaSale();
                         fichaDentro = false;
                         break;
-                    case "SUPERFALD√ìN":
+                    case "SUPERFALD”N":
                         graficos.superfaldonSale();
                         break;
                     case "VS":
@@ -1218,11 +1223,11 @@ namespace Elecciones_Europeas
                         graficos.sfFichasSale();
                         sfFichasDentro = false;
                         break;
-                    case "PACT√ìMETRO":
+                    case "PACT”METRO":
                         graficos.sfPactometroSale();
                         sfPactometroDentro = false;
                         break;
-                    case "MAYOR√çAS":
+                    case "MAYORÕAS":
                         graficos.sfMayoriasSale();
                         sfMayoriasDentro = false;
                         break;
@@ -1238,6 +1243,50 @@ namespace Elecciones_Europeas
                     default: break;
                 }
             }
+        }
+
+
+        // =========================================
+        // EVENTOS DE CONFIGURACI”N AVANZADA
+        // =========================================
+        private bool primerosResultadosActivo = true;
+        private bool sondeoAnimadoActivo = true;
+        private void chkPrimerosResultados_Checked(object sender, RoutedEventArgs e)
+        {
+            primerosResultadosActivo = true;
+        }
+        private void chkPrimerosResultados_Unchecked(object sender, RoutedEventArgs e)
+        {
+            primerosResultadosActivo = false;
+        }
+        private void chkSondeoAnimado_Checked(object sender, RoutedEventArgs e)
+        {
+            sondeoAnimadoActivo = true;
+        }
+        private void chkSondeoAnimado_Unchecked(object sender, RoutedEventArgs e)
+        {
+            sondeoAnimadoActivo = false;
+        }
+        /// <summary>
+        /// Calcula los segundos restantes hasta la hora destino seleccionada
+        /// </summary>
+        private int CalcularSegundosHastaHora()
+        {
+            if (timePickerCuentaAtras.SelectedTime.HasValue)
+            {
+                var horaDestino = timePickerCuentaAtras.SelectedTime.Value;
+                var ahora = DateTime.Now;
+                var destino = ahora.Date.Add(horaDestino.TimeOfDay);
+
+                // Si la hora ya pasÛ hoy, cuenta para maÒana
+                if (destino <= ahora)
+                    destino = destino.AddDays(1);
+
+                var diferencia = destino - ahora;
+                txtTiempoRestante.Text = $"Tiempo restante: {diferencia.Hours:00}:{diferencia.Minutes:00}:{diferencia.Seconds:00}";
+                return (int)diferencia.TotalSeconds;
+            }
+            return 0;
         }
 
         //LOGICA DE CIERRE DE VENTANA
@@ -1259,3 +1308,4 @@ namespace Elecciones_Europeas
 
     }
 }
+

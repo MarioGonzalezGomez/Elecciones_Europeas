@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace Elecciones_Europeas
+namespace Elecciones
 {
     /// <summary>
     /// Splash screen shown during application initialization

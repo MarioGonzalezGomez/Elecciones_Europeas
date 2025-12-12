@@ -1,9 +1,9 @@
-using Elecciones_Europeas.src.controller;
-using Elecciones_Europeas.src.logic;
-using Elecciones_Europeas.src.model;
-using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.model.IPF.DTO;
+using Elecciones.src.controller;
+using Elecciones.src.logic;
+using Elecciones.src.model;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.IPF;
+using Elecciones.src.model.IPF.DTO;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,12 +20,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.utils;
 using System.ComponentModel;
-using Elecciones_Europeas.src.logic.comparators;
-using Elecciones_Europeas.src.logic.comparators;
+using Elecciones.src.logic.comparators;
+using Elecciones.src.logic.comparators;
 
-namespace Elecciones_Europeas
+namespace Elecciones
 {
     /// <summary>
     /// Interaction logic for Pactos.xaml
@@ -169,11 +169,11 @@ namespace Elecciones_Europeas
 
         private void imgFlechaEntraIzq_MouseEnter(object sender, MouseEventArgs e)
         {
-            imgFlechaEntraIzq.Source = new BitmapImage(new Uri("/Elecciones_Europeas;component/iconos/flecha_pulsada.png", UriKind.Relative));
+            imgFlechaEntraIzq.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/flecha_pulsada.png", UriKind.Relative));
         }
         private void imgFlechaEntraIzq_MouseLeave(object sender, MouseEventArgs e)
         {
-            imgFlechaEntraIzq.Source = new BitmapImage(new Uri("/Elecciones_Europeas;component/iconos/flecha.png", UriKind.Relative));
+            imgFlechaEntraIzq.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/flecha.png", UriKind.Relative));
         }
         private void imgFlechaEntraIzq_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -261,11 +261,11 @@ namespace Elecciones_Europeas
 
         private void imgFlechaSaleIzq_MouseEnter(object sender, MouseEventArgs e)
         {
-            imgFlechaSaleIzq.Source = new BitmapImage(new Uri("/Elecciones_Europeas;component/iconos/flecha_pulsada.png", UriKind.Relative));
+            imgFlechaSaleIzq.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/flecha_pulsada.png", UriKind.Relative));
         }
         private void imgFlechaSaleIzq_MouseLeave(object sender, MouseEventArgs e)
         {
-            imgFlechaSaleIzq.Source = new BitmapImage(new Uri("/Elecciones_Europeas;component/iconos/flecha.png", UriKind.Relative));
+            imgFlechaSaleIzq.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/flecha.png", UriKind.Relative));
         }
         private void imgFlechaSaleIzq_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -310,11 +310,11 @@ namespace Elecciones_Europeas
 
         private void imgFlechaEntraDer_MouseEnter(object sender, MouseEventArgs e)
         {
-            imgFlechaEntraDer.Source = new BitmapImage(new Uri("/Elecciones_Europeas;component/iconos/flecha_pulsada.png", UriKind.Relative));
+            imgFlechaEntraDer.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/flecha_pulsada.png", UriKind.Relative));
         }
         private void imgFlechaEntraDer_MouseLeave(object sender, MouseEventArgs e)
         {
-            imgFlechaEntraDer.Source = new BitmapImage(new Uri("/Elecciones_Europeas;component/iconos/flecha.png", UriKind.Relative));
+            imgFlechaEntraDer.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/flecha.png", UriKind.Relative));
         }
         private void imgFlechaEntraDer_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -333,11 +333,11 @@ namespace Elecciones_Europeas
 
         private void imgFlechaSaleDer_MouseEnter(object sender, MouseEventArgs e)
         {
-            imgFlechaSaleDer.Source = new BitmapImage(new Uri("/Elecciones_Europeas;component/iconos/flecha_pulsada.png", UriKind.Relative));
+            imgFlechaSaleDer.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/flecha_pulsada.png", UriKind.Relative));
         }
         private void imgFlechaSaleDer_MouseLeave(object sender, MouseEventArgs e)
         {
-            imgFlechaSaleDer.Source = new BitmapImage(new Uri("/Elecciones_Europeas;component/iconos/flecha.png", UriKind.Relative));
+            imgFlechaSaleDer.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/flecha.png", UriKind.Relative));
         }
         private void imgFlechaSaleDer_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {

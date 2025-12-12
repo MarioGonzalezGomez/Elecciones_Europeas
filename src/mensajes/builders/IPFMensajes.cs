@@ -1,5 +1,5 @@
-﻿using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Elecciones_Europeas.src.mensajes.builders
+namespace Elecciones.src.mensajes.builders
 {
     internal class IPFMensajes
     {
@@ -263,49 +263,49 @@ namespace Elecciones_Europeas.src.mensajes.builders
         public string superfaldonSedesSale() { return Sale("SEDES"); }
 
         //SUPERFALDON - FICHAS
-        // TODO: Construir señal para entrada del gráfico FICHAS en SUPERFALDÓN
+        // TODO: Construir se�al para entrada del gr�fico FICHAS en SUPERFALD�N
         public string sfFichasEntra() { return ""; }
-        // TODO: Construir señal para encadenar entre gráficos FICHAS en SUPERFALDÓN
+        // TODO: Construir se�al para encadenar entre gr�ficos FICHAS en SUPERFALD�N
         public string sfFichasEncadena() { return ""; }
-        // TODO: Construir señal para salida del gráfico FICHAS en SUPERFALDÓN
+        // TODO: Construir se�al para salida del gr�fico FICHAS en SUPERFALD�N
         public string sfFichasSale() { return ""; }
 
         //SUPERFALDON - PACTOMETRO
-        // TODO: Construir señal para entrada del gráfico PACTÓMETRO en SUPERFALDÓN
+        // TODO: Construir se�al para entrada del gr�fico PACT�METRO en SUPERFALD�N
         public string sfPactometroEntra() { return ""; }
-        // TODO: Construir señal para encadenar entre gráficos PACTÓMETRO en SUPERFALDÓN
+        // TODO: Construir se�al para encadenar entre gr�ficos PACT�METRO en SUPERFALD�N
         public string sfPactometroEncadena() { return ""; }
-        // TODO: Construir señal para salida del gráfico PACTÓMETRO en SUPERFALDÓN
+        // TODO: Construir se�al para salida del gr�fico PACT�METRO en SUPERFALD�N
         public string sfPactometroSale() { return ""; }
 
         //SUPERFALDON - MAYORIAS
-        // TODO: Construir señal para entrada del gráfico MAYORÍAS en SUPERFALDÓN
+        // TODO: Construir se�al para entrada del gr�fico MAYOR�AS en SUPERFALD�N
         public string sfMayoriasEntra() { return ""; }
-        // TODO: Construir señal para encadenar entre gráficos MAYORÍAS en SUPERFALDÓN
+        // TODO: Construir se�al para encadenar entre gr�ficos MAYOR�AS en SUPERFALD�N
         public string sfMayoriasEncadena() { return ""; }
-        // TODO: Construir señal para salida del gráfico MAYORÍAS en SUPERFALDÓN
+        // TODO: Construir se�al para salida del gr�fico MAYOR�AS en SUPERFALD�N
         public string sfMayoriasSale() { return ""; }
 
         //SUPERFALDON - BIPARTIDISMO
-        // TODO: Construir señal para entrada del gráfico BIPARTIDISMO en SUPERFALDÓN
+        // TODO: Construir se�al para entrada del gr�fico BIPARTIDISMO en SUPERFALD�N
         public string sfBipartidismoEntra() { return ""; }
-        // TODO: Construir señal para encadenar entre gráficos BIPARTIDISMO en SUPERFALDÓN
+        // TODO: Construir se�al para encadenar entre gr�ficos BIPARTIDISMO en SUPERFALD�N
         public string sfBipartidismoEncadena() { return ""; }
-        // TODO: Construir señal para salida del gráfico BIPARTIDISMO en SUPERFALDÓN
+        // TODO: Construir se�al para salida del gr�fico BIPARTIDISMO en SUPERFALD�N
         public string sfBipartidismoSale() { return ""; }
 
         //SUPERFALDON - GANADOR
-        // TODO: Construir señal para entrada del gráfico GANADOR en SUPERFALDÓN
+        // TODO: Construir se�al para entrada del gr�fico GANADOR en SUPERFALD�N
         public string sfGanadorEntra() { return ""; }
-        // TODO: Construir señal para encadenar entre gráficos GANADOR en SUPERFALDÓN
+        // TODO: Construir se�al para encadenar entre gr�ficos GANADOR en SUPERFALD�N
         public string sfGanadorEncadena() { return ""; }
-        // TODO: Construir señal para salida del gráfico GANADOR en SUPERFALDÓN
+        // TODO: Construir se�al para salida del gr�fico GANADOR en SUPERFALD�N
         public string sfGanadorSale() { return ""; }
 
 
         //CONSTRUCTORES
 
-        //Para construir la señal necesitaría el objeto o evento al que llamo, la propiedad a cambiar,
+        //Para construir la se�al necesitar�a el objeto o evento al que llamo, la propiedad a cambiar,
         //el valor o valores que cambian y el tipo: 1 para itemset y 2 para itemgo
         private string EventBuild(string objeto, string propiedad, string values, int tipoItem)
         {

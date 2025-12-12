@@ -1,15 +1,15 @@
-Ôªøusing System.Configuration;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
-namespace Elecciones_Europeas
+namespace Elecciones
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
-        // L√≥gica para aplicar el theme al iniciar la aplicaci√≥n
+        // LÛgica para aplicar el theme al iniciar la aplicaciÛn
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -31,13 +31,13 @@ namespace Elecciones_Europeas
 
             try
             {
-                splash.UpdateStatus("Inicializando aplicaci√≥n...");
+                splash.UpdateStatus("Inicializando aplicaciÛn...");
                 
                 // Create and show main window
                 var mainWindow = new MainWindow();
                 this.MainWindow = mainWindow;
                 
-                splash.UpdateStatus("Aplicaci√≥n lista");
+                splash.UpdateStatus("AplicaciÛn lista");
                 System.Threading.Thread.Sleep(500); // Brief pause to show success message
                 
                 splash.Close();
@@ -47,16 +47,16 @@ namespace Elecciones_Europeas
             {
                 splash.Close();
                 
-                var logger = Elecciones_Europeas.src.service.FileLoggerService.GetInstance();
+                var logger = Elecciones.src.service.FileLoggerService.GetInstance();
                 logger.LogError("Failed to initialize application", ex);
 
-                var notificationService = Elecciones_Europeas.src.service.NotificationService.GetInstance();
+                var notificationService = Elecciones.src.service.NotificationService.GetInstance();
                 notificationService.ShowError(
-                    $"No se pudo iniciar la aplicaci√≥n debido a un error de conexi√≥n.\n\n" +
+                    $"No se pudo iniciar la aplicaciÛn debido a un error de conexiÛn.\n\n" +
                     $"Por favor, verifique:\n" +
-                    $"‚Ä¢ Que los servidores de base de datos est√°n activos\n" +
-                    $"‚Ä¢ Que la configuraci√≥n de red es correcta\n" +
-                    $"‚Ä¢ Que las credenciales son v√°lidas\n\n" +
+                    $"ï Que los servidores de base de datos est·n activos\n" +
+                    $"ï Que la configuraciÛn de red es correcta\n" +
+                    $"ï Que las credenciales son v·lidas\n\n" +
                     $"ERROR: {ex.Message}\n\n" +
                     $"Presione OK para cerrar.",
                     "Error de Inicio"
@@ -70,11 +70,11 @@ namespace Elecciones_Europeas
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            var logger = Elecciones_Europeas.src.service.FileLoggerService.GetInstance();
+            var logger = Elecciones.src.service.FileLoggerService.GetInstance();
             logger.LogError("An unhandled exception occurred.", e.Exception);
 
-            var notificationService = Elecciones_Europeas.src.service.NotificationService.GetInstance();
-            notificationService.ShowError($"Ha ocurrido un error inesperado: {e.Exception.Message}", "Error Cr√≠tico");
+            var notificationService = Elecciones.src.service.NotificationService.GetInstance();
+            notificationService.ShowError($"Ha ocurrido un error inesperado: {e.Exception.Message}", "Error CrÌtico");
 
             e.Handled = true; // Prevent crash if possible, or let it crash after logging if preferred. 
             // Usually for critical errors we might want to let it crash or shutdown gracefully.

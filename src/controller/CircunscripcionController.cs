@@ -1,6 +1,6 @@
-﻿using Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.service;
+using Elecciones.src.conexion;
+using Elecciones.src.model.IPF;
+using Elecciones.src.service;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.controller
+namespace Elecciones.src.controller
 {
     public class CircunscripcionController
     {

@@ -1,10 +1,10 @@
-Ôªøusing System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.mensajes.builders
+namespace Elecciones.src.mensajes.builders
 {
     internal class PrimeMensajes
     {
@@ -24,7 +24,7 @@ namespace Elecciones_Europeas.src.mensajes.builders
             return instance;
         }
 
-        //MENSAJES ESPEC√çFICOS
+        //MENSAJES ESPECÕFICOS
 
         public string SubirRotulos()
         {
@@ -36,7 +36,7 @@ namespace Elecciones_Europeas.src.mensajes.builders
             return CambioParametroProyecto("Par_Posicion_GrupoXY", "1");
         }
 
-        //M√âTODOS GEN√âRICOS DONDE PODER ESPECIFICAR POR PAR√ÅMETRO
+        //M…TODOS GEN…RICOS DONDE PODER ESPECIFICAR POR PAR¡METRO
 
         public string Entra(string escena)
         {
@@ -86,12 +86,12 @@ namespace Elecciones_Europeas.src.mensajes.builders
         }
 
 
-        //M√âTODOS GEN√âRICOS PARA EL MANEJO DE VIDEO
+        //M…TODOS GEN…RICOS PARA EL MANEJO DE VIDEO
         public string PlayVideo(string nombreElementoClip)
         {
             string play;
             //Utilizo un bool para hacer play de inicio o continuando en un pause dependiendo de si es la primera vez que se ejecuta en una escena o no.
-            //Por tanto, para cada nueva escena que se cargue, deber√≠a pasarse esta variable a true
+            //Por tanto, para cada nueva escena que se cargue, deberÌa pasarse esta variable a true
             if (primerPlay)
             {
                 play = $"P\\COMMAND:Program\\1\\*\\{nombreElementoClip}.Play\\\\\r\n";
@@ -128,7 +128,7 @@ namespace Elecciones_Europeas.src.mensajes.builders
         }
 
 
-        //CONSTRUCTORES BASE PARA LAS DIFERENTES SE√ëALES
+        //CONSTRUCTORES BASE PARA LAS DIFERENTES SE—ALES
 
         private string ConstructorBase(string accion, string escena)
         {

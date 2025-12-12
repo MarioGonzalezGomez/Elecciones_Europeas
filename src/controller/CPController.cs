@@ -1,13 +1,13 @@
-Ôªøusing Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.service;
+using Elecciones.src.conexion;
+using Elecciones.src.model.IPF;
+using Elecciones.src.service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.controller
+namespace Elecciones.src.controller
 {
     internal class CPController
     {
@@ -42,7 +42,7 @@ namespace Elecciones_Europeas.src.controller
         {
             return _service.FindAll();
         }
-        //Datos de los partidos m√°s votados en cada autonom√≠a
+        //Datos de los partidos m·s votados en cada autonomÌa
         public List<CircunscripcionPartido> FindMasVotadosAutonomiasOficial()
         {
             return _service.FindMasVotadosAutonomiasOficial();
@@ -51,7 +51,7 @@ namespace Elecciones_Europeas.src.controller
         {
             return _service.FindMasVotadosAutonomiasSondeo();
         }
-        //Datos de los partidos m√°s votados en cada provincia de una autonom√≠a determinada
+        //Datos de los partidos m·s votados en cada provincia de una autonomÌa determinada
         public List<CircunscripcionPartido> FindMasVotadosProvinciasOficial(string codAutonomia)
         {
             return _service.FindMasVotadosProvinciasOficial(codAutonomia);
@@ -61,7 +61,7 @@ namespace Elecciones_Europeas.src.controller
             return _service.FindMasVotadosProvinciasSondeo(codAutonomia);
         }
 
-        //Datos de todos los partidos con representaci√≥n en una circunscipci√≥n
+        //Datos de todos los partidos con representaciÛn en una circunscipciÛn
         public List<CircunscripcionPartido> FindByIdCircunscripcionOficial(string cod)
         {
             return _service.FindByIdCircunscripcionOficial(cod);
@@ -79,7 +79,7 @@ namespace Elecciones_Europeas.src.controller
             return _service.FindByIdCircunscripcionSondeoSinFiltrar(cod);
         }
 
-        //Datos de un partido en las distintas autonom√≠as
+        //Datos de un partido en las distintas autonomÌas
         public List<CircunscripcionPartido> FindPartidoPorAutonomiasOficial(string codPartido)
         {
             return _service.FindPartidoPorAutonomiasOficial(codPartido);
@@ -89,7 +89,7 @@ namespace Elecciones_Europeas.src.controller
             return _service.FindPartidoPorAutonomiasSondeo(codPartido);
         }
 
-        //Datos de un partido en las provincias de una autonom√≠a dada
+        //Datos de un partido en las provincias de una autonomÌa dada
         public List<CircunscripcionPartido> FindPartidoPorProvinciasOficial(string codAutonomia, string codPartido)
         {
             return _service.FindPartidoPorProvinciasOficial(codAutonomia, codPartido);

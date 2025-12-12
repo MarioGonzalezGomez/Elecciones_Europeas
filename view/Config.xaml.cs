@@ -1,6 +1,6 @@
-﻿using Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.mensajes;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.conexion;
+using Elecciones.src.mensajes;
+using Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,7 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Elecciones_Europeas
+namespace Elecciones
 {
     /// <summary>
     /// Interaction logic for Config.xaml

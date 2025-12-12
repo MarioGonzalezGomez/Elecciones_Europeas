@@ -1,5 +1,5 @@
-﻿using Elecciones_Europeas.src.controller;
-using Elecciones_Europeas.src.model.IPF;
+using Elecciones.src.controller;
+using Elecciones.src.model.IPF;
 using MaterialDesignThemes.Wpf.Transitions;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Elecciones_Europeas.src.logic
+namespace Elecciones.src.logic
 {
     public class Escuchador
     {

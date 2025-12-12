@@ -1,13 +1,13 @@
-ï»¿using Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.controller;
-using Elecciones_Europeas.src.model.IPF;
+using Elecciones.src.conexion;
+using Elecciones.src.controller;
+using Elecciones.src.model.IPF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.model.DTO.BrainStormDTO
+namespace Elecciones.src.model.DTO.BrainStormDTO
 {
     public class CircunscripcionDTO
     {
@@ -77,7 +77,7 @@ namespace Elecciones_Europeas.src.model.DTO.BrainStormDTO
             dto.participacion = participacion;
             dto.participacionHistorica = participacionHistorica;
             dto.participacionMedia = participacionMedia;
-            dto.anioUltimasElecciones = "AÃ±o Ãšltimas";
+            dto.anioUltimasElecciones = "Año Últimas";
 
             return dto;
         }

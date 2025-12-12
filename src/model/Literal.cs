@@ -1,4 +1,4 @@
-Ôªøusing Elecciones_Europeas.src.utils;
+using Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.model.IPF
+namespace Elecciones.src.model.IPF
 {
     public class Literal
     {
@@ -43,7 +43,7 @@ namespace Elecciones_Europeas.src.model.IPF
         public async Task ToCsv(List<Literal> literales)
         {
             string fileName = $"{configuration.GetValue("rutaArchivos")}\\CSV\\Partido.csv";
-            string csv = $"C√≥digo;Castellano;Catal√°n;Euskera;Gallego;Valenciano;Mallorqu√≠n\n";
+            string csv = $"CÛdigo;Castellano;Catal·n;Euskera;Gallego;Valenciano;MallorquÌn\n";
             foreach (Literal l in literales)
             {
                 csv += $"{l.codigo};{l.castellano};{l.catalan};{l.vasco};{l.gallego};{l.valenciano};{l.mallorquin}\n";

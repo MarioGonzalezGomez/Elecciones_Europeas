@@ -1,14 +1,14 @@
-ï»¿using Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.service;
+using Elecciones.src.conexion;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.IPF;
+using Elecciones.src.service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.controller
+namespace Elecciones.src.controller
 {
     internal class BrainStormController
     {
@@ -47,9 +47,9 @@ namespace Elecciones_Europeas.src.controller
         }
 
         /// <summary>
-        /// Obtiene los partidos mÃ¡s votados por autonomÃ­as (datos oficiales).
-        /// NOTA: Este mÃ©todo es para elecciones NACIONALES Ãºnicamente (tipoElecciones != 2).
-        /// Consulta el cÃ³digo nacional 9900000.
+        /// Obtiene los partidos más votados por autonomías (datos oficiales).
+        /// NOTA: Este método es para elecciones NACIONALES únicamente (tipoElecciones != 2).
+        /// Consulta el código nacional 9900000.
         /// </summary>
         public BrainStormDTO FindMasVotadosAutonomiasOficial(int avanceActual)
         {
@@ -59,9 +59,9 @@ namespace Elecciones_Europeas.src.controller
             return dto;
         }
         /// <summary>
-        /// Obtiene los partidos mÃ¡s votados por autonomÃ­as (datos de sondeo).
-        /// NOTA: Este mÃ©todo es para elecciones NACIONALES Ãºnicamente (tipoElecciones != 2).
-        /// Consulta el cÃ³digo nacional 9900000.
+        /// Obtiene los partidos más votados por autonomías (datos de sondeo).
+        /// NOTA: Este método es para elecciones NACIONALES únicamente (tipoElecciones != 2).
+        /// Consulta el código nacional 9900000.
         /// </summary>
         public BrainStormDTO FindMasVotadosAutonomiasSondeo(int avanceActual)
         {
@@ -133,9 +133,9 @@ namespace Elecciones_Europeas.src.controller
         }
 
         /// <summary>
-        /// Obtiene datos de un partido especÃ­fico por autonomÃ­as (datos oficiales).
-        /// NOTA: Este mÃ©todo es para elecciones NACIONALES Ãºnicamente (tipoElecciones != 2).
-        /// Consulta el cÃ³digo nacional 9900000.
+        /// Obtiene datos de un partido específico por autonomías (datos oficiales).
+        /// NOTA: Este método es para elecciones NACIONALES únicamente (tipoElecciones != 2).
+        /// Consulta el código nacional 9900000.
         /// </summary>
         public BrainStormDTO FindPartidoPorAutonomiasOficial(string codPartido, int avanceActual)
         {
@@ -145,9 +145,9 @@ namespace Elecciones_Europeas.src.controller
             return dto;
         }
         /// <summary>
-        /// Obtiene datos de un partido especÃ­fico por autonomÃ­as (datos de sondeo).
-        /// NOTA: Este mÃ©todo es para elecciones NACIONALES Ãºnicamente (tipoElecciones != 2).
-        /// Consulta el cÃ³digo nacional 9900000.
+        /// Obtiene datos de un partido específico por autonomías (datos de sondeo).
+        /// NOTA: Este método es para elecciones NACIONALES únicamente (tipoElecciones != 2).
+        /// Consulta el código nacional 9900000.
         /// </summary>
         public BrainStormDTO FindPartidoPorAutonomiasSondeo(string codPartido, int avanceActual)
         {

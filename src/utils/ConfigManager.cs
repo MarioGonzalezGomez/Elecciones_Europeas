@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 
-namespace Elecciones_Europeas.src.utils
+namespace Elecciones.src.utils
 {
     public class ConfigManager
     {

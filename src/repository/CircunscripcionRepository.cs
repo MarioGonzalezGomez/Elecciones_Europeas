@@ -1,11 +1,11 @@
-﻿using Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.service;
+using Elecciones.src.conexion;
+using Elecciones.src.model.IPF;
+using Elecciones.src.service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Elecciones_Europeas.src.repository
+namespace Elecciones.src.repository
 {
     internal class CircunscripcionRepository : IRepository<Circunscripcion, string>
     {

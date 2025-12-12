@@ -1,4 +1,4 @@
-Ôªøusing Elecciones_Europeas.src.utils;
+using Elecciones.src.utils;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -7,9 +7,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Elecciones_Europeas.src.service;
+using Elecciones.src.service;
 
-namespace Elecciones_Europeas.src.conexion
+namespace Elecciones.src.conexion
 {
     internal class ConexionGraficos
     {
@@ -81,7 +81,7 @@ namespace Elecciones_Europeas.src.conexion
 
         private void AbrirConexion(string programaGrafico = "")
         {
-            Console.WriteLine("Iniciando conexi√≥n...");
+            Console.WriteLine("Iniciando conexiÛn...");
             try
             {
                 client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -93,19 +93,19 @@ namespace Elecciones_Europeas.src.conexion
                 _loggerService.LogError($"Error connecting to {programaGrafico} at {_ip}:{_port}", ex);
                 if (String.Equals(programaGrafico, "prime", StringComparison.OrdinalIgnoreCase))
                 {
-                    _notificationService.ShowError($"Error al conectar con PRIME en la IP: {_ip}", "Error de conexi√≥n Prime");
+                    _notificationService.ShowError($"Error al conectar con PRIME en la IP: {_ip}", "Error de conexiÛn Prime");
                     configuration.SetValue("activoPrime", "0");
                     conectado = false;
                 }
                 else if (String.Equals(programaGrafico, "ipf", StringComparison.OrdinalIgnoreCase))
                 {
-                    _notificationService.ShowError($"Error al conectar con BRAINSTORM en la IP: {_ip}", "Error de conexi√≥n Brainstorm");
+                    _notificationService.ShowError($"Error al conectar con BRAINSTORM en la IP: {_ip}", "Error de conexiÛn Brainstorm");
                     configuration.SetValue("activoIPF", "0");
                     conectado = false;
                 }
                 else
                 {
-                    _notificationService.ShowError($"Error al conectar con el programa gr√°fico en la IP: {_ip}", "Error de conexi√≥n");
+                    _notificationService.ShowError($"Error al conectar con el programa gr·fico en la IP: {_ip}", "Error de conexiÛn");
                     conectado = false;
                 }
 
@@ -126,7 +126,7 @@ namespace Elecciones_Europeas.src.conexion
                 byte[] solicitudBuffer = Encoding.UTF8.GetBytes(solicitud);
                 client.Send(solicitudBuffer);
 
-                // Establecer un tiempo de espera de 5 segundos para la operaci√≥n de recepci√≥n
+                // Establecer un tiempo de espera de 5 segundos para la operaciÛn de recepciÛn
                 client.ReceiveTimeout = 500;
 
                 byte[] receivedBuffer = new byte[1024];
@@ -139,7 +139,7 @@ namespace Elecciones_Europeas.src.conexion
                 _loggerService.LogError("SocketException in RecibirMensaje", ex);
                 if (ex.SocketErrorCode == SocketError.TimedOut)
                 {
-                    _notificationService.ShowError("Se agot√≥ el tiempo de espera al recibir datos.", "Error de tiempo de espera");
+                    _notificationService.ShowError("Se agotÛ el tiempo de espera al recibir datos.", "Error de tiempo de espera");
                 }
                 else
                 {

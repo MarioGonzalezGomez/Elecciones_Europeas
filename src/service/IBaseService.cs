@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
-namespace Elecciones_Europeas.src.service
+namespace Elecciones.src.service
 {
     internal interface IBaseService<T, ID>
     {

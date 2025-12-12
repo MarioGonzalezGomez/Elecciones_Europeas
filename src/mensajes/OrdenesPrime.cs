@@ -1,12 +1,12 @@
-﻿using Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.mensajes.builders;
+using Elecciones.src.conexion;
+using Elecciones.src.mensajes.builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.mensajes
+namespace Elecciones.src.mensajes
 {
     internal class OrdenesPrime
     {

@@ -1,9 +1,9 @@
-﻿using Elecciones_Europeas.src.model;
-using Elecciones_Europeas.src.model.DTO.BrainStormDTO;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.model.IPF.DTO;
-using Elecciones_Europeas.src.service;
-using Elecciones_Europeas.src.utils;
+using Elecciones.src.model;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.IPF;
+using Elecciones.src.model.IPF.DTO;
+using Elecciones.src.service;
+using Elecciones.src.utils;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -12,7 +12,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.logic
+namespace Elecciones.src.logic
 {
     public class LogicaArco
     {

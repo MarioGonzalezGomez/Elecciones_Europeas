@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Input;
 
-namespace Elecciones_Europeas.src.viewmodel.MvvmBase
+namespace Elecciones.src.viewmodel.MvvmBase
 {
     public class RelayCommand : ICommand
     {

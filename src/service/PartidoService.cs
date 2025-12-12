@@ -1,12 +1,12 @@
-﻿using Elecciones_Europeas.src.conexion;
-using Elecciones_Europeas.src.controller;
-using Elecciones_Europeas.src.model.IPF;
-using Elecciones_Europeas.src.repository;
+using Elecciones.src.conexion;
+using Elecciones.src.controller;
+using Elecciones.src.model.IPF;
+using Elecciones.src.repository;
 using System.Collections.Generic;
 using System.Drawing;
 
 
-namespace Elecciones_Europeas.src.service
+namespace Elecciones.src.service
 {
     internal class PartidoService : IBaseService<Partido, string>
     {

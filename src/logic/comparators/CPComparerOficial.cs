@@ -1,11 +1,11 @@
-ï»¿using Elecciones_Europeas.src.model.IPF;
+using Elecciones.src.model.IPF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Elecciones_Europeas.src.logic.comparators
+namespace Elecciones.src.logic.comparators
 {
     internal class CPComparerOficial : IComparer<CircunscripcionPartido>
     {
@@ -16,11 +16,11 @@ namespace Elecciones_Europeas.src.logic.comparators
             if (o1 == null) return -1;
             if (o2 == null) return 1;
 
-            // Si o1 tiene el cÃ³digo 99999, siempre va al Ãºltimo
+            // Si o1 tiene el código 99999, siempre va al último
             if (o1.codPartido.Equals("99999")) return -1;
             if (o2.codPartido.Equals("99999")) return 1;
 
-            // Si o1 tiene el cÃ³digo 96009, siempre va antes que 99999 pero despuÃ©s de los otros
+            // Si o1 tiene el código 96009, siempre va antes que 99999 pero después de los otros
             if (o1.codPartido.Equals("96009"))
             {
                 if (o2.codPartido.Equals("99999")) return 1;
@@ -33,7 +33,7 @@ namespace Elecciones_Europeas.src.logic.comparators
                 return -1;
             }
 
-            // Comparar los demÃ¡s elementos segÃºn los criterios especificados
+            // Comparar los demás elementos según los criterios especificados
             int comp = Comparer<int>.Default.Compare(o1.escaniosHasta, o2.escaniosHasta);
             if (comp == 0)
             {

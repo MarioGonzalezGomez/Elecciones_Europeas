@@ -143,9 +143,6 @@ namespace Elecciones_Europeas.src.controller
         public void PP_PSOEEntra() { if (ipfActivo.Valor == 1) { ipf.PP_PSOEEntra(); } }
         public void PP_PSOESale() { if (ipfActivo.Valor == 1) { ipf.PP_PSOESale(); } }
 
-        public void PP_PSOEaGenerales() { if (ipfActivo.Valor == 1) { ipf.PP_PSOEaGenerales(); } }
-        public void PP_PSOEaEuropeas() { if (ipfActivo.Valor == 1) { ipf.PP_PSOEaEuropeas(); } }
-
         //DESPLIEGAS
         public void Despliega4() { if (ipfActivo.Valor == 1) { ipf.Despliega4(); } }
         public void Despliega5() { if (ipfActivo.Valor == 1) { ipf.Despliega5(); } }
@@ -180,6 +177,7 @@ namespace Elecciones_Europeas.src.controller
             if (ipfActivo.Valor == 1) { ipf.SedesEncadena(tickerIn, codPartidoSiguiente, codPartidoAnterior); }
         }
         public void SedesSale(bool tickerIn, string codPartido = "") { if (ipfActivo.Valor == 1) { ipf.SedesSale(tickerIn, codPartido); } }
+
 
         //CARTONES
         //PARTICIPACION

@@ -24,7 +24,17 @@ namespace Elecciones_Europeas.src.mensajes.builders
             return instance;
         }
 
+        //MENSAJES ESPECÍFICOS
 
+        public string SubirRotulos()
+        {
+            return CambioParametroProyecto("Par_Posicion_GrupoXY","2");
+        }
+
+        public string BajarRotulos()
+        {
+            return CambioParametroProyecto("Par_Posicion_GrupoXY", "1");
+        }
 
         //MÉTODOS GENÉRICOS DONDE PODER ESPECIFICAR POR PARÁMETRO
 

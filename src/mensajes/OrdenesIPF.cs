@@ -94,8 +94,6 @@ namespace Elecciones_Europeas.src.mensajes
         public void PP_PSOEEntra() { c.EnviarMensaje(builder.PP_PSOEEntra()); }
         public void PP_PSOESale() { c.EnviarMensaje(builder.PP_PSOESale()); }
 
-        public void PP_PSOEaGenerales() { c.EnviarMensaje(builder.PP_PSOEaGenerales()); }
-        public void PP_PSOEaEuropeas() { c.EnviarMensaje(builder.PP_PSOEaEuropeas()); }
 
         //DESPLIEGAS
         public void Despliega4() { c.EnviarMensaje(builder.Despliega4()); }

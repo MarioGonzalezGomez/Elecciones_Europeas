@@ -218,24 +218,25 @@ namespace Elecciones_Europeas
             switch (tablaPrincipal)
             {
                 case 1:
-                    graficosListView.Items.Add("TICKER");
+                    graficosListView.Items.Add("CUENTA ATRÁS");
+                    graficosListView.Items.Add("FICHAS");
                     graficosListView.Items.Add("SEDES");
                     //  graficosListView.Items.Add("INDEPENDENTISMO");
                     break;
                 case 2:
                     graficosListView.Items.Add("PARTICIPACIÓN");
-                    graficosListView.Items.Add("CCAA");
+                    //graficosListView.Items.Add("CCAA");
+                    graficosListView.Items.Add("FICHAS");
+                    //graficosListView.Items.Add("PACTÓMETRO");
+                    graficosListView.Items.Add("MAYORÍAS");
+                    //graficosListView.Items.Add("VS");
+                    break;
+                case 3:
                     graficosListView.Items.Add("FICHAS");
                     graficosListView.Items.Add("PACTÓMETRO");
                     graficosListView.Items.Add("MAYORÍAS");
-                    graficosListView.Items.Add("SUPERFALDÓN");
-                    graficosListView.Items.Add("VS");
-                    break;
-                case 3:
-                    graficosListView.Items.Add("RA 1");
-                    graficosListView.Items.Add("SEDES");
-                    graficosListView.Items.Add("RA 3");
-                    graficosListView.Items.Add("RA 4");
+                    graficosListView.Items.Add("BIPARTIDISMO");
+                    graficosListView.Items.Add("GANADOR");
                     break;
                 case 4:
                     graficosListView.Items.Add("PANTALLA 1");
@@ -347,7 +348,9 @@ namespace Elecciones_Europeas
             graficos.TickerActualizaEscrutado();
             graficos.TickerActualiza();
         }
-        private void UpdateCartones() { }
+        private void UpdateCartones()
+        {
+        }
 
         private bool CompararOrden(BrainStormDTO anterior, BrainStormDTO actual)
         {
@@ -364,6 +367,7 @@ namespace Elecciones_Europeas
             ReajustarSizeTabla();
         }
 
+        //LOGICA CONFIG
         private void imgConfig_MouseEnter(object sender, MouseEventArgs e)
         {
             // Cambiar la imagen a la versión azul cuando el ratón entra
@@ -441,6 +445,7 @@ namespace Elecciones_Europeas
             }
         }
 
+        //LOGICA CAMBIO DE ELECCIONES
         private void btnSondeoCentral_Click(object sender, RoutedEventArgs e)
         {
             oficiales = false;
@@ -508,7 +513,7 @@ namespace Elecciones_Europeas
         private void ActualizarPorOfiSondeo()
         {
             graficos.SondeoUOficial(oficiales);
-            botonera.AdaptarEntorno();
+            if (botonera != null) { botonera.AdaptarEntorno(); }
             ActualizarDatosEnTabla();
             if (circunscripcionesListView.SelectedItem != null || autonomiasListView.SelectedItem != null)
             {
@@ -603,6 +608,7 @@ namespace Elecciones_Europeas
             }
         }
 
+        //LOGICA BOTONES DE AVANCE
         private void btnAvance1_Click(object sender, RoutedEventArgs e)
         {
             RestaurarColorAvance();
@@ -666,6 +672,7 @@ namespace Elecciones_Europeas
             btnAvance4.Background = color;
         }
 
+        //LOGICA SELECCION DE CIRCUNSCRIPCIONES
         private void autonomiasListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DesplegarCircunscripciones();
@@ -786,269 +793,8 @@ namespace Elecciones_Europeas
             cpdatas.ForEach(listaDeDatos.Add);
         }
 
-        private BrainStormDTO ObtenerDTO(bool filtrado, string circunscripcion)
-        {
-            if (filtrado)
-            {
-                dto = oficiales ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficial(circunscripcion, avance, tipoElecciones)
-                             : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeo(circunscripcion, avance, tipoElecciones);
-            }
-            else
-            {
-                dto = oficiales ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(circunscripcion, avance, tipoElecciones)
-                             : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(circunscripcion, avance, tipoElecciones);
-            }
-            return dto;
-        }
 
-        private void btnReset_Click(object sender, RoutedEventArgs e)
-        {
-            if (ipf != null) { ipf.Reset(); }
-            if (prime != null) { prime.Reset(); }
-            preparado = false;
-            sondeoEnElAire = false;
-            tickerDentro = false;
-            sedeDentro = false;
-            if (pactos != null) { pactos.pactoDentro = false; }
-        }
-
-        private void btnPrepara_Click(object sender, RoutedEventArgs e)
-        {
-            EscribirFichero();
-        }
-        private async void EscribirFichero(bool desdeSedes = false)
-        {
-            if (dto != null)
-            {
-                preparado = true;
-
-                if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
-                {
-                    if (desdeSedes)
-                    {
-                        if (oficiales) { await dto.ToCsv(); }
-                        else { await dto.ToCsv("Brainstorm_Sondeo"); }
-                    }
-                }
-                else
-                {
-                    if (oficiales) { await dto.ToCsv(); }
-                    else { await dto.ToCsv("Brainstorm_Sondeo"); }
-                }
-                if (partidoSeleccionado != null)
-                {
-                    SedesDTO sede = SedesDTO.FromPartidoDTO(partidoSeleccionado, conexionActiva);
-                    await sede.ToCsv();
-                }
-
-                if (graficos.primeActivo.Valor == 1)
-                {
-                    if (oficiales) { dto = BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones); }
-                    else { dto = BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones); }
-                    // await EscribirJsonPrimeAsync();
-                }
-                // await EscribirJsonPrimeAsync();
-            }
-
-        }
-        private async Task EscribirJsonPrimeAsync()
-        {
-            Recuentos rs = new Recuentos();
-            List<Recuentos> recuentos = rs.GetRecuentos(oficiales, avance, tipoElecciones, conexionActiva);
-            await rs.ToJson(recuentos);
-        }
-        private void btnEntra_Click(object sender, RoutedEventArgs e)
-        {
-            if (!preparado) { EscribirFichero(); }
-            if (string.Equals(graficosHeader.Header, "FALDONES")) { EntraFaldon(); }
-            if (string.Equals(graficosHeader.Header, "CARTONES")) { EntraCarton(); }
-        }
-        private void EntraFaldon()
-        {
-            if (dto != null && graficosListView.SelectedIndex != -1)
-            {
-                switch (graficosListView.SelectedValue.ToString())
-                {
-                    case "TICKER":
-                        if (sondeoEnElAire && oficiales)
-                        {
-                            graficos.DeSondeoAOficiales();
-                            sondeoEnElAire = false;
-                        }
-                        else
-                        {
-                            if (tickerDentro) { graficos.TickerEncadena(oficiales); }
-                            else { graficos.TickerEntra(oficiales); }
-                            if (!oficiales) { sondeoEnElAire = true; }
-                        }
-                        tickerDentro = true;
-                        break;
-                    case "INDEPENDENTISMO":
-                        if (tickerDentro)
-                        {
-                            graficos.independentismoEntra();
-                            dtoDesdeSedes = new BrainStormDTO(dto);
-                        }
-                        break;
-                    case "SEDES":
-                        if (partidoSeleccionado != null)
-                        {
-                            if (!sedeDentro)
-                            {
-                                graficos.SedesEntra(false, partidoSeleccionado.codigo);
-                                dtoDesdeSedes = new BrainStormDTO(dto);
-                            }
-                            else { graficos.SedesEncadena(false, partidoSeleccionado.codigo); }
-                            sedeDentro = true;
-                        }
-                        break;
-                    default: break;
-                }
-            }
-        }
-        private void EntraCarton()
-        {
-            if (dto != null && graficosListView.SelectedIndex != -1)
-            {
-                switch (graficosListView.SelectedValue.ToString())
-                {
-                    case "PARTICIPACIÓN":
-                        if (participacionDentro) { graficos.participacionEncadena(); }
-                        else { graficos.participacionEntra(); }
-                        break;
-                    case "CCAA":
-                        if (ccaaDentro) { graficos.ccaaEncadena(); }
-                        else { graficos.ccaaEntra(); }
-                        break;
-                    case "MAYORÍAS":
-                        if (mayoriasDentro) { graficos.mayoriasEncadena(); }
-                        else { graficos.mayoriasEntra(); }
-                        break;
-                    case "FICHAS":
-                        if (fichaDentro) { graficos.fichaEncadena(); }
-                        else { graficos.fichaEntra(); }
-                        break;
-                    case "SUPERFALDÓN":
-                        if (superfaldonDentro) { graficos.superfaldonEntra(); }
-                        else { graficos.superfaldonEntra(); }
-                        break;
-                    case "VS":
-                        //graficos.superfaldonEntra();
-                        break;
-
-                    default: break;
-                }
-            }
-            // graficosListView.Items.Add("PACTÓMETRO");
-            // graficosListView.Items.Add("SUPERFALDÓN");
-        }
-        private void btnSale_Click(object sender, RoutedEventArgs e)
-        {
-            if (string.Equals(graficosHeader.Header, "FALDONES")) { SaleFaldon(); }
-            if (string.Equals(graficosHeader.Header, "CARTONES")) { SaleCarton(); }
-        }
-        private void SaleFaldon()
-        {
-            if (graficosListView.SelectedIndex != -1)
-            {
-                switch (graficosListView.SelectedValue.ToString())
-                {
-                    case "TICKER":
-                        graficos.TickerSale(oficiales);
-                        if (!oficiales) { sondeoEnElAire = false; }
-                        tickerDentro = false;
-                        break;
-                    case "SEDES":
-                        if (partidoSeleccionado != null)
-                        {
-                            graficos.SedesSale(false, partidoSeleccionado.codigo);
-                            sedeDentro = false;
-                            if (tickerDentro)
-                            {
-                                Update(true);
-                            }
-                        }
-                        break;
-                    case "INDEPENDENTISMO":
-                        graficos.independentismoSale();
-                        if (tickerDentro)
-                        {
-                            Update(true);
-                        }
-                        break;
-                    default: break;
-                }
-            }
-        }
-        private void SaleCarton()
-        {
-            if (graficosListView.SelectedIndex != -1)
-            {
-                switch (graficosListView.SelectedValue.ToString())
-                {
-                    case "PARTICIPACIÓN":
-                        graficos.participacionSale();
-                        participacionDentro = false;
-                        break;
-                    case "CCAA":
-                        graficos.ccaaSale();
-                        ccaaDentro = false;
-                        break;
-                    case "MAYORÍAS":
-                        graficos.mayoriasSale();
-                        mayoriasDentro = false;
-                        break;
-                    case "FICHAS":
-                        graficos.fichaSale();
-                        fichaDentro = false;
-                        break;
-                    case "SUPERFALDÓN":
-                        graficos.superfaldonSale();
-                        break;
-                    case "VS":
-                        // graficos.superfaldonEntra();
-                        break;
-
-                    default: break;
-                }
-            }
-        }
-        private void btnPactos_Click(object sender, RoutedEventArgs e)
-        {
-            if (dto != null)
-            {
-                if (pactos == null)
-                {
-                    if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO"))
-                    {
-                        pactos = new Pactos(dtoSinFiltrar, oficiales);
-                    }
-                    else
-                    {
-                        pactos = new Pactos(dto, oficiales);
-                    }
-                    pactos.Show();
-                }
-                else { pactos.Activate(); }
-            }
-            else
-            {
-                MessageBox.Show($"Seleccione alguna circunscripción para ver su pestaña de pactos", "Circunscipción no seleccionada", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-        private void btnActualiza_Click(object sender, RoutedEventArgs e)
-        {
-            bool temp = actualizacionActiva;
-            actualizacionActiva = true;
-            if (graficosListView.SelectedItem != null && (string.Equals(graficosListView.SelectedValue, "SEDES") || string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO")))
-            {
-                Update(true);
-            }
-            else { Update(); }
-
-            actualizacionActiva = temp;
-        }
-
+        //ADAPTACION DE DATOS DEPENDIENDO DE ELEMENTO SELECCIONADO
         private void graficosListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (graficosListView.SelectedIndex != -1)
@@ -1140,6 +886,338 @@ namespace Elecciones_Europeas
             }
         }
 
+        //LOGICA DE FICHEROS
+        private BrainStormDTO ObtenerDTO(bool filtrado, string circunscripcion)
+        {
+            if (filtrado)
+            {
+                dto = oficiales ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficial(circunscripcion, avance, tipoElecciones)
+                             : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeo(circunscripcion, avance, tipoElecciones);
+            }
+            else
+            {
+                dto = oficiales ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(circunscripcion, avance, tipoElecciones)
+                             : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(circunscripcion, avance, tipoElecciones);
+            }
+            return dto;
+        }
+
+        private async void EscribirFichero(bool desdeSedes = false)
+        {
+            if (dto != null)
+            {
+                preparado = true;
+
+                if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
+                {
+                    if (desdeSedes)
+                    {
+                        if (oficiales) { await dto.ToCsv(); }
+                        else { await dto.ToCsv("Brainstorm_Sondeo"); }
+                    }
+                }
+                else
+                {
+                    if (oficiales) { await dto.ToCsv(); }
+                    else { await dto.ToCsv("Brainstorm_Sondeo"); }
+                }
+                if (partidoSeleccionado != null)
+                {
+                    SedesDTO sede = SedesDTO.FromPartidoDTO(partidoSeleccionado, conexionActiva);
+                    await sede.ToCsv();
+                }
+
+                if (graficos.primeActivo.Valor == 1)
+                {
+                    if (oficiales) { dto = BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones); }
+                    else { dto = BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones); }
+                    // await EscribirJsonPrimeAsync();
+                }
+                // await EscribirJsonPrimeAsync();
+            }
+
+        }
+        private async Task EscribirJsonPrimeAsync()
+        {
+            Recuentos rs = new Recuentos();
+            List<Recuentos> recuentos = rs.GetRecuentos(oficiales, avance, tipoElecciones, conexionActiva);
+            await rs.ToJson(recuentos);
+        }
+
+        //LOGICA DE BOTONES GENERICOS
+        private void btnReset_Click(object sender, RoutedEventArgs e)
+        {
+            if (ipf != null) { ipf.Reset(); }
+            if (prime != null) { prime.Reset(); }
+            preparado = false;
+            sondeoEnElAire = false;
+            tickerDentro = false;
+            sedeDentro = false;
+            if (pactos != null) { pactos.pactoDentro = false; }
+        }
+        private void btnPrepara_Click(object sender, RoutedEventArgs e)
+        {
+            EscribirFichero();
+        }
+        private void btnEntra_Click(object sender, RoutedEventArgs e)
+        {
+            if (!preparado) { EscribirFichero(); }
+            if (string.Equals(graficosHeader.Header, "FALDÓN")) { EntraFaldon(); }
+            if (string.Equals(graficosHeader.Header, "CARTÓN")) { EntraCarton(); }
+            if (string.Equals(graficosHeader.Header, "SUPERFALDÓN")) { EntraSuperfaldon(); }
+            if (string.Equals(graficosHeader.Header, "PANTALLA")) { EntraSuperfaldon(); }
+            if (string.Equals(graficosHeader.Header, "REALIDAD AUMENTADA")) { EntraSuperfaldon(); }
+            if (string.Equals(graficosHeader.Header, "DRON")) { EntraSuperfaldon(); }
+        }
+        private void btnSale_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.Equals(graficosHeader.Header, "FALDÓN")) { SaleFaldon(); }
+            if (string.Equals(graficosHeader.Header, "CARTÓN")) { SaleCarton(); }
+            if (string.Equals(graficosHeader.Header, "SUPERFALDÓN")) { SaleSuperfaldon(); }
+        }
+        private void btnActualiza_Click(object sender, RoutedEventArgs e)
+        {
+            bool temp = actualizacionActiva;
+            actualizacionActiva = true;
+            if (graficosListView.SelectedItem != null && (string.Equals(graficosListView.SelectedValue, "SEDES") || string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO")))
+            {
+                Update(true);
+            }
+            else { Update(); }
+
+            actualizacionActiva = temp;
+        }
+        private void btnPactos_Click(object sender, RoutedEventArgs e)
+        {
+            if (dto != null)
+            {
+                if (pactos == null)
+                {
+                    if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO"))
+                    {
+                        pactos = new Pactos(dtoSinFiltrar, oficiales);
+                    }
+                    else
+                    {
+                        pactos = new Pactos(dto, oficiales);
+                    }
+                    pactos.Show();
+                }
+                else { pactos.Activate(); }
+            }
+            else
+            {
+                MessageBox.Show($"Seleccione alguna circunscripción para ver su pestaña de pactos", "Circunscipción no seleccionada", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        //LOGICA PARA LOS TIPOS DE GRÁFICOS DISTINTOS
+        private void EntraFaldon()
+        {
+            if (dto != null && graficosListView.SelectedIndex != -1)
+            {
+                switch (graficosListView.SelectedValue.ToString())
+                {
+                    case "CUENTA ATRÁS":
+                        graficos.EntraReloj();
+                        break;
+                    case "FICHAS":
+                        if (sondeoEnElAire && oficiales)
+                        {
+                            graficos.DeSondeoAOficiales();
+                            sondeoEnElAire = false;
+                        }
+                        else
+                        {
+                            if (tickerDentro) { graficos.TickerEncadena(oficiales); }
+                            else { graficos.TickerEntra(oficiales); }
+                            if (!oficiales) { sondeoEnElAire = true; }
+                        }
+                        tickerDentro = true;
+                        break;
+                    case "INDEPENDENTISMO":
+                        if (tickerDentro)
+                        {
+                            graficos.independentismoEntra();
+                            dtoDesdeSedes = new BrainStormDTO(dto);
+                        }
+                        break;
+                    case "SEDES":
+                        if (partidoSeleccionado != null)
+                        {
+                            if (!sedeDentro)
+                            {
+                                graficos.SedesEntra(false, partidoSeleccionado.codigo);
+                                dtoDesdeSedes = new BrainStormDTO(dto);
+                            }
+                            else { graficos.SedesEncadena(false, partidoSeleccionado.codigo); }
+                            sedeDentro = true;
+                        }
+                        break;
+                    default: break;
+                }
+            }
+        }
+        private void EntraCarton()
+        {
+            if (dto != null && graficosListView.SelectedIndex != -1)
+            {
+                switch (graficosListView.SelectedValue.ToString())
+                {
+                    case "PARTICIPACIÓN":
+                        if (participacionDentro) { graficos.participacionEncadena(); }
+                        else { graficos.participacionEntra(); }
+                        break;
+                    case "FICHAS":
+                        if (fichaDentro) { graficos.fichaEncadena(); }
+                        else { graficos.fichaEntra(); }
+                        break;
+                    case "MAYORÍAS":
+                        if (mayoriasDentro) { graficos.mayoriasEncadena(); }
+                        else { graficos.mayoriasEntra(); }
+                        break;
+                    case "CCAA":
+                        if (ccaaDentro) { graficos.ccaaEncadena(); }
+                        else { graficos.ccaaEntra(); }
+                        break;
+                    case "SUPERFALDÓN":
+                        if (superfaldonDentro) { graficos.superfaldonEntra(); }
+                        else { graficos.superfaldonEntra(); }
+                        break;
+                    case "VS":
+                        //graficos.superfaldonEntra();
+                        break;
+
+                    default: break;
+                }
+            }
+        }
+        private void EntraSuperfaldon()
+        {
+            if (dto != null && graficosListView.SelectedIndex != -1)
+            {
+                switch (graficosListView.SelectedValue.ToString())
+                {
+                    case "FICHAS":
+
+                        break;
+                    case "PACTÓMETRO":
+
+                        break;
+                    case "MAYORÍAS":
+
+                        break;
+                    case "BIPARTIDISMO":
+
+                        break;
+                    case "GANADOR":
+
+                        break;
+
+                    default: break;
+                }
+            }
+        }
+
+        private void SaleFaldon()
+        {
+            if (graficosListView.SelectedIndex != -1)
+            {
+                switch (graficosListView.SelectedValue.ToString())
+                {
+                    case "CUENTA ATRÁS":
+                        graficos.SaleReloj();
+                        break;
+                    case "FICHAS":
+                        graficos.TickerSale(oficiales);
+                        if (!oficiales) { sondeoEnElAire = false; }
+                        tickerDentro = false;
+                        break;
+                    case "SEDES":
+                        if (partidoSeleccionado != null)
+                        {
+                            graficos.SedesSale(false, partidoSeleccionado.codigo);
+                            sedeDentro = false;
+                            if (tickerDentro)
+                            {
+                                Update(true);
+                            }
+                        }
+                        break;
+                    case "INDEPENDENTISMO":
+                        graficos.independentismoSale();
+                        if (tickerDentro)
+                        {
+                            Update(true);
+                        }
+                        break;
+                    default: break;
+                }
+            }
+        }
+        private void SaleCarton()
+        {
+            if (graficosListView.SelectedIndex != -1)
+            {
+                switch (graficosListView.SelectedValue.ToString())
+                {
+                    case "PARTICIPACIÓN":
+                        graficos.participacionSale();
+                        participacionDentro = false;
+                        break;
+                    case "CCAA":
+                        graficos.ccaaSale();
+                        ccaaDentro = false;
+                        break;
+                    case "MAYORÍAS":
+                        graficos.mayoriasSale();
+                        mayoriasDentro = false;
+                        break;
+                    case "FICHAS":
+                        graficos.fichaSale();
+                        fichaDentro = false;
+                        break;
+                    case "SUPERFALDÓN":
+                        graficos.superfaldonSale();
+                        break;
+                    case "VS":
+                        // graficos.superfaldonEntra();
+                        break;
+
+                    default: break;
+                }
+            }
+        }
+        private void SaleSuperfaldon()
+        {
+            if (graficosListView.SelectedIndex != -1)
+            {
+                switch (graficosListView.SelectedValue.ToString())
+                {
+                    case "FICHAS":
+                       
+                        break;
+                    case "PACTÓMETRO":
+                       
+                        break;
+                    case "MAYORÍAS":
+                        
+                        break;
+                    case "BIPARTIDISMO":
+                        
+                        break;
+                    case "GANADOR":
+                       
+                        break;
+
+                    default: break;
+                }
+            }
+            // graficosListView.Items.Add("PACTÓMETRO");
+            // graficosListView.Items.Add("SUPERFALDÓN");
+        }
+
+        //LOGICA DE CIERRE DE VENTANA
         private void WindowClosing(object? sender, CancelEventArgs e)
         {
             if (botonera != null)

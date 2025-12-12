@@ -128,15 +128,6 @@ namespace Elecciones_Europeas
             if (gController != null && gController.ipfActivo.Valor == 1) { gController.AnimacionSondeo(false); }
         }
 
-        private void ProyeccionCheck_Checked(object sender, RoutedEventArgs e)
-        {
-            if (gController != null && gController.ipfActivo.Valor == 1) { gController.Proyeccion(true); }
-        }
-        private void ProyeccionCheck_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (gController != null && gController.ipfActivo.Valor == 1) { gController.Proyeccion(false); }
-        }
-
         private void DespliegaButton_Click(object sender, RoutedEventArgs e)
         {
             MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
@@ -161,20 +152,6 @@ namespace Elecciones_Europeas
             else
             {
                 MessageBox.Show($"No hay ningún partido desplegado", "Acción no permitida", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-        private void EncadenaButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
-            var partido = mainWindow.datosListView.SelectedItem as CPDataDTO;
-            if (partido != null && partidoDesplegado != null)
-            {
-                gController.SedesEncadena(true, partido.codigo, partidoDesplegado.codigo);
-                partidoDesplegado = partido;
-            }
-            else
-            {
-                MessageBox.Show($"Debes seleccionar un partido para poder encadenarlo", "Seleccionar Partido", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -215,28 +192,11 @@ namespace Elecciones_Europeas
         {
             gController.PP_PSOESale();
         }
-        private void EspaniaPP_PSOEButton_Click(object sender, RoutedEventArgs e)
-        {
-            gController.PP_PSOEaGenerales();
-        }
-        private void EuropaPP_PSOEButton_Click(object sender, RoutedEventArgs e)
-        {
-            gController.PP_PSOEaEuropeas();
-        }
 
-        private void Despliega4Button_Click(object sender, RoutedEventArgs e)
+        private void btnSubirRotulosTd_Click(object sender, RoutedEventArgs e)
         {
-            gController.Despliega4();
-        }
-        private void Despliega5Button_Click(object sender, RoutedEventArgs e)
-        {
-            gController.Despliega5();
-        }
-        private void RecuperaTodosButton_Click(object sender, RoutedEventArgs e)
-        {
-            gController.RecuperaTodos();
-        }
 
+        }
     }
 }
 

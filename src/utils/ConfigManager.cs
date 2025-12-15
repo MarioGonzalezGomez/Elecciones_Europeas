@@ -1,25 +1,40 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using Elecciones.src.service;
 
 namespace Elecciones.src.utils
 {
     public class ConfigManager
     {
-        public static ConfigManager instance;
+        private static ConfigManager instance;
+        private static readonly object _lock = new();
         private Dictionary<string, string> config;
         private string path;
+        private readonly FileLoggerService _logger = FileLoggerService.GetInstance();
 
         private ConfigManager(string ruta)
         {
-            path = ruta;
-            config = new Dictionary<string, string>();
+            // If ruta is null/empty, use executable folder
+            if (string.IsNullOrWhiteSpace(ruta))
+            {
+                ruta = Path.Combine(AppContext.BaseDirectory, "config.ini");
+            }
+
+            path = Path.GetFullPath(ruta);
+            config = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            EnsureConfigExists();
         }
 
-        public static ConfigManager GetInstance(string ruta = "config.ini")
+        public static ConfigManager GetInstance(string ruta = null)
         {
-            if (instance == null)
+            lock (_lock)
             {
-                instance = new ConfigManager(ruta);
+                if (instance == null)
+                {
+                    instance = new ConfigManager(ruta);
+                }
             }
             return instance;
         }
@@ -27,58 +42,104 @@ namespace Elecciones.src.utils
         public string GetValue(string key)
         {
             if (config.ContainsKey(key))
-                return config[key];
-            return "";
+                return config[key] ?? string.Empty;
+            return string.Empty;
         }
 
         public void SetValue(string key, string value)
         {
-            config[key] = value;
+            config[key] = value ?? string.Empty;
         }
 
         public Dictionary<string, string> ReadConfig()
         {
             config.Clear();
-            var lines = File.ReadAllLines(path);
-            foreach (var line in lines)
+
+            try
             {
-                // Skip empty or whitespace-only lines
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                // Skip comment lines
-                if (line.TrimStart().StartsWith('#'))
-                    continue;
-
-                // Split only once and store result
-                var parts = line.Split('=');
-                
-                // Validate that we have exactly 2 parts (key and value)
-                if (parts.Length == 2)
+                if (!File.Exists(path))
                 {
-                    var key = parts[0].Trim();
-                    var value = parts[1].Trim();
-                    
-                    // Only add if key is not empty
+                    _logger.LogInfo($"Config file not found at '{path}', using empty config.");
+                    return config;
+                }
+
+                var lines = File.ReadAllLines(path);
+                foreach (var rawLine in lines)
+                {
+                    // Skip empty or whitespace-only lines
+                    if (string.IsNullOrWhiteSpace(rawLine))
+                        continue;
+
+                    // Skip comment lines starting with #
+                    var line = rawLine.Trim();
+                    if (line.StartsWith('#'))
+                        continue;
+
+                    // Split at first '=' only
+                    int idx = line.IndexOf('=');
+                    if (idx <= 0)
+                        continue;
+
+                    var key = line.Substring(0, idx).Trim();
+                    var value = line.Substring(idx + 1).Trim();
+
                     if (!string.IsNullOrWhiteSpace(key))
                     {
                         config[key] = value;
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed reading config file '{path}'", ex);
+            }
+
             return config;
         }
 
         public void SaveConfig()
         {
-            string lines = "";
-            foreach (var key in config.Keys)
+            try
             {
-                var value = config[key];
-                var line = $"{key}={value}\n";
-                lines += line;
+                var sb = new StringBuilder();
+                foreach (var kvp in config)
+                {
+                    sb.AppendLine($"{kvp.Key}={kvp.Value}");
+                }
+                Directory.CreateDirectory(Path.GetDirectoryName(path) ?? AppContext.BaseDirectory);
+                File.WriteAllText(path, sb.ToString());
             }
-          File.WriteAllText($"{path}", lines);
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed saving config file '{path}'", ex);
+            }
+        }
+
+        private void EnsureConfigExists()
+        {
+            try
+            {
+                var dir = Path.GetDirectoryName(path);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                if (!File.Exists(path))
+                {
+                    // Create a minimal default config file with a comment header
+                    var defaultContent = new StringBuilder();
+                    defaultContent.AppendLine("# Elecciones - config.ini");
+                    defaultContent.AppendLine("# If you edit this file, keep KEY=VALUE per line");
+                    File.WriteAllText(path, defaultContent.ToString());
+                }
+                // Try to load existing content
+                ReadConfig();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Unable to ensure config file '{path}' exists", ex);
+            }
         }
     }
 }

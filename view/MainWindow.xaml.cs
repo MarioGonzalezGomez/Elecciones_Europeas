@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Win32; // <- Added for OpenFileDialog
 
 namespace Elecciones
 {
@@ -101,6 +102,10 @@ namespace Elecciones
             PrepararEstructuraDeCarpetas();
             IniciarEscuchadores();
             AdaptarTablas();
+
+            // Initialize video UI state (loads saved paths / modes)
+            InitializeVideoConfigUI();
+
             this.Closing += WindowClosing;
         }
 
@@ -324,9 +329,10 @@ namespace Elecciones
                     else { dtoAnterior = new BrainStormDTO(dto); }
                     seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                     dto = oficiales ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficial(elementoSeleccionado, avance, tipoElecciones) : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeo(elementoSeleccionado, avance, tipoElecciones);
-                    if (string.Equals(graficosHeader.Header, "FALDONES")) { UpdateFaldones(dtoAnterior); }
+                    if (string.Equals(graficosHeader.Header, "FALDÓN")) { UpdateFaldones(dtoAnterior); }
                     //Add cambios por actualizacion en vivo en cartones
-                    if (string.Equals(graficosHeader.Header, "CARTONES")) { UpdateCartones(); }
+                    if (string.Equals(graficosHeader.Header, "CARTÓN")) { UpdateCartones(); }
+                    if (string.Equals(graficosHeader.Header, "SUPERFADÓN")) { UpdateSuperfaldones(); }
                     if (pactos != null && pactos.pactoDentro == false) { pactos.RecargarDatos(dto, oficiales); }
                     ActualizarInfoInterfaz(seleccionada, dto);
                     EscribirFichero(desdeSede);
@@ -359,6 +365,9 @@ namespace Elecciones
             graficos.TickerActualiza();
         }
         private void UpdateCartones()
+        {
+        }
+        private void UpdateSuperfaldones()
         {
         }
 
@@ -817,7 +826,14 @@ namespace Elecciones
         {
             switch (tipoGrafico)
             {
+                case "CUENTA ATRÁS":
+                    // Ocultar la lista de datos al mostrar la cuenta atrás
+                    datosListView.Visibility = Visibility.Collapsed;
+                    break;
                 case "SEDES":
+                    // Restaurar visibilidad al volver de "CUENTA ATRÁS"
+                    datosListView.Visibility = Visibility.Visible;
+
                     columna3.Header = "ESCAÑOS";
                     Binding binding3 = new Binding("escaniosHasta");
                     columna3.DisplayMemberBinding = binding3;
@@ -834,6 +850,9 @@ namespace Elecciones
                     }
                     break;
                 case "INDEPENDENTISMO":
+                    // Restaurar visibilidad al volver de "CUENTA ATRÁS"
+                    datosListView.Visibility = Visibility.Visible;
+
                     ActualizarDatosEnTabla();
                     if (dto != null)
                     {
@@ -843,6 +862,9 @@ namespace Elecciones
                     break;
 
                 default:
+                    // Restaurar visibilidad al volver de "CUENTA ATRÁS"
+                    datosListView.Visibility = Visibility.Visible;
+
                     ActualizarDatosEnTabla();
                     if (dto != null)
                     {
@@ -1265,6 +1287,10 @@ namespace Elecciones
         {
             sondeoAnimadoActivo = false;
         }
+        private void timePickerCuentaAtras_SelectedTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
+        {
+            CalcularSegundosHastaHora();
+        }
         /// <summary>
         /// Calcula los segundos restantes hasta la hora destino seleccionada
         /// </summary>
@@ -1304,6 +1330,117 @@ namespace Elecciones
             }
         }
 
+        /// <summary>
+        /// Inicializa los controles de vídeo leyendo la configuración (si existe).
+        /// Guarda el estado inicial en el GraphicController para que el subsistema gráfico sepa la configuración.
+        /// </summary>
+        private void InitializeVideoConfigUI()
+        {
+            // Use ConfigManager already available as 'configuration'
+            for (int i = 1; i <= 6; i++)
+            {
+                string keyMode = $"video{i}_isLive";
+                string keyPath = $"video{i}_path";
+                string modeVal = configuration.GetValue(keyMode) ?? "0";
+                string pathVal = configuration.GetValue(keyPath) ?? string.Empty;
+
+                // find controls by name
+                var chk = this.FindName($"chkVideoLive{i}") as CheckBox;
+                var txt = this.FindName($"txtVideoPath{i}") as TextBox;
+                var btn = this.FindName($"btnBrowse{i}") as Button;
+
+                if (chk != null)
+                {
+                    bool isLive = modeVal == "1";
+                    chk.IsChecked = isLive;
+                }
+                if (txt != null)
+                {
+                    txt.Text = pathVal;
+                    // disable textbox and browse when live
+                    if (chk != null && chk.IsChecked == true)
+                    {
+                        txt.IsEnabled = false;
+                        if (btn != null) btn.IsEnabled = false;
+                    }
+                }
+
+                // notify graphics controller
+                if (graficos != null)
+                {
+                    bool isLiveNotify = modeVal == "1";
+                    graficos.SetVideoMode(i, isLiveNotify);
+                    graficos.SetVideoPath(i, pathVal);
+                }
+            }
+        }
+
+        // Called when user toggles a checkbox between Directo (live) and Pregrabado
+        private void VideoMode_Checked(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox chk && int.TryParse(chk.Tag?.ToString(), out int index))
+            {
+                SetVideoModeFromUI(index, true);
+            }
+        }
+        private void VideoMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox chk && int.TryParse(chk.Tag?.ToString(), out int index))
+            {
+                SetVideoModeFromUI(index, false);
+            }
+        }
+
+        private void SetVideoModeFromUI(int index, bool isLive)
+        {
+            // enable/disable path controls
+            var txt = this.FindName($"txtVideoPath{index}") as TextBox;
+            var btn = this.FindName($"btnBrowse{index}") as Button;
+            if (txt != null) txt.IsEnabled = !isLive;
+            if (btn != null) btn.IsEnabled = !isLive;
+
+            // persist change
+            configuration.SetValue($"video{index}_isLive", isLive ? "1" : "0");
+            configuration.SaveConfig();
+
+            // notify graphic controller
+            graficos?.SetVideoMode(index, isLive);
+        }
+
+        // Browse button clicked -> open file dialog, set path, persist and notify
+        private void BrowseVideo_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && int.TryParse(btn.Tag?.ToString(), out int index))
+            {
+                var dialog = new OpenFileDialog();
+                dialog.Filter = "Video files|*.mp4;*.mov;*.mkv;*.wmv;*.avi|All files|*.*";
+                bool? result = dialog.ShowDialog();
+                if (result == true)
+                {
+                    string selected = dialog.FileName;
+                    var txt = this.FindName($"txtVideoPath{index}") as TextBox;
+                    if (txt != null)
+                    {
+                        txt.Text = selected;
+                    }
+                    // persist
+                    configuration.SetValue($"video{index}_path", selected);
+                    configuration.SaveConfig();
+
+                    // notify
+                    graficos?.SetVideoPath(index, selected);
+                }
+            }
+        }
+
+        // Optionally expose method to update path programmatically
+        private void UpdateVideoPathFromCode(int index, string path)
+        {
+            var txt = this.FindName($"txtVideoPath{index}") as TextBox;
+            if (txt != null) txt.Text = path;
+            configuration.SetValue($"video{index}_path", path);
+            configuration.SaveConfig();
+            graficos?.SetVideoPath(index, path);
+        }
     }
 }
-

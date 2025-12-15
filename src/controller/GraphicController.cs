@@ -57,7 +57,34 @@ namespace Elecciones.src.controller
             }
         }
 
-        //SE�ALES ESPECIALES
+        // New: video configuration helpers
+        /// <summary>
+        /// Setea el modo de la fuente de vídeo (true = DIRECTO, false = PREGRABADO) y lo persiste.
+        /// </summary>
+        public void SetVideoMode(int slotIndex, bool isLive)
+        {
+            if (slotIndex < 1 || slotIndex > 6) return;
+            config.SetValue($"video{slotIndex}_isLive", isLive ? "1" : "0");
+            config.SaveConfig();
+
+            // Aquí se podría notificar a IPF/Prime si existiera un mensaje definido.
+            // Ejemplo (si se implementa en builder): ipf?.SendVideoMode(slotIndex, isLive);
+        }
+
+        /// <summary>
+        /// Setea la ruta del fichero a usar para la fuente de vídeo y lo persiste.
+        /// </summary>
+        public void SetVideoPath(int slotIndex, string path)
+        {
+            if (slotIndex < 1 || slotIndex > 6) return;
+            config.SetValue($"video{slotIndex}_path", path ?? string.Empty);
+            config.SaveConfig();
+
+            // Aquí se podría notificar a IPF/Prime si existiera un mensaje definido.
+            // Ejemplo (si se implementa en builder): ipf?.SendVideoPath(slotIndex, path);
+        }
+
+        //SEÑALES ESPECIALES
         public void ReiniciarConexionPrime() { if (prime != null) { prime.ReiniciarConexion(); } }
         public void ReiniciarConexionIpf() { if (ipf != null) { ipf.ReiniciarConexion(); } }
 
@@ -256,6 +283,3 @@ namespace Elecciones.src.controller
         public void sfGanadorSale() { if (ipfActivo.Valor == 1) { ipf.sfGanadorSale(); } }
     }
 }
-
-
-

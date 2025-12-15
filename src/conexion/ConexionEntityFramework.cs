@@ -1,11 +1,12 @@
 using Elecciones.src.model.IPF;
 using Elecciones.src.utils;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using System;
-using System.Configuration;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 using System.Windows;
+using Elecciones.src.service;
 
 namespace Elecciones.src.conexion
 {
@@ -18,10 +19,11 @@ namespace Elecciones.src.conexion
         private string? _user;
         private string? _pass;
         public int _tipoConexion { get; set; }
-        private MySqlConnection connection;
-        private MainWindow main;
+        private MySqlConnection? connection;
+        private MainWindow? main;
 
         ConfigManager configuration;
+        private readonly FileLoggerService _logger = FileLoggerService.GetInstance();
 
         public ConexionEntityFramework(DbContextOptions options) : base(options)
         {
@@ -183,88 +185,127 @@ namespace Elecciones.src.conexion
 
         private string GetConnectionString()
         {
-            string connectionServer;
+            string connectionServer = string.Empty;
             string connectionEnd = $";port={_port};uid={_user};pwd={_pass};database={_database}";
 
-            try
+            // Helper to test TCP connectivity fast (short timeout) to avoid UI blocking
+            bool TestTcpConnection(string host, int port, int timeoutMs = 1000)
             {
-                connectionServer = $"server={_server}";
-                TestConnection(connectionServer + connectionEnd);
-            }
-            catch (Exception exMain)
-            {
-                MessageBox.Show($"Error al conectar con la base de datos en la ip {_server}. Buscando nueva conexión.", "Error de conexión", MessageBoxButton.OK, MessageBoxImage.Error);
                 try
                 {
-                    if (_tipoConexion != 1)
+                    using var tcp = new TcpClient();
+                    var task = tcp.ConnectAsync(host, port);
+                    if (!task.Wait(timeoutMs))
                     {
-                        _server = configuration.GetValue("dataServer");
-                        connectionServer = $"server={_server}";
-                        TestConnection(connectionServer + connectionEnd);
-                        _tipoConexion = 1;
-                        configuration.SetValue("conexionDefault1", "1");
-                        main?.EscribirConexiones();
+                        return false;
                     }
-                    else
-                    {
-                        _server = configuration.GetValue("dataServerBackup");
-                        connectionServer = $"server={_server}";
-                        TestConnection(connectionServer + connectionEnd);
-                        _tipoConexion = 2;
-                        configuration.SetValue("conexionDefault1", "2");
-                        main?.EscribirConexiones();
-                    }
-
+                    return tcp.Connected;
                 }
-                catch (Exception exBackup)
+                catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al conectar con la base de datos en la ip {_server}. Buscando nueva conexión.", "Error de conexión", MessageBoxButton.OK, MessageBoxImage.Error);
-                    try
-                    {
-                        if (_tipoConexion == 3)
-                        {
-                            _server = configuration.GetValue("dataServerBackup");
-                            connectionServer = $"server={_server}";
-                            TestConnection(connectionServer + connectionEnd);
-                            _tipoConexion = 2;
-                            configuration.SetValue("conexionDefault1", "2");
-                            main?.EscribirConexiones();
-                        }
-                        else
-                        {
-                            _server = "127.0.0.1";
-                            connectionServer = $"server={_server}";
-                            TestConnection(connectionServer + connectionEnd);
-                            _tipoConexion = 3;
-                            configuration.SetValue("conexionDefault1", "3");
-                            main?.EscribirConexiones();
-                        }
-                    }
-                    catch (Exception exLocal)
-                    {
-                        // Maneja el error o lanza una excepción si no se puede establecer ninguna conexión
-                        MessageBox.Show($"No se ha podido conectar a la BD de ninguna de las IP facilitadas. Revise que están en funcionamiento y que las IP están bien escritas en el fichero de configuración", "Error de conexión", MessageBoxButton.OK, MessageBoxImage.Error);
-                        throw new ApplicationException("Error al conectar con la base de datos.", exLocal);
-                    }
+                    _logger.LogError($"TCP test failed for {host}:{port}", ex);
+                    return false;
                 }
+            }
+
+            int portNumber = 3306;
+            if (!int.TryParse(_port, out portNumber))
+            {
+                // If port parsing fails, fallback to 3306
+                portNumber = 3306;
+            }
+
+            // Order of candidates: current _server (chosen tipo), then other configured servers, then localhost
+            var candidates = new System.Collections.Generic.List<(string server, int tipo)>();
+
+            // add current preference first
+            if (!string.IsNullOrWhiteSpace(_server))
+                candidates.Add((_server, _tipoConexion));
+
+            // add primary and backup explicitly if different
+            var primary = configuration.GetValue("dataServer");
+            var backup = configuration.GetValue("dataServerBackup");
+
+            if (!string.IsNullOrWhiteSpace(primary) && !string.Equals(primary, _server, StringComparison.OrdinalIgnoreCase))
+                candidates.Add((primary, 1));
+            if (!string.IsNullOrWhiteSpace(backup) && !string.Equals(backup, _server, StringComparison.OrdinalIgnoreCase))
+                candidates.Add((backup, 2));
+
+            // finally localhost
+            candidates.Add(("127.0.0.1", 3));
+
+            (string server, int tipo)? selected = null;
+
+            foreach (var cand in candidates)
+            {
+                if (string.IsNullOrWhiteSpace(cand.server))
+                    continue;
+
+                if (TestTcpConnection(cand.server, portNumber, 1000))
+                {
+                    selected = cand;
+                    break;
+                }
+            }
+
+            if (selected == null)
+            {
+                // No server reachable
+                var message = "No se ha podido conectar a la BD en ninguna de las IPs configuradas. Revise la configuración y el estado de las bases de datos.";
+                _logger.LogError(message, null);
+
+                // Show a single UI message if possible (fast, via dispatcher)
+                try
+                {
+                    main?.Dispatcher.Invoke(() =>
+                    {
+                        MessageBox.Show(message, "Error de conexión", MessageBoxButton.OK, MessageBoxImage.Error);
+                    });
+                }
+                catch
+                {
+                    // ignore dispatcher failures
+                }
+
+                throw new ApplicationException("Error al conectar con la base de datos. Ninguna IP responde.");
+            }
+
+            // use selected
+            _server = selected.Value.server;
+            _tipoConexion = selected.Value.tipo;
+            connectionServer = $"server={_server}";
+
+            // persist chosen default for UI connections if available
+            try
+            {
+                configuration.SetValue("conexionDefault1", _tipoConexion.ToString());
+                main?.EscribirConexiones();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed persisting chosen DB connection type", ex);
             }
 
             return connectionServer + connectionEnd;
         }
 
-        private void TestConnection(string connectionString)
-        {
-            using (connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-            }
-        }
-
         public void CloseConection()
         {
             if (connection != null)
-                connection.Close();
-                connection = null;
+            {
+                try
+                {
+                    connection.Close();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Error closing MySql connection", ex);
+                }
+                finally
+                {
+                    connection = null;
+                }
+            }
         }
     }
 }

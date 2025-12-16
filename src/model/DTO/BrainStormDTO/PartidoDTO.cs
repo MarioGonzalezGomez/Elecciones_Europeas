@@ -12,20 +12,66 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
 {
     public class PartidoDTO
     {
-        public string codigo { get; set; }
-        public string padre { get; set; }
-        public string siglas { get; set; }
-        public string candidato { get; set; }
-        public int escaniosDesde { get; set; }
-        public int escaniosHasta { get; set; }
-        public int escaniosHistoricos { get; set; }
-        public double porcentajeVoto { get; set; }
-        public double porcentajeVotoHistorico { get; set; }
-        public int numVotantes { get; set; }
-        public int numVotantesHistoricos { get; set; }
-        public int diferenciaEscanios { get; set; }
-        public string tendencia { get; set; }
-        public string independentismo { get; set; }
+        public string codigo
+        {
+            get; set;
+        }
+        public string padre
+        {
+            get; set;
+        }
+        public string siglas
+        {
+            get; set;
+        }
+        public string candidato
+        {
+            get; set;
+        }
+        public int escaniosDesde
+        {
+            get; set;
+        }
+        public int escaniosHasta
+        {
+            get; set;
+        }
+        public int escaniosHistoricos
+        {
+            get; set;
+        }
+        public double porcentajeVoto
+        {
+            get; set;
+        }
+        public double porcentajeVotoHistorico
+        {
+            get; set;
+        }
+        public int numVotantes
+        {
+            get; set;
+        }
+        public int numVotantesHistoricos
+        {
+            get; set;
+        }
+        public int diferenciaEscanios
+        {
+            get; set;
+        }
+        public string tendencia
+        {
+            get; set;
+        }
+        public string independentismo
+        {
+            get; set;
+        }
+        public string nombre
+        {
+            get; set;
+        }
 
         private PartidoDTO(string codigo, int escaniosHistoricos, int numVotantes)
         {
@@ -50,6 +96,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                 dto.numVotantes = cp.numVotantes;
                 dto.numVotantesHistoricos = cp.numVotantesHist;
                 dto.independentismo = partido.independentismo.ToString();
+                dto.nombre = partido.nombre;
 
                 int dif = cp.escaniosHastaHist == 0 ? dto.escaniosHasta : dto.escaniosHasta - cp.escaniosHastaHist;
                 dto.diferenciaEscanios = int.Abs(dif);

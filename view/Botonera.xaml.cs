@@ -61,7 +61,7 @@ namespace Elecciones
             {
                 color = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#cb96f8"));
                 EntraHistButton.Background = color;
-                EntraHistButton.Content = "ENTRA HIST�RICO";
+                EntraHistButton.Content = "ENTRA HISTÓRICO";
                 // EntraMillonesButton.Visibility = Visibility.Visible;
                 // EntraEscanosButton.Visibility = Visibility.Visible;
             }

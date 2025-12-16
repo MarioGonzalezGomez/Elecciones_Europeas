@@ -30,10 +30,11 @@ namespace Elecciones.src.model.IPF
             this.nombre = nombre;
             this.candidato = candidato;
             this.independentismo = independentismo;
+
         }
         public override string ToString()
         {
-            return $"{codigo};{codigoPadre};{siglas};{nombre};{candidato};{independentismo}";
+            return $"{codigo};{codigoPadre};{siglas};{nombre};{candidato};{independentismo};";
         }
         public async Task ToJson()
         {

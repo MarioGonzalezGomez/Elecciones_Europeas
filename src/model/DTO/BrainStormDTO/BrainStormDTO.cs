@@ -63,7 +63,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
             }
             string resultado = "Codigo;Nombre;Escrutado;Escaños;Mayoría;Avance;Participacion;Participacion Historica;Media de Participacion;Votantes;Últimas Elecciones;Numero de partidos\n";
             resultado += $"{circunscripcionDTO.codigo};{circunscripcionDTO.nombre};{circunscripcionDTO.escrutado.ToString("F2")};{circunscripcionDTO.escaniosTotales};{circunscripcionDTO.mayoria};{circunscripcionDTO.numAvance};{circunscripcionDTO.participacion.ToString("F2")};{circunscripcionDTO.participacionHistorica.ToString("F2")};{circunscripcionDTO.participacionMedia.ToString("F2")};{circunscripcionDTO.numVotantesTotales};{circunscripcionDTO.anioUltimasElecciones};{numPartidos}\n";
-            resultado += $"Código;Padre;Siglas;Candidato;Escaños Desde;Hasta;Históricos;% Voto;Votantes;Diferencia de escaños;Tendencia;Diferencia de votos;Tendendia;Votantes Historico\n";
+            resultado += $"Código;Padre;Siglas;Candidato;Escaños Desde;Hasta;Históricos;% Voto;Votantes;Diferencia de escaños;Tendencia;Diferencia de votos;Tendendia;Votantes Historico;Nombre\n";
             foreach (var p in partidos)
             {
                 string codigo = p.padre;
@@ -75,7 +75,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                   "-";
                 difVotos = difVotos < 0 ? difVotos * (-1) : difVotos;
                 double porcentajeVotoTruncado = Math.Truncate(p.porcentajeVoto * 10) / 10;
-                resultado += $"{p.codigo};{codigoPadre};{p.siglas};{p.candidato};{p.escaniosDesde};{p.escaniosHasta};{p.escaniosHistoricos};{porcentajeVotoTruncado.ToString()};{p.numVotantes.ToString("#,##0").Replace(",", ".")};{p.diferenciaEscanios};{p.tendencia};{difVotos.ToString("#,##0").Replace(",", ".")};{tendenciaVotos};{p.numVotantesHistoricos.ToString("#,##0").Replace(",", ".")}\n";
+                resultado += $"{p.codigo};{codigoPadre};{p.siglas};{p.candidato};{p.escaniosDesde};{p.escaniosHasta};{p.escaniosHistoricos};{porcentajeVotoTruncado.ToString()};{p.numVotantes.ToString("#,##0").Replace(",", ".")};{p.diferenciaEscanios};{p.tendencia};{difVotos.ToString("#,##0").Replace(",", ".")};{tendenciaVotos};{p.numVotantesHistoricos.ToString("#,##0").Replace(",", ".")};{p.nombre}\n";
             }
 
             await File.WriteAllTextAsync(fileName, resultado);

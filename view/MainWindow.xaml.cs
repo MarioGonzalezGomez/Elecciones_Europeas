@@ -327,8 +327,16 @@ namespace Elecciones
                 {
                     if (desdeSede) { dtoAnterior = new BrainStormDTO(dtoDesdeSedes); }
                     else { dtoAnterior = new BrainStormDTO(dto); }
+
                     seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                    dto = oficiales ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficial(elementoSeleccionado, avance, tipoElecciones) : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeo(elementoSeleccionado, avance, tipoElecciones);
+
+                    // Determine whether we should request the filtered DTO for UI (true) or the unfiltered one (false).
+                    // Preserve previous behavior: when the current grafico is "SEDES" use unfiltered for UI; otherwise use filtered.
+                    bool filtroSedes = graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES");
+
+                    // Use ObtenerDTO which now updates both dto and dtoSinFiltrar.
+                    dto = ObtenerDTO(filtroSedes, elementoSeleccionado);
+
                     if (string.Equals(graficosHeader.Header, "FALDÓN")) { UpdateFaldones(dtoAnterior); }
                     //Add cambios por actualizacion en vivo en cartones
                     if (string.Equals(graficosHeader.Header, "CARTÓN")) { UpdateCartones(); }
@@ -362,7 +370,7 @@ namespace Elecciones
                 }
             }
             graficos.TickerActualizaEscrutado();
-            graficos.TickerActualiza();
+            graficos.TickerActualiza(dto);
         }
         private void UpdateCartones()
         {
@@ -462,6 +470,119 @@ namespace Elecciones
                     else { btnSondeoSuperior.Background = color; }
                     break;
             }
+        }
+
+        /// <summary>
+        /// Inicializa los controles de vídeo leyendo la configuración (si existe).
+        /// Guarda el estado inicial en el GraphicController para que el subsistema gráfico sepa la configuración.
+        /// </summary>
+        private void InitializeVideoConfigUI()
+        {
+            // Use ConfigManager already available as 'configuration'
+            for (int i = 1; i <= 6; i++)
+            {
+                string keyMode = $"video{i}_isLive";
+                string keyPath = $"video{i}_path";
+                string modeVal = configuration.GetValue(keyMode) ?? "0";
+                string pathVal = configuration.GetValue(keyPath) ?? string.Empty;
+
+                // find controls by name
+                var chk = this.FindName($"chkVideoLive{i}") as CheckBox;
+                var txt = this.FindName($"txtVideoPath{i}") as TextBox;
+                var btn = this.FindName($"btnBrowse{i}") as Button;
+
+                if (chk != null)
+                {
+                    bool isLive = modeVal == "1";
+                    chk.IsChecked = isLive;
+                }
+                if (txt != null)
+                {
+                    txt.Text = pathVal;
+                    // disable textbox and browse when live
+                    if (chk != null && chk.IsChecked == true)
+                    {
+                        txt.IsEnabled = false;
+                        if (btn != null) btn.IsEnabled = false;
+                    }
+                }
+
+                // notify graphics controller
+                if (graficos != null)
+                {
+                    bool isLiveNotify = modeVal == "1";
+                    graficos.SetVideoMode(i, isLiveNotify);
+                    graficos.SetVideoPath(i, pathVal);
+                }
+            }
+        }
+
+        // Called when user toggles a checkbox between Directo (live) and Pregrabado
+        private void VideoMode_Checked(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox chk && int.TryParse(chk.Tag?.ToString(), out int index))
+            {
+                SetVideoModeFromUI(index, true);
+            }
+        }
+        private void VideoMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox chk && int.TryParse(chk.Tag?.ToString(), out int index))
+            {
+                SetVideoModeFromUI(index, false);
+            }
+        }
+
+        private void SetVideoModeFromUI(int index, bool isLive)
+        {
+            // enable/disable path controls
+            var txt = this.FindName($"txtVideoPath{index}") as TextBox;
+            var btn = this.FindName($"btnBrowse{index}") as Button;
+            if (txt != null) txt.IsEnabled = !isLive;
+            if (btn != null) btn.IsEnabled = !isLive;
+
+            // persist change
+            configuration.SetValue($"video{index}_isLive", isLive ? "1" : "0");
+            configuration.SaveConfig();
+
+            // notify graphic controller
+            graficos?.SetVideoMode(index, isLive);
+        }
+
+        // Browse button clicked -> open file dialog, set path, persist and notify
+        private void BrowseVideo_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && int.TryParse(btn.Tag?.ToString(), out int index))
+            {
+                var dialog = new OpenFileDialog();
+                dialog.Filter = "Video files|*.mp4;*.mov;*.mkv;*.wmv;*.avi|All files|*.*";
+                bool? result = dialog.ShowDialog();
+                if (result == true)
+                {
+                    string selected = dialog.FileName;
+                    var txt = this.FindName($"txtVideoPath{index}") as TextBox;
+                    if (txt != null)
+                    {
+                        txt.Text = selected;
+                    }
+                    // persist
+                    configuration.SetValue($"video{index}_path", selected);
+                    configuration.SaveConfig();
+
+                    // notify
+                    graficos?.SetVideoPath(index, selected);
+                }
+            }
+        }
+
+        // Optionally expose method to update path programmatically
+        private void UpdateVideoPathFromCode(int index, string path)
+        {
+            var txt = this.FindName($"txtVideoPath{index}") as TextBox;
+            if (txt != null) txt.Text = path;
+            configuration.SetValue($"video{index}_path", path);
+            configuration.SaveConfig();
+            graficos?.SetVideoPath(index, path);
         }
 
         //LOGICA CAMBIO DE ELECCIONES
@@ -921,16 +1042,38 @@ namespace Elecciones
         //LOGICA DE FICHEROS
         private BrainStormDTO ObtenerDTO(bool filtrado, string circunscripcion)
         {
+            // Always update both dto (used by UI when 'filtrado' requested or not) and dtoSinFiltrar (complete list).
+            // This ensures dtoSinFiltrar reflects the latest data whenever dto is refreshed.
             if (filtrado)
             {
-                dto = oficiales ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficial(circunscripcion, avance, tipoElecciones)
-                             : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeo(circunscripcion, avance, tipoElecciones);
+                // dto is filtered (UI-friendly), dtoSinFiltrar keeps the full unfiltered dataset
+                dto = oficiales
+                    ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficial(circunscripcion, avance, tipoElecciones)
+                    : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeo(circunscripcion, avance, tipoElecciones);
+
+                try
+                {
+                    dtoSinFiltrar = oficiales
+                        ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(circunscripcion, avance, tipoElecciones)
+                        : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(circunscripcion, avance, tipoElecciones);
+                }
+                catch
+                {
+                    // If unfiltered fetch fails, keep dtoSinFiltrar as a defensive copy of dto to avoid null usage elsewhere.
+                    dtoSinFiltrar = new BrainStormDTO(dto);
+                }
             }
             else
             {
-                dto = oficiales ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(circunscripcion, avance, tipoElecciones)
-                             : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(circunscripcion, avance, tipoElecciones);
+                // dto is the unfiltered dataset; make dtoSinFiltrar a copy of it so both reflect the same full data.
+                dto = oficiales
+                    ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(circunscripcion, avance, tipoElecciones)
+                    : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(circunscripcion, avance, tipoElecciones);
+
+                // Keep dtoSinFiltrar consistent with dto (full)
+                dtoSinFiltrar = new BrainStormDTO(dto);
             }
+
             return dto;
         }
 
@@ -940,19 +1083,94 @@ namespace Elecciones
             {
                 preparado = true;
 
+                // Read ordering mode from config (non-boolean so it can be extended later)
+                string ordenSetting = configuration.GetValue("ordenPartidos") ?? "0";
+
+                // Local helper: create a new BrainStormDTO copy ordered by partido.codigo.
+                // Uses the provided source (so we can pass an unfiltered DTO when needed).
+                BrainStormDTO CreateOrderedDtoCopyFrom(BrainStormDTO source)
+                {
+                    var ordered = new BrainStormDTO(source);
+                    ordered.partidos = source.partidos.OrderBy(p => p.codigo).ToList();
+                    // For the code-ordered files we want the full list count (they contain all parties).
+                    ordered.numPartidos = ordered.partidos.Count;
+                    return ordered;
+                }
+
+                // If config requests code ordering we must obtain the full (unfiltered) DTO from controller
+                // so the _Codigo files contain the complete list of parties. Do this without mutating the UI dto.
+                BrainStormDTO dtoToWriteMain = dto; // which dto will be used for the main filenames
+
+                if (ordenSetting == "1")
+                {
+                    // Fetch unfiltered DTO directly from controller (do not call ObtenerDTO to avoid changing UI state).
+                    dtoSinFiltrar = oficiales
+                        ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones)
+                        : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones);
+
+                    // If the configuration indicates that the main CSVs should use code-ordering,
+                    // use the ordered full DTO for the main files as well.
+                    dtoToWriteMain = CreateOrderedDtoCopyFrom(dtoSinFiltrar);
+                }
+
+                // Write the main CSV (behaviour preserved; main file will use code-ordered DTO if ordenSetting == "1")
                 if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
                 {
                     if (desdeSedes)
                     {
-                        if (oficiales) { await dto.ToCsv(); }
-                        else { await dto.ToCsv("Brainstorm_Sondeo"); }
+                        if (oficiales)
+                        {
+                            if (ordenSetting == "1") { await dtoToWriteMain.ToCsv(); }
+                            else { await dto.ToCsv(); }
+                        }
+                        else
+                        {
+                            if (ordenSetting == "1") { await dtoToWriteMain.ToCsv("Brainstorm_Sondeo"); }
+                            else { await dto.ToCsv("Brainstorm_Sondeo"); }
+                        }
                     }
                 }
                 else
                 {
-                    if (oficiales) { await dto.ToCsv(); }
-                    else { await dto.ToCsv("Brainstorm_Sondeo"); }
+                    if (oficiales)
+                    {
+                        if (ordenSetting == "1") { await dtoToWriteMain.ToCsv(); }
+                        else { await dto.ToCsv(); }
+                    }
+                    else
+                    {
+                        if (ordenSetting == "1") { await dtoToWriteMain.ToCsv("Brainstorm_Sondeo"); }
+                        else { await dto.ToCsv("Brainstorm_Sondeo"); }
+                    }
                 }
+
+                // Always also write the new code-ordered files that must contain the complete list.
+                // Ensure we have a full DTO to build them from (fetch if not already fetched).
+                try
+                {
+                    if (dtoSinFiltrar == null)
+                    {
+                        dtoSinFiltrar = oficiales
+                            ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones)
+                            : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones);
+                    }
+
+                    var dtoCodigoOrdered = CreateOrderedDtoCopyFrom(dtoSinFiltrar);
+
+                    if (oficiales)
+                    {
+                        await dtoCodigoOrdered.ToCsv("Brainstorm_Codigo");
+                    }
+                    else
+                    {
+                        await dtoCodigoOrdered.ToCsv("Brainstorm_Sondeo_Codigo");
+                    }
+                }
+                catch
+                {
+                    // Keep behaviour non-intrusive on filesystem errors (existing code uses minimal handling).
+                }
+
                 if (partidoSeleccionado != null)
                 {
                     SedesDTO sede = SedesDTO.FromPartidoDTO(partidoSeleccionado, conexionActiva);
@@ -1054,8 +1272,7 @@ namespace Elecciones
                         int segundos = CalcularSegundosHastaHora();
                         if (segundos > 0)
                         {
-                            // TODO: Modificar graficos.EntraReloj() para aceptar segundos
-                            graficos.EntraReloj();
+                            graficos.EntraReloj(segundos);
                         }
                         break;
                     case "FICHAS":
@@ -1066,8 +1283,8 @@ namespace Elecciones
                         }
                         else
                         {
-                            if (tickerDentro) { graficos.TickerEncadena(oficiales); }
-                            else { graficos.TickerEntra(oficiales); }
+                            if (tickerDentro) { graficos.TickerEncadena(oficiales, dto); }
+                            else { graficos.TickerEntra(oficiales, dto); }
                             if (!oficiales) { sondeoEnElAire = true; }
                         }
                         tickerDentro = true;
@@ -1102,20 +1319,32 @@ namespace Elecciones
                 switch (graficosListView.SelectedValue.ToString())
                 {
                     case "PARTICIPACIÓN":
-                        if (participacionDentro) { graficos.participacionEncadena(); }
-                        else { graficos.participacionEntra(); }
+                        if (participacionDentro) { graficos.participacionEncadena(dtoSinFiltrar, avance); }
+                        else
+                        {
+                            graficos.participacionEntra(dtoSinFiltrar, avance);
+                            participacionDentro = true;
+                        }
                         break;
                     case "FICHAS":
-                        if (fichaDentro) { graficos.fichaEncadena(); }
-                        else { graficos.fichaEntra(); }
+                        if (fichaDentro) { graficos.fichaEncadena(oficiales, dtoSinFiltrar, partidoSeleccionado); }
+                        else
+                        {
+                            graficos.fichaEntra(oficiales, dtoSinFiltrar, partidoSeleccionado);
+                            fichaDentro = true;
+                        }
                         break;
                     case "MAYORÍAS":
-                        if (mayoriasDentro) { graficos.mayoriasEncadena(); }
-                        else { graficos.mayoriasEntra(); }
+                        if (mayoriasDentro) { graficos.mayoriasEncadena(dto); }
+                        else
+                        {
+                            graficos.mayoriasEntra(dto);
+                            mayoriasDentro = true;
+                        }
                         break;
                     case "CCAA":
                         if (ccaaDentro) { graficos.ccaaEncadena(); }
-                        else { graficos.ccaaEntra(); }
+                        else { graficos.ccaaEntra(dto); }
                         break;
                     case "SUPERFALDÓN":
                         if (superfaldonDentro) { graficos.superfaldonEntra(); }
@@ -1221,7 +1450,7 @@ namespace Elecciones
                         mayoriasDentro = false;
                         break;
                     case "FICHAS":
-                        graficos.fichaSale();
+                        graficos.fichaSale(oficiales);
                         fichaDentro = false;
                         break;
                     case "SUPERFALDÓN":
@@ -1328,119 +1557,6 @@ namespace Elecciones
             {
                 config.Close();
             }
-        }
-
-        /// <summary>
-        /// Inicializa los controles de vídeo leyendo la configuración (si existe).
-        /// Guarda el estado inicial en el GraphicController para que el subsistema gráfico sepa la configuración.
-        /// </summary>
-        private void InitializeVideoConfigUI()
-        {
-            // Use ConfigManager already available as 'configuration'
-            for (int i = 1; i <= 6; i++)
-            {
-                string keyMode = $"video{i}_isLive";
-                string keyPath = $"video{i}_path";
-                string modeVal = configuration.GetValue(keyMode) ?? "0";
-                string pathVal = configuration.GetValue(keyPath) ?? string.Empty;
-
-                // find controls by name
-                var chk = this.FindName($"chkVideoLive{i}") as CheckBox;
-                var txt = this.FindName($"txtVideoPath{i}") as TextBox;
-                var btn = this.FindName($"btnBrowse{i}") as Button;
-
-                if (chk != null)
-                {
-                    bool isLive = modeVal == "1";
-                    chk.IsChecked = isLive;
-                }
-                if (txt != null)
-                {
-                    txt.Text = pathVal;
-                    // disable textbox and browse when live
-                    if (chk != null && chk.IsChecked == true)
-                    {
-                        txt.IsEnabled = false;
-                        if (btn != null) btn.IsEnabled = false;
-                    }
-                }
-
-                // notify graphics controller
-                if (graficos != null)
-                {
-                    bool isLiveNotify = modeVal == "1";
-                    graficos.SetVideoMode(i, isLiveNotify);
-                    graficos.SetVideoPath(i, pathVal);
-                }
-            }
-        }
-
-        // Called when user toggles a checkbox between Directo (live) and Pregrabado
-        private void VideoMode_Checked(object sender, RoutedEventArgs e)
-        {
-            if (sender is CheckBox chk && int.TryParse(chk.Tag?.ToString(), out int index))
-            {
-                SetVideoModeFromUI(index, true);
-            }
-        }
-        private void VideoMode_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (sender is CheckBox chk && int.TryParse(chk.Tag?.ToString(), out int index))
-            {
-                SetVideoModeFromUI(index, false);
-            }
-        }
-
-        private void SetVideoModeFromUI(int index, bool isLive)
-        {
-            // enable/disable path controls
-            var txt = this.FindName($"txtVideoPath{index}") as TextBox;
-            var btn = this.FindName($"btnBrowse{index}") as Button;
-            if (txt != null) txt.IsEnabled = !isLive;
-            if (btn != null) btn.IsEnabled = !isLive;
-
-            // persist change
-            configuration.SetValue($"video{index}_isLive", isLive ? "1" : "0");
-            configuration.SaveConfig();
-
-            // notify graphic controller
-            graficos?.SetVideoMode(index, isLive);
-        }
-
-        // Browse button clicked -> open file dialog, set path, persist and notify
-        private void BrowseVideo_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && int.TryParse(btn.Tag?.ToString(), out int index))
-            {
-                var dialog = new OpenFileDialog();
-                dialog.Filter = "Video files|*.mp4;*.mov;*.mkv;*.wmv;*.avi|All files|*.*";
-                bool? result = dialog.ShowDialog();
-                if (result == true)
-                {
-                    string selected = dialog.FileName;
-                    var txt = this.FindName($"txtVideoPath{index}") as TextBox;
-                    if (txt != null)
-                    {
-                        txt.Text = selected;
-                    }
-                    // persist
-                    configuration.SetValue($"video{index}_path", selected);
-                    configuration.SaveConfig();
-
-                    // notify
-                    graficos?.SetVideoPath(index, selected);
-                }
-            }
-        }
-
-        // Optionally expose method to update path programmatically
-        private void UpdateVideoPathFromCode(int index, string path)
-        {
-            var txt = this.FindName($"txtVideoPath{index}") as TextBox;
-            if (txt != null) txt.Text = path;
-            configuration.SetValue($"video{index}_path", path);
-            configuration.SaveConfig();
-            graficos?.SetVideoPath(index, path);
         }
     }
 }

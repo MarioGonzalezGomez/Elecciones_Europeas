@@ -90,25 +90,20 @@ namespace Elecciones
 
         private void btnEscanos_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Implementar funcionalidad Escaños
-            gController.TickerMillonesSale(); // Placeholder - usar el método existente más similar
+            gController.TickerEscanosEntra();
         }
-
         private void btnPorcentajeVoto_Click(object sender, RoutedEventArgs e)
         {
             gController.TickerVotosEntra();
         }
-
         private void btnHistoricos_Click(object sender, RoutedEventArgs e)
         {
             gController.TickerHistoricosEntraInd();
         }
-
         private void btnMillones_Click(object sender, RoutedEventArgs e)
         {
             gController.TickerMillonesEntra();
         }
-
         private void btnHistoricosCom_Click(object sender, RoutedEventArgs e)
         {
             gController.TickerHistoricosEntraCom();
@@ -122,7 +117,6 @@ namespace Elecciones
         {
             // TODO: Implementar Video In
         }
-
         private void btnVideoOut_Click(object sender, RoutedEventArgs e)
         {
             // TODO: Implementar Video Out
@@ -132,7 +126,6 @@ namespace Elecciones
         {
             // TODO: Implementar Entran Todos
         }
-
         private void btnSalenTodos_Click(object sender, RoutedEventArgs e)
         {
             // TODO: Implementar Salen Todos
@@ -144,21 +137,23 @@ namespace Elecciones
 
         private void btnEntraTD_Click(object sender, RoutedEventArgs e)
         {
+            gController.TickerTDEntra(main.dto);
             gController.SubirRotulosPrimeTD();
         }
-
         private void btnSaleTD_Click(object sender, RoutedEventArgs e)
         {
+            gController.TickerTDSale();
             gController.BajarRotulosPrimeTD();
         }
 
         private void btnEntraEspecial_Click(object sender, RoutedEventArgs e)
         {
+            gController.TickerTDEntra(main.dto);
             gController.SubirRotulosPrimeEsp();
         }
-
         private void btnSaleEspecial_Click(object sender, RoutedEventArgs e)
         {
+            gController.TickerTDSale();
             gController.BajarRotulosPrimeEsp();
         }
 
@@ -170,7 +165,6 @@ namespace Elecciones
         {
             // TODO: Implementar - mayoriasEntra requiere BrainStormDTO
         }
-
         private void btnBajaMayoria_Click(object sender, RoutedEventArgs e)
         {
             gController.mayoriasSale();
@@ -180,7 +174,6 @@ namespace Elecciones
         {
             // TODO: Implementar Sube CCAA
         }
-
         private void btnBajaCCAA_Click(object sender, RoutedEventArgs e)
         {
             // TODO: Implementar Baja CCAA

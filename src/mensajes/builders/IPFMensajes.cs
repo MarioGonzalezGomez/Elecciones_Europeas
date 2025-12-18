@@ -400,19 +400,18 @@ namespace Elecciones.src.mensajes.builders
             }
             return signal;
         }
-        public string TickerTDEncadena(bool oficial, BrainStormDTO dto)
-        {
-            return oficial ? Encadena("TICKER") : Encadena("TICKER_SONDEO");
-        }
+       // public string TickerTDEncadena(bool oficial, BrainStormDTO dto)
+       // {
+       //     return oficial ? Encadena("TICKER") : Encadena("TICKER_SONDEO");
+       // }
         public string TickerTDActualiza(BrainStormDTO dto)
         {
             // Fix: pasar count como string y tipoItem explícito
             return EventBuild("nPartidosConEscanio", "MAP_INT_PAR", $"{dto.partidos.Count}", 1);
         }
-        public string TickerTDSale(bool oficial)
+        public string TickerTDSale()
         {
-            string tipo = oficial ? "Resultados" : "Sondeo";
-            return Sale(tipo);
+            return "";
         }
 
         //PP_PSOE

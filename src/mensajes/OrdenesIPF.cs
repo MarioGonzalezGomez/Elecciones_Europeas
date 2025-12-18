@@ -140,6 +140,14 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(builder.TickerActualizaNumPartidos());
         }
 
+        public void TickerEscanosEntra()
+        {
+            c.EnviarMensaje(builder.TickerEscanosEntra());
+        }
+        public void TickerEscanosSale()
+        {
+            c.EnviarMensaje(builder.TickerEscanosSale());
+        }
         public void TickerVotosEntra()
         {
             c.EnviarMensaje(builder.TickerVotosEntra());
@@ -180,6 +188,16 @@ namespace Elecciones.src.mensajes
         public void TickerFotosSale()
         {
             c.EnviarMensaje(builder.TickerFotosSale());
+        }
+
+        //TICKER TD
+        public void TickerTDEntra(BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.TickerTDEntra(dto));
+        }
+        public void TickerTDSale()
+        {
+            c.EnviarMensaje(builder.TickerTDSale());
         }
 
         //PP_PSOE

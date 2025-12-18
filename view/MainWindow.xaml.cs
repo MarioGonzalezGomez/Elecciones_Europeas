@@ -38,7 +38,7 @@ namespace Elecciones
         ObservableCollection<CPDataDTO> listaDeDatos;
         ConexionEntityFramework conexionActiva;
         private int avance;
-        BrainStormDTO dto;
+        public BrainStormDTO dto;
         public BrainStormDTO dtoSinFiltrar;
         BrainStormDTO dtoDesdeSedes;
         bool preparado;

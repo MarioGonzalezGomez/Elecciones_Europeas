@@ -247,6 +247,14 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.TickerActualizaNumPartidos(); }
         }
 
+        public void TickerEscanosEntra()
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerEscanosEntra(); }
+        }
+        public void TickerEscanosSale()
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerEscanosSale(); }
+        }
         public void TickerVotosEntra()
         {
             if (ipfActivo.Valor == 1) { ipf.TickerVotosEntra(); }
@@ -287,6 +295,16 @@ namespace Elecciones.src.controller
         public void TickerFotosSale()
         {
             if (ipfActivo.Valor == 1) { ipf.TickerFotosSale(); }
+        }
+
+        //TICKER TD
+        public void TickerTDEntra(BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerTDEntra(dto); }
+        }
+        public void TickerTDSale()
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerTDSale(); }
         }
 
         //PP_PSOE
@@ -432,7 +450,7 @@ namespace Elecciones.src.controller
         }
         public void fichaActualiza(bool oficiales, BrainStormDTO dto, BrainStormDTO dtoAnterior)
         {
-            if (ipfActivo.Valor == 1) { ipf.fichaActualiza(oficiales,dto,dtoAnterior); }
+            if (ipfActivo.Valor == 1) { ipf.fichaActualiza(oficiales, dto, dtoAnterior); }
         }
         public void fichaSale(bool oficiales)
         {

@@ -140,21 +140,29 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(builder.TickerActualizaNumPartidos());
         }
 
-        public void TickerVotosEntra(bool oficiales)
+        public void TickerVotosEntra()
         {
-            c.EnviarMensaje(builder.TickerVotosEntra(oficiales));
+            c.EnviarMensaje(builder.TickerVotosEntra());
         }
-        public void TickerVotosSale(bool oficiales)
+        public void TickerVotosSale()
         {
-            c.EnviarMensaje(builder.TickerVotosSale(oficiales));
+            c.EnviarMensaje(builder.TickerVotosSale());
         }
-        public void TickerHistoricosEntra(bool oficiales)
+        public void TickerHistoricosEntraInd()
         {
-            c.EnviarMensaje(builder.TickerHistoricosEntra(oficiales));
+            c.EnviarMensaje(builder.TickerHistoricosEntraInd());
         }
-        public void TickerHistoricosSale(bool oficiales)
+        public void TickerHistoricosSaleInd()
         {
-            c.EnviarMensaje(builder.TickerHistoricosSale(oficiales));
+            c.EnviarMensaje(builder.TickerHistoricosSaleInd());
+        }
+        public void TickerHistoricosEntraCom()
+        {
+            c.EnviarMensaje(builder.TickerHistoricosEntraCom());
+        }
+        public void TickerHistoricosSaleCom()
+        {
+            c.EnviarMensaje(builder.TickerHistoricosSaleCom());
         }
         public void TickerMillonesEntra()
         {
@@ -264,17 +272,17 @@ namespace Elecciones.src.mensajes
         }
 
         //SEDES
-        public void SedesEntra(bool tickerIn, string codPartido)
+        public void SedesEntra(bool tickerIn, BrainStormDTO dto, PartidoDTO seleccionado)
         {
-            c.EnviarMensaje(builder.SedesEntra(tickerIn, codPartido));
+            c.EnviarMensaje(builder.SedesEntra(tickerIn, dto, seleccionado));
         }
         public void SedesEncadena(bool tickerIn, string codPartidoSiguiente, string codPartidoAnterior)
         {
             c.EnviarMensaje(builder.SedesEncadena(tickerIn, codPartidoSiguiente, codPartidoAnterior));
         }
-        public void SedesSale(bool tickerIn, string codPartido = "")
+        public void SedesSale(bool tickerIn)
         {
-            c.EnviarMensaje(builder.SedesSale(tickerIn, codPartido));
+            c.EnviarMensaje(builder.SedesSale(tickerIn));
         }
 
 
@@ -315,6 +323,10 @@ namespace Elecciones.src.mensajes
         public void fichaEncadena(bool oficiales, BrainStormDTO dto, PartidoDTO partido)
         {
             c.EnviarMensaje(builder.fichaEncadena(oficiales, dto, partido));
+        }
+        public void fichaActualiza(bool oficiales, BrainStormDTO dto, BrainStormDTO dtoAnterior)
+        {
+            c.EnviarMensaje(builder.fichaActualiza(oficiales, dto, dtoAnterior));
         }
         public void fichaSale(bool oficiales)
         {

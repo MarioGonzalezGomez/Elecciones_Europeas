@@ -12,9 +12,18 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
 {
     public class BrainStormDTO
     {
-        public CircunscripcionDTO circunscripcionDTO { get; set; }
-        public int numPartidos { get; set; }
-        public List<PartidoDTO> partidos { get; set; }
+        public CircunscripcionDTO circunscripcionDTO
+        {
+            get; set;
+        }
+        public int numPartidos
+        {
+            get; set;
+        }
+        public List<PartidoDTO> partidos
+        {
+            get; set;
+        }
         ConfigManager configuration;
 
         public BrainStormDTO(Circunscripcion c, int avanceActual, int tipoElecciones, List<CircunscripcionPartido> cps, bool oficiales, ConexionEntityFramework con)
@@ -58,7 +67,8 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
             {
                 fileName = $"{configuration.GetValue("rutaArchivos")}\\CSV\\{ruta}.csv";
             }
-            else {
+            else
+            {
                 fileName = $"{configuration.GetValue("rutaArchivos")}\\{ruta}.csv";
             }
             string resultado = "Codigo;Nombre;Escrutado;Escaños;Mayoría;Avance;Participacion;Participacion Historica;Media de Participacion;Votantes;Últimas Elecciones;Numero de partidos\n";
@@ -75,7 +85,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                   "-";
                 difVotos = difVotos < 0 ? difVotos * (-1) : difVotos;
                 double porcentajeVotoTruncado = Math.Truncate(p.porcentajeVoto * 10) / 10;
-                resultado += $"{p.codigo};{codigoPadre};{p.siglas};{p.candidato};{p.escaniosDesde};{p.escaniosHasta};{p.escaniosHistoricos};{porcentajeVotoTruncado.ToString()};{p.numVotantes.ToString("#,##0").Replace(",", ".")};{p.diferenciaEscanios};{p.tendencia};{difVotos.ToString("#,##0").Replace(",", ".")};{tendenciaVotos};{p.numVotantesHistoricos.ToString("#,##0").Replace(",", ".")};{p.nombre}\n";
+                resultado += $"{p.codigo};{codigoPadre};{p.siglas};{p.candidato};{p.escaniosDesde};{p.escaniosHasta};{p.escaniosHistoricos};{porcentajeVotoTruncado.ToString()};{p.numVotantes};{p.diferenciaEscanios};{p.tendencia};{difVotos};{tendenciaVotos};{p.numVotantesHistoricos};{p.nombre}\n";
             }
 
             await File.WriteAllTextAsync(fileName, resultado);

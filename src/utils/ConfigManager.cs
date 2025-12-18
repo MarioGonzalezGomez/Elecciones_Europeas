@@ -194,6 +194,7 @@ namespace Elecciones.src.utils
                     defaultContent.AppendLine("horaAvance1Historico=");
                     defaultContent.AppendLine("horaAvance2Historico=");
                     defaultContent.AppendLine("horaAvance3Historico=");
+                    defaultContent.AppendLine("horaParticipacionHistorico=");
                     defaultContent.AppendLine();
 
                     File.WriteAllText(path, defaultContent.ToString());
@@ -210,7 +211,8 @@ namespace Elecciones.src.utils
                     {"horaParticipacion", "" },
                     {"horaAvance1Historico", "" },
                     {"horaAvance2Historico", "" },
-                    {"horaAvance3Historico", "" }
+                    {"horaAvance3Historico", "" },
+                    { "horaParticipacionHistorico", "" }
                 };
 
                 foreach (var kv in defaults)

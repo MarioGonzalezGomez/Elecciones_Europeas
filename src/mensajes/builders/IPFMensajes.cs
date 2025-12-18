@@ -1,22 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.ConstrainedExecution;
-using System.Runtime.InteropServices;
-using System.Security.Policy;
+﻿using System.Globalization;
 using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using Elecciones.src.conexion;
 using Elecciones.src.controller;
 using Elecciones.src.model.DTO.BrainStormDTO;
-using Elecciones.src.model.DTO.Cartones;
 using Elecciones.src.model.IPF;
 using Elecciones.src.utils;
-using Org.BouncyCastle.Bcpg.OpenPgp;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Elecciones.src.mensajes.builders
 {
@@ -45,7 +34,27 @@ namespace Elecciones.src.mensajes.builders
             return instance;
         }
 
+        // --- Helpers añadidos: leer modo/ruta de vídeo bajo demanda ---
+        /// <summary>
+        /// Devuelve true si la fuente de vídeo del slot indicado está en modo DIRECTO (live).
+        /// </summary>
+        public bool IsVideoLive(int index)
+        {
+            if (index < 1 || index > 6) return false;
+            var val = configuration.GetValue($"video{index}_isLive");
+            if (string.IsNullOrEmpty(val)) return false;
+            return val == "1" || val.Equals("true", StringComparison.OrdinalIgnoreCase);
+        }
 
+        /// <summary>
+        /// Devuelve la ruta persistida para el slot de vídeo indicado (vacío si no existe).
+        /// </summary>
+        public string GetVideoPath(int index)
+        {
+            if (index < 1 || index > 6) return string.Empty;
+            return configuration.GetValue($"video{index}_path") ?? string.Empty;
+        }
+        // --- Fin helpers ---
 
         //MENSAJES ESPECIFICOS
 
@@ -99,7 +108,8 @@ namespace Elecciones.src.mensajes.builders
         public string EntraReloj(int segundos)
         {
             string signal = "";
-            signal += EventBuild("cuentaAtras", "TIMER_LENGTH", segundos) + "\n";
+            // Fix: pasar el valor numérico como string y tipoItem explícito
+            signal += EventBuild("cuentaAtras", "TIMER_LENGTH", $"{segundos}", 1) + "\n";
             signal += Entra("cuentaAtras");
             return signal;
         }
@@ -118,7 +128,8 @@ namespace Elecciones.src.mensajes.builders
             string tipo = oficial ? "Resultados" : "Sondeo";
             string entra = (oficial && animacionPrimeros || !oficial && animacionSondeo) ? "EntraPorPrimeraVez" : "ENTRA";
             string signal = "";
-            signal += EventBuild("nPartidosConEscanio", "MAP_INT_PAR", dto.partidos.Count) + "\n";
+            // Fix: pasar count como string y tipoItem explícito
+            signal += EventBuild("nPartidosConEscanio", "MAP_INT_PAR", $"{dto.partidos.Count}", 1) + "\n";
             signal += Entra(tipo);
             return signal;
         }
@@ -128,7 +139,8 @@ namespace Elecciones.src.mensajes.builders
         }
         public string TickerActualiza(BrainStormDTO dto)
         {
-            return EventRunBuild("TICKER/ACTUALIZO");
+            // Fix: pasar count como string y tipoItem explícito
+            return EventBuild("nPartidosConEscanio", "MAP_INT_PAR", $"{dto.partidos.Count}", 1);
         }
         public string TickerSale(bool oficial)
         {
@@ -174,38 +186,154 @@ namespace Elecciones.src.mensajes.builders
             return EventBuild("TICKER/CambiaNPartidos", "MAP_INT_PAR", "1", 1);
         }
 
-        public string TickerVotosEntra(bool oficial)
+        public string TickerEscanosEntra()
         {
-            return oficial ? EventRunBuild("TICKER/VOTOS/ENTRA") : EventRunBuild("TICKER_SONDEO/VOTOS/ENTRA");
+            // Datos por separado -> General + Escanios Entra
+            string signal = "";
+            signal += EventRunBuild("DatosPorSeparado/General") + "\n";
+            signal += EventRunBuild("DatosPorSeparado/Escanios/ENTRA");
+            return signal;
         }
-        public string TickerVotosSale(bool oficial)
+        public string TickerEscanosSale()
         {
-            return oficial ? EventRunBuild("TICKER/VOTOS/SALE") : EventRunBuild("TICKER_SONDEO/VOTOS/SALE");
+            // Escanios Sale (solo la señal específica)
+            return EventRunBuild("DatosPorSeparado/Escanios/SALE");
         }
-        public string TickerHistoricosEntra(bool oficial)
+        public string TickerVotosEntra()
         {
-            return oficial ? EventRunBuild("TICKER/HISTORICOS/ENTRA") : EventRunBuild("TICKER_SONDEO/HISTORICOS/ENTRA");
+            // Datos por separado -> General + '100' (votos) Entra
+            string signal = "";
+            signal += EventRunBuild("DatosPorSeparado/General") + "\n";
+            signal += EventRunBuild("DatosPorSeparado/100/ENTRA");
+            return signal;
         }
-        public string TickerHistoricosSale(bool oficial)
+        public string TickerVotosSale()
         {
-            return oficial ? EventRunBuild("TICKER/HISTORICOS/SALE") : EventRunBuild("TICKER_SONDEO/HISTORICOS/SALE");
+            // Votos Sale (solo la señal específica)
+            return EventRunBuild("DatosPorSeparado/100/SALE");
         }
+
+        public string TickerHistoricosEntraInd()
+        {
+            // Datos por separado -> General + HST Entra (individualizados)
+            string signal = "";
+            signal += EventRunBuild("DatosPorSeparado/General") + "\n";
+            signal += EventRunBuild("DatosPorSeparado/HST/ENTRA");
+            return signal;
+        }
+        public string TickerHistoricosSaleInd()
+        {
+            // HST Sale (individualizados)
+            return EventRunBuild("DatosPorSeparado/HST/SALE");
+        }
+
+        public string TickerHistoricosEntraCom()
+        {
+            // Datos combinados -> General + HST Entra (combinados)
+            string signal = "";
+            signal += EventRunBuild("DatosCombinados/General") + "\n";
+            signal += EventRunBuild("DatosCombinados/HST/ENTRA");
+            return signal;
+        }
+        public string TickerHistoricosSaleCom()
+        {
+            // HST Sale (combinados)
+            return EventRunBuild("DatosCombinados/HST/SALE");
+        }
+
         public string TickerMillonesEntra()
         {
-            return EventRunBuild("TICKER/MILLONES/ENTRA");
+            // Datos combinados -> General + MLLNS Entra (millones)
+            string signal = "";
+            signal += EventRunBuild("DatosCombinados/General") + "\n";
+            signal += EventRunBuild("DatosCombinados/MLLNS/ENTRA");
+            return signal;
         }
         public string TickerMillonesSale()
         {
-            return EventRunBuild("TICKER/MILLONES/SALE");
+            // MLLNS Sale (millones)
+            return EventRunBuild("DatosCombinados/MLLNS/SALE");
         }
 
         public string TickerFotosEntra()
         {
-            return EventBuild("siOcultoCarasSegunNPartidos", "MAP_INT_PAR", 1);
+            // Fix: pasar 1 como string
+            return EventBuild("siOcultoCarasSegunNPartidos", "MAP_INT_PAR", "1", 1);
         }
         public string TickerFotosSale()
         {
-            return EventBuild("siOcultoCarasSegunNPartidos", "MAP_INT_PAR", 0);
+            // Fix: pasar 0 como string
+            return EventBuild("siOcultoCarasSegunNPartidos", "MAP_INT_PAR", "0", 1);
+        }
+
+        public string TickerVideoDespliega()
+        {
+            //itemset("SiVideo/EntraVideoGeneral", "EVENT_RUN")
+            //itemset("SiVideo/" + siglas + "/EntraVideo" + siglas, "EVENT_RUN")
+            return "";
+        }
+        public string TickerVideoOculta()
+        {
+            //itemset("SiVideo/" + siglas + "/SaleVideo" + siglas, "EVENT_RUN")
+            //itemset("SiVideo/SaleVideoGeneral", "EVENT_RUN")
+            return "";
+        }
+
+        //FALDON TD
+        public string TickerTDEntra(BrainStormDTO dto)
+        {
+            var main = Application.Current.MainWindow as MainWindow;
+            List<string> siglasPartidos = main.dtoSinFiltrar.partidos.Select(x => x.siglas).ToList();
+            List<string> siglasActivos = dto.partidos.Select(x => x.siglas).ToList();
+            string signal = "";
+            //Poner camara en su sitio
+            signal += EventBuild("<>pipe", "PIPE_TYPE", "Orthogonal", 1) + "\n";
+            signal += EventBuild("cam1", "CAM_PV[1]", "-535", 1) + "\n";
+
+            signal += EventBuild("NumeroEscrutado", "TEXT_STRING", $"{dto.circunscripcionDTO.escrutado}%", 2, 0.5, 0) + "\n";
+
+            //Tamano
+            //itemgo("Pastilla", "PRIM_BAR_LEN[0]", 1341, 0.5, 0) 
+
+            foreach (var siglas in siglasPartidos)
+            {
+
+                if (siglasActivos.Contains(siglas))
+                {
+                    PartidoDTO temp = dto.partidos.FirstOrDefault(x => x.siglas == siglas);
+                    signal += Oculta_Desoculta(false, $"Partidos/{siglas}") + "\n";
+                    signal += EventBuild($"Escaños/{siglas}", "TEXT_STRING", $"{temp.escaniosHasta}", 2, 0.5, 0) + "\n";
+                }
+                else
+                {
+                    signal += Oculta_Desoculta(true, $"Partidos/{siglas}") + "\n";
+                    signal += EventBuild($"Escaños/{siglas}", "TEXT_STRING", $"0", 2, 0.5, 0) + "\n";
+                }
+                //Posiciones
+                //For de posiciones de fichas
+                //itemgo("Partidos/{sigla}", "OBJ_DISPLACEMENT[0]", 512, 0.5, 0)
+
+                //Posicion elementos dentro pastilla con for para cada elemento
+                //itemset("Partidos/{sigla}/Logo", "OBJ_DISPLACEMENT[0]", -1125)
+                //itemset("Partidos/{sigla}/Escaños", "OBJ_DISPLACEMENT[0]", 61)
+
+            }
+
+            return signal;
+        }
+        public string TickerTDEncadena(bool oficial, BrainStormDTO dto)
+        {
+            return oficial ? Encadena("TICKER") : Encadena("TICKER_SONDEO");
+        }
+        public string TickerTDActualiza(BrainStormDTO dto)
+        {
+            // Fix: pasar count como string y tipoItem explícito
+            return EventBuild("nPartidosConEscanio", "MAP_INT_PAR", $"{dto.partidos.Count}", 1);
+        }
+        public string TickerTDSale(bool oficial)
+        {
+            string tipo = oficial ? "Resultados" : "Sondeo";
+            return Sale(tipo);
         }
 
         //PP_PSOE
@@ -322,19 +450,18 @@ namespace Elecciones.src.mensajes.builders
         }
 
         //SEDES
-        public string SedesEntra(bool tickerIn, string codPartido)
+        public string SedesEntra(bool tickerIn, BrainStormDTO dto, PartidoDTO seleccionado = null)
         {
-            string signal;
+            string signal = "";
+            signal += EventBuild("nSede", "MAP_INT_PAR", $"{dto.partidos.IndexOf(seleccionado) + 1}", 1) + "\n";
             if (tickerIn)
             {
-                signal = EventBuild("TOTAL/CualPartidoATotal", "MAP_STRING_PAR", $"'{codPartido}'", 1);
-                signal += EventBuild($"TOTAL/FCN_INI", "MAP_EXE", 1);
-                signal += EventBuild($"TOTAL/FCN_Total", "MAP_EXE", 1);
+                signal += EventBuild("Sedes", "MAP_EXE");
+                signal += Entra("Sedes/DesdePartido");
             }
             else
             {
-                signal = EventBuild($"SEDES/Partido1", "MAP_STRING_PAR", $"'{codPartido}'", 1);
-                signal += Entra($"SEDES");
+                signal += Entra("Sedes/Desde0");
             }
             return signal;
         }
@@ -354,15 +481,15 @@ namespace Elecciones.src.mensajes.builders
             }
             return signal;
         }
-        public string SedesSale(bool tickerIn, string codPartido = "")
+        public string SedesSale(bool tickerIn)
         {
-            string signal = tickerIn ? EventBuild($"TOTAL/FCN_Vuelve", "MAP_EXE", 1) : Sale("SEDES");
+            string signal = tickerIn ? Sale("Sedes/DesdePartido") : Sale("Sedes/Desde0");
             return signal;
         }
 
 
         //CARTONES
-        
+
         //PARTICIPACION
         public string participacionEntra(BrainStormDTO dto, int avance)
         {
@@ -371,12 +498,12 @@ namespace Elecciones.src.mensajes.builders
             {
                 signal.Append(Prepara("PARTICIPACION") + "\n");
 
-                // Try to load the full Circunscripcion model (contains avance1/2/3 and sus hist�ricos).
+                // Try to load the full Circunscripcion model (contains avance1/2/3 and sus históricos).
                 Circunscripcion? circ = null;
                 try
                 {
                     using var con = new ConexionEntityFramework();
-                    // Prefer lookup by c�digo si existe, otherwise by nombre.
+                    // Prefer lookup by código si existe, otherwise by nombre.
                     if (!string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo))
                     {
                         circ = CircunscripcionController.GetInstance(con).FindById(dto.circunscripcionDTO.codigo);
@@ -386,7 +513,7 @@ namespace Elecciones.src.mensajes.builders
                         circ = CircunscripcionController.GetInstance(con).FindByName(dto.circunscripcionDTO.nombre);
                     }
 
-                    // Reveal map(s) for autonom�a / provincias using the Circunscripcion data when available.
+                    // Reveal map(s) for autonomía / provincias using the Circunscripcion data when available.
                     var nombreParaMap = circ?.nombre ?? dto.circunscripcionDTO?.nombre ?? string.Empty;
                     var codigoParaMap = circ?.codigo ?? dto.circunscripcionDTO?.codigo ?? string.Empty;
 
@@ -433,6 +560,12 @@ namespace Elecciones.src.mensajes.builders
                 string horaAv3 = configuration.GetValue("horaAvance3") ?? "";
                 string horaFinal = configuration.GetValue("horaParticipacion") ?? "";
 
+                // Historical hour labels
+                string horaAv1Hist = configuration.GetValue("horaAvance1Historico") ?? "";
+                string horaAv2Hist = configuration.GetValue("horaAvance2Historico") ?? "";
+                string horaAv3Hist = configuration.GetValue("horaAvance3Historico") ?? "";
+                string horaFinalHist = configuration.GetValue("horaParticipacionHistorico") ?? "";
+
                 // Determine left/right values and labels using the full Circunscripcion when available,
                 // otherwise fall back to values present in dto.circunscripcionDTO.
                 double leftValue = 0.0;
@@ -454,69 +587,69 @@ namespace Elecciones.src.mensajes.builders
                     try { finalParticipation = Convert.ToDouble(cDto.GetType().GetProperty("participacion")?.GetValue(cDto) ?? 0.0); } catch { finalParticipation = 0.0; }
                 }
 
+                // New mapping: do NOT cross advances.
+                // Show historical value for the same advance on the left, current value for the same advance on the right.
                 switch (avance)
                 {
                     case 1:
-                        // First advance: left empty / 0, right = avance1 (or fallback final participation)
-                        leftTime = "";
+                        leftTime = string.IsNullOrWhiteSpace(horaAv1Hist) ? "" : horaAv1Hist;
                         rightTime = string.IsNullOrWhiteSpace(horaAv1) ? "" : horaAv1;
-                        leftValue = 0.0;
                         if (circ != null)
                         {
+                            leftValue = circ.avance1Hist;
                             rightValue = circ.avance1 != 0.0 ? circ.avance1 : finalParticipation;
                         }
                         else
                         {
-                            // DTO fallback: try to read avance1 or participacion
+                            try { leftValue = Convert.ToDouble(cDto?.GetType().GetProperty("avance1Hist")?.GetValue(cDto) ?? 0.0); } catch { leftValue = 0.0; }
                             try { rightValue = Convert.ToDouble(cDto?.GetType().GetProperty("avance1")?.GetValue(cDto) ?? finalParticipation); } catch { rightValue = finalParticipation; }
                         }
                         break;
 
                     case 2:
-                        // current avance2 vs historical avance1
-                        leftTime = string.IsNullOrWhiteSpace(horaAv1) ? "" : horaAv1;
+                        leftTime = string.IsNullOrWhiteSpace(horaAv2Hist) ? "" : horaAv2Hist;
                         rightTime = string.IsNullOrWhiteSpace(horaAv2) ? "" : horaAv2;
                         if (circ != null)
                         {
-                            leftValue = circ.avance1Hist;
+                            leftValue = circ.avance2Hist;
                             rightValue = circ.avance2 != 0.0 ? circ.avance2 : finalParticipation;
                         }
                         else
                         {
-                            try { leftValue = Convert.ToDouble(cDto?.GetType().GetProperty("avance1Hist")?.GetValue(cDto) ?? 0.0); } catch { leftValue = 0.0; }
+                            try { leftValue = Convert.ToDouble(cDto?.GetType().GetProperty("avance2Hist")?.GetValue(cDto) ?? 0.0); } catch { leftValue = 0.0; }
                             try { rightValue = Convert.ToDouble(cDto?.GetType().GetProperty("avance2")?.GetValue(cDto) ?? finalParticipation); } catch { rightValue = finalParticipation; }
                         }
                         break;
 
                     case 3:
-                        // current avance3 vs historical avance2
-                        leftTime = string.IsNullOrWhiteSpace(horaAv2) ? "" : horaAv2;
+                        leftTime = string.IsNullOrWhiteSpace(horaAv3Hist) ? "" : horaAv3Hist;
                         rightTime = string.IsNullOrWhiteSpace(horaAv3) ? "" : horaAv3;
                         if (circ != null)
                         {
-                            leftValue = circ.avance2Hist;
+                            leftValue = circ.avance3Hist;
                             rightValue = circ.avance3 != 0.0 ? circ.avance3 : finalParticipation;
                         }
                         else
                         {
-                            try { leftValue = Convert.ToDouble(cDto?.GetType().GetProperty("avance2Hist")?.GetValue(cDto) ?? 0.0); } catch { leftValue = 0.0; }
+                            try { leftValue = Convert.ToDouble(cDto?.GetType().GetProperty("avance3Hist")?.GetValue(cDto) ?? 0.0); } catch { leftValue = 0.0; }
                             try { rightValue = Convert.ToDouble(cDto?.GetType().GetProperty("avance3")?.GetValue(cDto) ?? finalParticipation); } catch { rightValue = finalParticipation; }
                         }
                         break;
 
                     case 4:
                     default:
-                        // Final participation: compare historical avance3 with final participation
-                        leftTime = string.IsNullOrWhiteSpace(horaAv3) ? "" : horaAv3;
+                        // Final participation: compare historical participation with final participation
+                        leftTime = string.IsNullOrWhiteSpace(horaFinalHist) ? "" : horaFinalHist;
                         rightTime = string.IsNullOrWhiteSpace(horaFinal) ? "" : horaFinal;
                         if (circ != null)
                         {
-                            leftValue = circ.avance3Hist;
+                            leftValue = circ.participacionHist;
                             rightValue = finalParticipation;
                         }
                         else
                         {
-                            try { leftValue = Convert.ToDouble(cDto?.GetType().GetProperty("avance3Hist")?.GetValue(cDto) ?? 0.0); } catch { leftValue = 0.0; }
+                            // Some DTOs may have 'participacionHistorica' or 'participacionHist'
+                            try { leftValue = Convert.ToDouble(cDto?.GetType().GetProperty("participacionHistorica")?.GetValue(cDto) ?? cDto?.GetType().GetProperty("participacionHist")?.GetValue(cDto) ?? 0.0); } catch { leftValue = 0.0; }
                             rightValue = finalParticipation;
                         }
                         break;
@@ -527,8 +660,8 @@ namespace Elecciones.src.mensajes.builders
                 signal.Append(EventBuild("Participacion/Hora_Dch", "TEXT_STRING", $"{rightTime}", 1) + "\n");
 
                 // Send bar values with animation (itemgo)
-                signal.Append(EventBuild("Participacion_Barra_Izq", "MAP_FLOAT_PAR", $"{leftValue.ToString("F1", CultureInfo.InvariantCulture)}", 2, 0.5, 0.6) + "\n");
-                signal.Append(EventBuild("Participacion_Barra_Dch", "MAP_FLOAT_PAR", $"{rightValue.ToString("F1", CultureInfo.InvariantCulture)}", 2, 0.5, 0.6) + "\n");
+                signal.Append(EventBuild("Participacion_Barra_Izq", "MAP_FLOAT_PAR", $"{leftValue.ToString("F2", CultureInfo.InvariantCulture)}", 2, 0.5, 0.6) + "\n");
+                signal.Append(EventBuild("Participacion_Barra_Dch", "MAP_FLOAT_PAR", $"{rightValue.ToString("F2", CultureInfo.InvariantCulture)}", 2, 0.5, 0.6) + "\n");
 
                 // Adjust fonts/offset depending on the right value (current participation)
                 double reference = rightValue;
@@ -547,7 +680,7 @@ namespace Elecciones.src.mensajes.builders
                     signal.Append(EventBuild("Participacion/Txt_Izq", "TEXT_FONT", "Heavy_Negro", 1) + "\n");
                 }
 
-                // Finally, enter PARTICIPACION
+                // Finalmente, entrar en PARTICIPACION
                 signal.Append(Entra("PARTICIPACION"));
             }
 
@@ -560,10 +693,10 @@ namespace Elecciones.src.mensajes.builders
             {
                 signal += Encadena("PARTICIPACION") + "\n";
 
-                // If the selected circunscripci�n is an autonom�a (code ends with 00000)
-                // then hide (Oculta_Desoculta(false,...)) every province belonging to that autonom�a.
+                // If the selected circunscripción is an autonomía (code ends with 00000)
+                // then hide (Oculta_Desoculta(false,...)) every province belonging to that autonomía.
                 // We use CircunscripcionController.FindAllCircunscripcionesByNameAutonomia(nombreAutonomia)
-                // which returns the provinces (codes ending with "000") for the given autonom�a name.
+                // which returns the provinces (codes ending with "000") for the given autonomía name.
                 if (!string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo) && dto.circunscripcionDTO.codigo.EndsWith("00000"))
                 {
                     try
@@ -579,25 +712,68 @@ namespace Elecciones.src.mensajes.builders
                         }
                         else
                         {
-                            // Fallback: if no provinces found, hide the autonom�a map object itself
+                            // Fallback: if no provinces found, hide the autonomía map object itself
                             signal += EventBuild($"Participacion/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0.3) + "\n";
                         }
                     }
                     catch (Exception)
                     {
-                        // On any error (DB unavailable, etc.) fallback to hiding the autonom�a object itself
+                        // On any error (DB unavailable, etc.) fallback to hiding the autonomía object itself
                         signal += EventBuild($"Participacion/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0.3) + "\n";
                     }
                 }
                 else
                 {
-                    // Not an autonom�a: hide the single circunscripci�n selected
+                    // Not an autonomía: hide the single circunscripción selected
                     signal += EventBuild($"Participacion/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0.3) + "\n";
                 }
 
                 signal += CambiaTexto("Participacion/LugarTxt", $"{dto.circunscripcionDTO.nombre}") + "\n";
 
-                if (dto.circunscripcionDTO.participacion < 25)
+                // Read hour labels (including historical)
+                string horaAv1 = configuration.GetValue("horaAvance1") ?? "";
+                string horaAv2 = configuration.GetValue("horaAvance2") ?? "";
+                string horaAv3 = configuration.GetValue("horaAvance3") ?? "";
+                string horaFinal = configuration.GetValue("horaParticipacion") ?? "";
+                string horaAv1Hist = configuration.GetValue("horaAvance1Historico") ?? "";
+                string horaAv2Hist = configuration.GetValue("horaAvance2Historico") ?? "";
+                string horaAv3Hist = configuration.GetValue("horaAvance3Historico") ?? "";
+                string horaFinalHist = configuration.GetValue("horaParticipacionHistorico") ?? "";
+
+                // Determine left/right values using DTO only (encadenar doesn't query DB)
+                double leftValue = 0.0;
+                double rightValue = 0.0;
+                var cDto = dto.circunscripcionDTO;
+                switch (avance)
+                {
+                    case 1:
+                        leftValue = SafeGetDouble(cDto, "avance1Hist", 0.0);
+                        rightValue = SafeGetDouble(cDto, "avance1", SafeGetDouble(cDto, "participacion", 0.0));
+                        signal += EventBuild("Participacion/Hora_Izq", "TEXT_STRING", $"{(string.IsNullOrWhiteSpace(horaAv1Hist) ? "" : horaAv1Hist)}", 1) + "\n";
+                        signal += EventBuild("Participacion/Hora_Dch", "TEXT_STRING", $"{(string.IsNullOrWhiteSpace(horaAv1) ? "" : horaAv1)}", 1) + "\n";
+                        break;
+                    case 2:
+                        leftValue = SafeGetDouble(cDto, "avance2Hist", 0.0);
+                        rightValue = SafeGetDouble(cDto, "avance2", SafeGetDouble(cDto, "participacion", 0.0));
+                        signal += EventBuild("Participacion/Hora_Izq", "TEXT_STRING", $"{(string.IsNullOrWhiteSpace(horaAv2Hist) ? "" : horaAv2Hist)}", 1) + "\n";
+                        signal += EventBuild("Participacion/Hora_Dch", "TEXT_STRING", $"{(string.IsNullOrWhiteSpace(horaAv2) ? "" : horaAv2)}", 1) + "\n";
+                        break;
+                    case 3:
+                        leftValue = SafeGetDouble(cDto, "avance3Hist", 0.0);
+                        rightValue = SafeGetDouble(cDto, "avance3", SafeGetDouble(cDto, "participacion", 0.0));
+                        signal += EventBuild("Participacion/Hora_Izq", "TEXT_STRING", $"{(string.IsNullOrWhiteSpace(horaAv3Hist) ? "" : horaAv3Hist)}", 1) + "\n";
+                        signal += EventBuild("Participacion/Hora_Dch", "TEXT_STRING", $"{(string.IsNullOrWhiteSpace(horaAv3) ? "" : horaAv3)}", 1) + "\n";
+                        break;
+                    default:
+                        leftValue = SafeGetDouble(cDto, "participacionHistorica", SafeGetDouble(cDto, "participacionHist", 0.0));
+                        rightValue = SafeGetDouble(cDto, "participacion", 0.0);
+                        signal += EventBuild("Participacion/Hora_Izq", "TEXT_STRING", $"{(string.IsNullOrWhiteSpace(horaFinalHist) ? "" : horaFinalHist)}", 1) + "\n";
+                        signal += EventBuild("Participacion/Hora_Dch", "TEXT_STRING", $"{(string.IsNullOrWhiteSpace(horaFinal) ? "" : horaFinal)}", 1) + "\n";
+                        break;
+                }
+
+                // Fonts/offset depending on rightValue
+                if (rightValue < 25)
                 {
                     signal += EventBuild("Participacion/Barras/Barra_Dch/Txt_Dch", "OBJ_OFFSET[2]", "322", 2, 0.5) + "\n";
                     signal += EventBuild("Participacion/Txt_Dch", "TEXT_FONT", "Heavy_Naranja", 1) + "\n";
@@ -611,12 +787,31 @@ namespace Elecciones.src.mensajes.builders
                     signal += EventBuild("OBJ_DISPLACEMENT2", "BIND_VOFFSET[0]", "190", 2, 0.5) + "\n";
                     signal += EventBuild("Participacion/Txt_Izq", "TEXT_FONT", "Heavy_Negro", 1) + "\n";
                 }
-                signal += EventBuild("Participacion_Barra_Dch", "MAP_FLOAT_PAR", $"{dto.circunscripcionDTO.participacion.ToString("F1")}", 2, 0.5, 0.3) + "\n";
-                signal += EventBuild("Participacion_Barra_Izq", "MAP_FLOAT_PAR", $"{dto.circunscripcionDTO.participacion.ToString("F1")}", 2, 0.5, 0.3) + "\n";
+
+                signal += EventBuild("Participacion_Barra_Dch", "MAP_FLOAT_PAR", $"{rightValue.ToString("F2", CultureInfo.InvariantCulture)}", 2, 0.5, 0.3) + "\n";
+                signal += EventBuild("Participacion_Barra_Izq", "MAP_FLOAT_PAR", $"{leftValue.ToString("F2", CultureInfo.InvariantCulture)}", 2, 0.5, 0.3) + "\n";
 
             }
 
             return signal;
+        }
+
+        // small helper to safely read double properties from DTO via reflection
+        private static double SafeGetDouble(object? dto, string propName, double defaultValue)
+        {
+            if (dto == null) return defaultValue;
+            try
+            {
+                var prop = dto.GetType().GetProperty(propName);
+                if (prop == null) return defaultValue;
+                var val = prop.GetValue(dto);
+                if (val == null) return defaultValue;
+                return Convert.ToDouble(val, CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return defaultValue;
+            }
         }
         public string participacionSale()
         {
@@ -639,7 +834,7 @@ namespace Elecciones.src.mensajes.builders
             // Set location text
             signal.Append(EventBuild("CCAA_Carton/LugarTxt", "TEXT_STRING", $"{dto.circunscripcionDTO.nombre}", 1) + "\n");
 
-            // Reveal map(s) for the selected circunscripci�n (autonom�a -> reveal provinces)
+            // Reveal map(s) for the selected circunscripción (autonomía -> reveal provinces)
             if (!string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo) && dto.circunscripcionDTO.codigo.EndsWith("00000"))
             {
                 try
@@ -655,19 +850,19 @@ namespace Elecciones.src.mensajes.builders
                     }
                     else
                     {
-                        // Fallback: reveal the autonom�a map object itself
+                        // Fallback: reveal the autonomía map object itself
                         signal.Append(EventBuild($"CCAA_Carton/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n");
                     }
                 }
                 catch (Exception)
                 {
-                    // On error fallback to revealing the autonom�a map object itself
+                    // On error fallback to revealing the autonomía map object itself
                     signal.Append(EventBuild($"CCAA_Carton/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n");
                 }
             }
             else
             {
-                // Not an autonom�a: reveal the single circunscripci�n selected
+                // Not an autonomía: reveal the single circunscripción selected
                 signal.Append(EventBuild($"CCAA_Carton/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n");
             }
 
@@ -719,8 +914,10 @@ namespace Elecciones.src.mensajes.builders
         //FICHAS DE PARTIDO
         private int indexCarrusel = 0;
         List<string> siglas;
+        PartidoDTO fichaSeleccionada = null;
         public string fichaEntra(bool oficiales, BrainStormDTO dto, PartidoDTO seleccionado = null)
         {
+            fichaSeleccionada = seleccionado;
             siglas = dto.partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList();
             string mode = oficiales ? "Oficiales" : "Sondeos";
             string path = $"Carton_Carrusel/{mode}/{siglas}";
@@ -759,6 +956,7 @@ namespace Elecciones.src.mensajes.builders
         // If you only want to animate a single carton out, pass siglasEntrar = null or empty.
         public string fichaEncadena(bool oficiales, BrainStormDTO dto, PartidoDTO seleccionado = null)
         {
+            fichaSeleccionada = seleccionado;
             string mode = oficiales ? "Oficiales" : "Sondeos";
             string path = $"Carton_Carrusel/{mode}/{siglas}";
             StringBuilder sb = new StringBuilder();
@@ -794,6 +992,21 @@ namespace Elecciones.src.mensajes.builders
 
             return sb.ToString();
         }
+        public string fichaActualiza(bool oficiales, BrainStormDTO dto, BrainStormDTO dtoAnterior)
+        {
+            //-Posición cartón que pasa por delante: itemset("Carton_Carrusel/Oficiales/Cs", "OBJ_DISPLACEMENT", (0, -0.3, 0))
+            //- Posición cartón que pasa por detrás: itemset("Carton_Carrusel/Oficiales/Cs", "OBJ_DISPLACEMENT", (0, 0, 0))
+            string signal = "";
+            if (oficiales)
+            {
+                signal += EventBuild("Oficial_Codigo", "MAP_LLSTRING_LOAD");
+            }
+            else
+            {
+                signal += EventBuild("Sondeo_Codigo", "MAP_LLSTRING_LOAD");
+            }
+            return signal;
+        }
         public string fichaSale(bool oficiales)
         {
             StringBuilder sb = new StringBuilder();
@@ -807,6 +1020,7 @@ namespace Elecciones.src.mensajes.builders
             sb.Append(Sale("CARRUSEL"));
             indexCarrusel = 0;
             siglas = new List<string>();
+            fichaSeleccionada = null;
             return sb.ToString();
         }
 
@@ -844,7 +1058,7 @@ namespace Elecciones.src.mensajes.builders
             // Set location text
             signal.Append(EventBuild("Mayorias/LugarTxt1", "TEXT_STRING", $"{dto.circunscripcionDTO.nombre}", 1) + "\n");
 
-            // Reveal map(s) for the selected circunscripci�n.
+            // Reveal map(s) for the selected circunscripción.
             if (!string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo) && dto.circunscripcionDTO.codigo.EndsWith("00000"))
             {
                 try
@@ -860,19 +1074,19 @@ namespace Elecciones.src.mensajes.builders
                     }
                     else
                     {
-                        // Fallback: reveal the autonom�a map object itself
+                        // Fallback: reveal the autonomía map object itself
                         signal.Append(EventBuild($"Mapa_Mayorias/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n");
                     }
                 }
                 catch (Exception)
                 {
-                    // On error fallback to revealing the autonom�a map object itself
+                    // On error fallback to revealing the autonomía map object itself
                     signal.Append(EventBuild($"Mapa_Mayorias/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n");
                 }
             }
             else
             {
-                // Not an autonom�a: reveal the single circunscripci�n selected
+                // Not an autonomía: reveal the single circunscripción selected
                 signal.Append(EventBuild($"Mapa_Mayorias/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n");
             }
 
@@ -946,85 +1160,85 @@ namespace Elecciones.src.mensajes.builders
         }
 
         //SUPERFALDON - FICHAS
-        // TODO: Construir se�al para entrada del gr�fico FICHAS en SUPERFALD�N
+        // TODO: Construir señal para entrada del gráfico FICHAS en SUPERFALDÓN
         public string sfFichasEntra()
         {
             return "";
         }
-        // TODO: Construir se�al para encadenar entre gr�ficos FICHAS en SUPERFALD�N
+        // TODO: Construir señal para encadenar entre gráficos FICHAS en SUPERFALDÓN
         public string sfFichasEncadena()
         {
             return "";
         }
-        // TODO: Construir se�al para salida del gr�fico FICHAS en SUPERFALD�N
+        // TODO: Construir señal para salida del gráfico FICHAS en SUPERFALDÓN
         public string sfFichasSale()
         {
             return "";
         }
 
         //SUPERFALDON - PACTOMETRO
-        // TODO: Construir se�al para entrada del gr�fico PACT�METRO en SUPERFALD�N
+        // TODO: Construir señal para entrada del gráfico PACTÓMETRO en SUPERFALDÓN
         public string sfPactometroEntra()
         {
             return "";
         }
-        // TODO: Construir se�al para encadenar entre gr�ficos PACT�METRO en SUPERFALD�N
+        // TODO: Construir señal para encadenar entre gráficos PACTÓMETRO en SUPERFALDÓN
         public string sfPactometroEncadena()
         {
             return "";
         }
-        // TODO: Construir se�al para salida del gr�fico PACT�METRO en SUPERFALD�N
+        // TODO: Construir señal para salida del gráfico PACTÓMETRO en SUPERFALDÓN
         public string sfPactometroSale()
         {
             return "";
         }
 
         //SUPERFALDON - MAYORIAS
-        // TODO: Construir se�al para entrada del gr�fico MAYOR�AS en SUPERFALD�N
+        // TODO: Construir señal para entrada del gráfico MAYORÍAS en SUPERFALDÓN
         public string sfMayoriasEntra()
         {
             return "";
         }
-        // TODO: Construir se�al para encadenar entre gr�ficos MAYOR�AS en SUPERFALD�N
+        // TODO: Construir señal para encadenar entre gráficos MAYORÍAS en SUPERFALDÓN
         public string sfMayoriasEncadena()
         {
             return "";
         }
-        // TODO: Construir se�al para salida del gr�fico MAYOR�AS en SUPERFALD�N
+        // TODO: Construir señal para salida del gráfico MAYORÍAS en SUPERFALDÓN
         public string sfMayoriasSale()
         {
             return "";
         }
 
         //SUPERFALDON - BIPARTIDISMO
-        // TODO: Construir se�al para entrada del gr�fico BIPARTIDISMO en SUPERFALD�N
+        // TODO: Construir señal para entrada del gráfico BIPARTIDISMO en SUPERFALDÓN
         public string sfBipartidismoEntra()
         {
             return "";
         }
-        // TODO: Construir se�al para encadenar entre gr�ficos BIPARTIDISMO en SUPERFALD�N
+        // TODO: Construir señal para encadenar entre gráficos BIPARTIDISMO en SUPERFALDÓN
         public string sfBipartidismoEncadena()
         {
             return "";
         }
-        // TODO: Construir se�al para salida del gr�fico BIPARTIDISMO en SUPERFALD�N
+        // TODO: Construir señal para salida del gráfico BIPARTIDISMO en SUPERFALDÓN
         public string sfBipartidismoSale()
         {
             return "";
         }
 
         //SUPERFALDON - GANADOR
-        // TODO: Construir se�al para entrada del gr�fico GANADOR en SUPERFALD�N
+        // TODO: Construir señal para entrada del gráfico GANADOR en SUPERFALDÓN
         public string sfGanadorEntra()
         {
             return "";
         }
-        // TODO: Construir se�al para encadenar entre gr�ficos GANADOR en SUPERFALD�N
+        // TODO: Construir señal para encadenar entre gráficos GANADOR en SUPERFALDÓN
         public string sfGanadorEncadena()
         {
             return "";
         }
-        // TODO: Construir se�al para salida del gr�fico GANADOR en SUPERFALD�N
+        // TODO: Construir señal para salida del gráfico GANADOR en SUPERFALDÓN
         public string sfGanadorSale()
         {
             return "";
@@ -1033,7 +1247,7 @@ namespace Elecciones.src.mensajes.builders
 
         //CONSTRUCTORES
 
-        //Para construir la se�al necesitar�a el objeto o evento al que llamo, la propiedad a cambiar,
+        //Para construir la señal necesitaría el objeto o evento al que llamo, la propiedad a cambiar,
         //el valor o valores que cambian y el tipo: 1 para itemset y 2 para itemgo
         /// <summary>
         /// General constructor for itemset/itemgo/itemget. If using itemgo, pass tipoItem = 2 and provide animTime & delay.
@@ -1126,6 +1340,10 @@ namespace Elecciones.src.mensajes.builders
         private string EventBuild(string objeto, string propiedad, int tipoItem)
         {
             return EventBuild(objeto, propiedad, null, tipoItem, 0.0, 0.0);
+        }
+        private string EventBuild(string objeto, string propiedad)
+        {
+            return $"itemset('<{_bd}>{objeto}','{propiedad}');";
         }
 
         /// <summary>

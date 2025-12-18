@@ -35,14 +35,24 @@ namespace Elecciones.src.mensajes
         }
 
         //ESPECIFICOS
-        public void SubirRotulos()
+        public void SubirRotulosTD()
         {
-            c.EnviarMensaje(builder.SubirRotulos());
+            c.EnviarMensaje(builder.SubirRotulosTD());
         }
 
-        public void BajarRotulos()
+        public void BajarRotulosTD()
         {
-            c.EnviarMensaje(builder.BajarRotulos());
+            c.EnviarMensaje(builder.BajarRotulosTD());
+        }
+
+        public void SubirRotulosEsp()
+        {
+            c.EnviarMensaje(builder.SubirRotulosEspeciales());
+        }
+
+        public void BajarRotulosEsp()
+        {
+            c.EnviarMensaje(builder.BajarRotulosEspeciales());
         }
 
         //GENERALES

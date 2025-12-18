@@ -39,7 +39,7 @@ namespace Elecciones
         ConexionEntityFramework conexionActiva;
         private int avance;
         BrainStormDTO dto;
-        BrainStormDTO dtoSinFiltrar;
+        public BrainStormDTO dtoSinFiltrar;
         BrainStormDTO dtoDesdeSedes;
         bool preparado;
         public bool oficiales;
@@ -58,11 +58,11 @@ namespace Elecciones
         private ObservableInt eleccionSeleccionada;
 
         //Si tenemos algún partido seleccionado con el que se deba hacer algo
-        private PartidoDTO? partidoSeleccionado;
+        public PartidoDTO? partidoSeleccionado;
 
         //Bool para hacer giro
         bool sondeoEnElAire;
-        bool tickerDentro;
+        public bool tickerDentro;
         bool sedeDentro;
 
         //Bool cartones
@@ -339,7 +339,7 @@ namespace Elecciones
 
                     if (string.Equals(graficosHeader.Header, "FALDÓN")) { UpdateFaldones(dtoAnterior); }
                     //Add cambios por actualizacion en vivo en cartones
-                    if (string.Equals(graficosHeader.Header, "CARTÓN")) { UpdateCartones(); }
+                    if (string.Equals(graficosHeader.Header, "CARTÓN")) { UpdateCartones(dtoAnterior); }
                     if (string.Equals(graficosHeader.Header, "SUPERFADÓN")) { UpdateSuperfaldones(); }
                     if (pactos != null && pactos.pactoDentro == false) { pactos.RecargarDatos(dto, oficiales); }
                     ActualizarInfoInterfaz(seleccionada, dto);
@@ -372,8 +372,12 @@ namespace Elecciones
             graficos.TickerActualizaEscrutado();
             graficos.TickerActualiza(dto);
         }
-        private void UpdateCartones()
+        private void UpdateCartones(BrainStormDTO dtoAnterior)
         {
+            if (fichaDentro)
+            {
+                graficos.fichaActualiza(oficiales, dto, dtoAnterior);
+            }
         }
         private void UpdateSuperfaldones()
         {
@@ -1301,7 +1305,7 @@ namespace Elecciones
                         {
                             if (!sedeDentro)
                             {
-                                graficos.SedesEntra(false, partidoSeleccionado.codigo);
+                                graficos.SedesEntra(false, dto, partidoSeleccionado);
                                 dtoDesdeSedes = new BrainStormDTO(dto);
                             }
                             else { graficos.SedesEncadena(false, partidoSeleccionado.codigo); }
@@ -1412,7 +1416,14 @@ namespace Elecciones
                     case "SEDES":
                         if (partidoSeleccionado != null)
                         {
-                            graficos.SedesSale(false, partidoSeleccionado.codigo);
+                            if (partidoSeleccionado.escaniosHasta > 0)
+                            {
+                                graficos.SedesSale(tickerDentro);
+                            }
+                            else
+                            {
+                                graficos.SedesSale(false);
+                            }
                             sedeDentro = false;
                             if (tickerDentro)
                             {

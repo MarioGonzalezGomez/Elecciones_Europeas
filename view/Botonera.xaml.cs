@@ -29,9 +29,10 @@ namespace Elecciones
 
         private bool oficial;
         private bool relojPausado;
-        private CPDataDTO? partidoDesplegado;
 
         private BrainStormDTO dto;
+        private PartidoDTO partidoSeleccionado;
+        private MainWindow main;
 
         public Botonera()
         {
@@ -44,8 +45,8 @@ namespace Elecciones
 
         private void InitializeVariables()
         {
-            var window = Application.Current.MainWindow as MainWindow;
-            oficial = window?.oficiales ?? false;
+            main = Application.Current.MainWindow as MainWindow;
+            oficial = main?.oficiales ?? false;
             gController = GraphicController.GetInstance();
             configuration = ConfigManager.GetInstance();
             configuration.ReadConfig();
@@ -79,36 +80,6 @@ namespace Elecciones
             SolidColorBrush fondo = (SolidColorBrush)Application.Current.FindResource("PrimaryHueDarkBrush");
             Background = fondo;
         }
-        private void AdaptarChecks()
-        {
-            string primerosActivo = gController.RecibirPrimerosResultados();
-            Console.WriteLine($"PRIMEROS : {primerosActivo}");
-            if (primerosActivo != null)
-            {
-                if (primerosActivo.Equals("1"))
-                {
-                    PrimerosResultadosCheck.IsChecked = true;
-                }
-                else if (primerosActivo.Equals("0"))
-                {
-                    PrimerosResultadosCheck.IsChecked = false;
-                }
-            }
-            string sondeoActivo = gController.RecibirAnimacionSondeo();
-            Console.WriteLine($"SONDEO : {sondeoActivo}");
-            if (sondeoActivo != null)
-            {
-                if (sondeoActivo.Equals("1"))
-                {
-                    PrimerosResultadosCheck.IsChecked = true;
-                }
-                else if (sondeoActivo.Equals("0"))
-                {
-                    PrimerosResultadosCheck.IsChecked = false;
-                }
-            }
-
-        }
 
         private void PrimerosResultadosCheck_Checked(object sender, RoutedEventArgs e)
         {
@@ -128,33 +99,6 @@ namespace Elecciones
             if (gController != null && gController.ipfActivo.Valor == 1) { gController.AnimacionSondeo(false); }
         }
 
-        private void DespliegaButton_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
-            var partido = mainWindow.datosListView.SelectedItem as CPDataDTO;
-            if (partido != null)
-            {
-                gController.SedesEntra(true, partido.codigo);
-                partidoDesplegado = partido;
-            }
-            else
-            {
-                MessageBox.Show($"Debes seleccionar un partido para desplegar sus datos", "Seleccionar Partido", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-        private void RepliegaButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (partidoDesplegado != null)
-            {
-                gController.SedesSale(true, partidoDesplegado.codigo);
-                partidoDesplegado = null;
-            }
-            else
-            {
-                MessageBox.Show($"No hay ning�n partido desplegado", "Acci�n no permitida", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
         private void EntraMillonesButton_Click(object sender, RoutedEventArgs e)
         {
             if (oficial)
@@ -167,7 +111,7 @@ namespace Elecciones
         }
         private void EntraPVotoButton_Click(object sender, RoutedEventArgs e)
         {
-            gController.TickerVotosEntra(oficial);
+            gController.TickerVotosEntra();
             // MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
             // var desplegado = mainWindow.desplegado;
         }
@@ -175,11 +119,11 @@ namespace Elecciones
         {
             if (oficial)
             {
-                gController.TickerHistoricosEntra(oficial);
+                gController.TickerHistoricosEntraInd();
             }
             else
             {
-                gController.TickerVotosSale(oficial);
+                gController.TickerVotosSale();
             }
 
         }
@@ -196,7 +140,23 @@ namespace Elecciones
         private void btnSubirRotulosTd_Click(object sender, RoutedEventArgs e)
         {
             // Enviar SubirRotulos a Prime para TeleDirecciones
-            gController.SubirRotulosPrime();
+            gController.SubirRotulosPrimeTD();
+        }
+
+        private void btnBajarRotulosTd_Click(object sender, RoutedEventArgs e)
+        {
+            // Enviar BajarRotulos a Prime para TeleDirecciones
+            gController.BajarRotulosPrimeTD();
+        }
+
+        private void btnSubirRotulosEsp_Click(object sender, RoutedEventArgs e)
+        {
+            gController.SubirRotulosPrimeEsp();
+        }
+
+        private void btnBajarRotulosEsp_Click(object sender, RoutedEventArgs e)
+        {
+            gController.BajarRotulosPrimeEsp();
         }
     }
 }

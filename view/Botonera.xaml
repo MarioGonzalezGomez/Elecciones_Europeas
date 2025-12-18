@@ -33,15 +33,11 @@
                 <RowDefinition Height="55*"/>
             </Grid.RowDefinitions>
 
-            <CheckBox Grid.Row="0" Content="PRIMEROS RESULTADOS" x:Name="PrimerosResultadosCheck" Margin="15,10,0,0" IsChecked="True" Checked="PrimerosResultadosCheck_Checked" Unchecked="PrimerosResultadosCheck_Unchecked"/>
-            <CheckBox Grid.Row="1" Content="SONDEO CON ANIMACION" x:Name="SondeoAnimadoCheck" Margin="15,5,0,0" IsChecked="True" Checked="SondeoAnimadoCheck_Checked" Unchecked="SondeoAnimadoCheck_Unchecked"/>
             <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Content="DESPLIEGA" Tag="ENTRA" Grid.Column="0"  Margin="5,10,5,0" Padding="1"  FontSize="12" x:Name="DespliegaButton" Click="DespliegaButton_Click"/>
-                <Button Content="REPLIEGA" Tag="SALE" Grid.Column="1" Margin="0,10,5,0"  Padding="1"  FontSize="12" x:Name="RepliegaButton" Click="RepliegaButton_Click" />
             </Grid>
         </Grid>
         <!--#endregion-->
@@ -84,13 +80,21 @@
 
         <!--#endregion-->
 
-        <!--#region TD --> 
+        <!--#region TD -->
 
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Content="SUBIR RÓTULOS TD" FontSize="18" Background="#ffb038" Margin="1" Padding="1" x:Name="btnSubirRotulosTd" Click="btnSubirRotulosTd_Click"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Content="SUBIR TD" FontSize="16" Background="#ffb038" Margin="1" Padding="1" x:Name="btnSubirRotulosTd" Click="btnSubirRotulosTd_Click"/>
+            <Button Content="BAJAR TD" Grid.Column="2" FontSize="16" Background="#ff7979" Margin="1" Padding="1" x:Name="btnBajarRotulosTd" Click="btnBajarRotulosTd_Click"/>
+            <Button Content="SUBIR ESP" Grid.Row="2" FontSize="16" Background="#ffb038" Margin="1" Padding="1" x:Name="btnSubirRotulosEsp" Click="btnSubirRotulosEsp_Click"/>
+            <Button Content="BAJAR ESP" Grid.Row="2" Grid.Column="2" FontSize="16" Background="#ff7979" Margin="1" Padding="1" x:Name="btnBajarRotulosEsp" Click="btnBajarRotulosEsp_Click"/>
         </Grid>
 
         <!--#endregion-->

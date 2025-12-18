@@ -1,14 +1,15 @@
-﻿using Elecciones.src.logic;
-using Elecciones.src.mensajes;
-using Elecciones.src.model.DTO.BrainStormDTO;
-using Elecciones.src.conexion;
-using Elecciones.src.utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Elecciones.src.conexion;
+using Elecciones.src.logic;
+using Elecciones.src.mensajes;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.IPF;
+using Elecciones.src.utils;
 
 namespace Elecciones.src.controller
 {
@@ -106,13 +107,21 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.Reset(); }
         }
         //PRIME - ROTULOS TD
-        public void SubirRotulosPrime()
+        public void SubirRotulosPrimeTD()
         {
-            if (primeActivo.Valor == 1) { prime.SubirRotulos(); }
+            if (primeActivo.Valor == 1) { prime.SubirRotulosTD(); }
         }
-        public void BajarRotulosPrime()
+        public void BajarRotulosPrimeTD()
         {
-            if (primeActivo.Valor == 1) { prime.BajarRotulos(); }
+            if (primeActivo.Valor == 1) { prime.BajarRotulosTD(); }
+        }
+        public void SubirRotulosPrimeEsp()
+        {
+            if (primeActivo.Valor == 1) { prime.SubirRotulosEsp(); }
+        }
+        public void BajarRotulosPrimeEsp()
+        {
+            if (primeActivo.Valor == 1) { prime.BajarRotulosEsp(); }
         }
 
         private void PrimeActivoChange(object? sender, EventArgs e)
@@ -238,21 +247,29 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.TickerActualizaNumPartidos(); }
         }
 
-        public void TickerVotosEntra(bool oficial)
+        public void TickerVotosEntra()
         {
-            if (ipfActivo.Valor == 1) { ipf.TickerVotosEntra(oficial); }
+            if (ipfActivo.Valor == 1) { ipf.TickerVotosEntra(); }
         }
-        public void TickerVotosSale(bool oficial)
+        public void TickerVotosSale()
         {
-            if (ipfActivo.Valor == 1) { ipf.TickerVotosSale(oficial); }
+            if (ipfActivo.Valor == 1) { ipf.TickerVotosSale(); }
         }
-        public void TickerHistoricosEntra(bool oficial)
+        public void TickerHistoricosEntraInd()
         {
-            if (ipfActivo.Valor == 1) { ipf.TickerHistoricosEntra(oficial); }
+            if (ipfActivo.Valor == 1) { ipf.TickerHistoricosEntraInd(); }
         }
-        public void TickerHistoricosSale(bool oficial)
+        public void TickerHistoricosSaleInd()
         {
-            if (ipfActivo.Valor == 1) { ipf.TickerHistoricosSale(oficial); }
+            if (ipfActivo.Valor == 1) { ipf.TickerHistoricosSaleInd(); }
+        }
+        public void TickerHistoricosEntraCom()
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerHistoricosEntraCom(); }
+        }
+        public void TickerHistoricosSaleCom()
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerHistoricosSaleCom(); }
         }
         public void TickerMillonesEntra()
         {
@@ -361,17 +378,17 @@ namespace Elecciones.src.controller
         }
 
         //SEDES
-        public void SedesEntra(bool tickerIn, string codPartido)
+        public void SedesEntra(bool tickerIn, BrainStormDTO dto, PartidoDTO seleccionado)
         {
-            if (ipfActivo.Valor == 1) { ipf.SedesEntra(tickerIn, codPartido); }
+            if (ipfActivo.Valor == 1) { ipf.SedesEntra(tickerIn, dto, seleccionado); }
         }
         public void SedesEncadena(bool tickerIn, string codPartidoSiguiente, string codPartidoAnterior = "")
         {
             if (ipfActivo.Valor == 1) { ipf.SedesEncadena(tickerIn, codPartidoSiguiente, codPartidoAnterior); }
         }
-        public void SedesSale(bool tickerIn, string codPartido = "")
+        public void SedesSale(bool tickerIn)
         {
-            if (ipfActivo.Valor == 1) { ipf.SedesSale(tickerIn, codPartido); }
+            if (ipfActivo.Valor == 1) { ipf.SedesSale(tickerIn); }
         }
 
 
@@ -412,6 +429,10 @@ namespace Elecciones.src.controller
         public void fichaEncadena(bool oficiales, BrainStormDTO dto, PartidoDTO partido)
         {
             if (ipfActivo.Valor == 1) { ipf.fichaEncadena(oficiales, dto, partido); }
+        }
+        public void fichaActualiza(bool oficiales, BrainStormDTO dto, BrainStormDTO dtoAnterior)
+        {
+            if (ipfActivo.Valor == 1) { ipf.fichaActualiza(oficiales,dto,dtoAnterior); }
         }
         public void fichaSale(bool oficiales)
         {

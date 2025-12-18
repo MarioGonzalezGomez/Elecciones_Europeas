@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +14,9 @@ namespace Elecciones.src.mensajes.builders
         bool primerPlay = true;
 
 
-        private PrimeMensajes() { }
+        private PrimeMensajes()
+        {
+        }
 
         public static PrimeMensajes GetInstance()
         {
@@ -26,14 +29,36 @@ namespace Elecciones.src.mensajes.builders
 
         //MENSAJES ESPECÍFICOS
 
-        public string SubirRotulos()
+        public string SubirRotulosEspeciales()
         {
-            return CambioParametroProyecto("Par_Posicion_GrupoXY","2");
+            string signal = "";
+            signal += CambioDeProyecto("Especiales_ConPicto_2026");
+            signal += CambioParametroProyecto("Par_Posicion_GrupoXY", "2");
+            return signal;
         }
 
-        public string BajarRotulos()
+        public string BajarRotulosEspeciales()
         {
-            return CambioParametroProyecto("Par_Posicion_GrupoXY", "1");
+            string signal = "";
+            signal += CambioDeProyecto("Especiales_ConPicto_2026");
+            signal += CambioParametroProyecto("Par_Posicion_GrupoXY", "1");
+            return signal;
+        }
+
+        public string SubirRotulosTD()
+        {
+            string signal = "";
+            signal += CambioDeProyecto("01_TD_2026");
+            signal += CambioParametroProyecto("TickerElec", "True");
+            return signal;
+        }
+
+        public string BajarRotulosTD()
+        {
+            string signal = "";
+            signal += CambioDeProyecto("01_TD_2026");
+            signal += CambioParametroProyecto("TickerElec", "False");
+            return signal;
         }
 
         //MÉTODOS GENÉRICOS DONDE PODER ESPECIFICAR POR PARÁMETRO

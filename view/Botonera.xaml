@@ -137,17 +137,47 @@
 
             <!--#region PANEL GRUPO 2 -->
             <StackPanel x:Name="PanelGrupo2" Visibility="Collapsed">
-                <Grid Margin="5">
+                <Grid Margin="8">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    
-                    <!-- Placeholder: Añadir botones del Grupo 2 aquí -->
-                    <Border Background="{DynamicResource PrimaryHueLightBrush}" CornerRadius="8" Padding="20" Margin="10">
-                        <TextBlock Text="Grupo 2&#x0a;(Pendiente de configurar)" 
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                   TextAlignment="Center" FontSize="14" Opacity="0.7"/>
-                    </Border>
+
+                    <!--#region ÁREA 1: Mayoría -->
+                    <GroupBox Grid.Row="0" Header="Mayoría" Padding="8" Margin="0,0,0,8"
+                              BorderBrush="{DynamicResource PrimaryHueMidBrush}" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="btnSubeMayoria" Content="Sube Mayoría" Grid.Column="0" 
+                                    Margin="2" Padding="10,8" Background="#4CAF50" Foreground="White"
+                                    Click="btnSubeMayoria_Click"/>
+                            <Button x:Name="btnBajaMayoria" Content="Baja Mayoría" Grid.Column="1" 
+                                    Margin="2" Padding="10,8" Background="#f44336" Foreground="White"
+                                    Click="btnBajaMayoria_Click"/>
+                        </Grid>
+                    </GroupBox>
+                    <!--#endregion-->
+
+                    <!--#region ÁREA 2: CCAA -->
+                    <GroupBox Grid.Row="1" Header="CCAA" Padding="8" Margin="0,0,0,8"
+                              BorderBrush="{DynamicResource PrimaryHueMidBrush}" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button x:Name="btnSubeCCAA" Content="Sube CCAA" Grid.Column="0" 
+                                    Margin="2" Padding="10,8" Background="#4CAF50" Foreground="White"
+                                    Click="btnSubeCCAA_Click"/>
+                            <Button x:Name="btnBajaCCAA" Content="Baja CCAA" Grid.Column="1" 
+                                    Margin="2" Padding="10,8" Background="#f44336" Foreground="White"
+                                    Click="btnBajaCCAA_Click"/>
+                        </Grid>
+                    </GroupBox>
+                    <!--#endregion-->
                 </Grid>
             </StackPanel>
             <!--#endregion-->

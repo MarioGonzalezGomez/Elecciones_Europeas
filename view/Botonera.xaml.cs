@@ -163,6 +163,30 @@ namespace Elecciones
         }
 
         #endregion
+
+        #region Grupo 2: Mayoría y CCAA
+
+        private void btnSubeMayoria_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Implementar - mayoriasEntra requiere BrainStormDTO
+        }
+
+        private void btnBajaMayoria_Click(object sender, RoutedEventArgs e)
+        {
+            gController.mayoriasSale();
+        }
+
+        private void btnSubeCCAA_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Implementar Sube CCAA
+        }
+
+        private void btnBajaCCAA_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Implementar Baja CCAA
+        }
+
+        #endregion
     }
 }
 

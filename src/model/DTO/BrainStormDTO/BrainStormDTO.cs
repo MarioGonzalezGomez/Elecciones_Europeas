@@ -34,7 +34,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
             foreach (var partido in cps)
             {
                 PartidoDTO dto = PartidoDTO.FromCP(partido, oficiales, con);
-                dto.codigo = dto.codigo.StartsWith("09") ? $"00{dto.codigo.Substring(2)}" : dto.codigo;
+                // dto.codigo = dto.codigo.StartsWith("09") ? $"00{dto.codigo.Substring(2)}" : dto.codigo;
                 if (dto != null) { partidos.Add(dto); }
 
             }
@@ -77,7 +77,8 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
             foreach (var p in partidos)
             {
                 string codigo = p.padre;
-                string codigoPadre = p.padre.StartsWith(configuration.GetValue("codigoRegionalBD1")) || p.padre.StartsWith(configuration.GetValue("codigoRegionalBD2")) ? $"00{p.padre.Substring(2)}" : p.padre;
+                // string codigoPadre = p.padre.StartsWith(configuration.GetValue("codigoRegionalBD1")) || p.padre.StartsWith(configuration.GetValue("codigoRegionalBD2")) ? $"00{p.padre.Substring(2)}" : p.padre;
+                string codigoPadre = codigo;
                 int difVotos = p.numVotantes - p.numVotantesHistoricos;
                 string tendenciaVotos = p.numVotantesHistoricos == 0 ? "*" :
                   difVotos > 0 ? "+" :

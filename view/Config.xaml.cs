@@ -252,6 +252,7 @@ namespace Elecciones
                 configuration.SetValue("tablasGraficosPrincipal", $"{cmbGraficos.SelectedIndex + 1}");
                 configuration.SetValue("bdIPF", configuration.GetValue($"headerTabla{cmbGraficos.SelectedIndex + 1}"));
                 main.InitializeListView();
+                main.ActualizarBotoneraGrupo();
             }
         }
         private void cmbThemes_SelectionChanged(object sender, SelectionChangedEventArgs e)

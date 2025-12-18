@@ -1,4 +1,4 @@
-using Elecciones.src.conexion;
+ï»¿using Elecciones.src.conexion;
 using Elecciones.src.controller;
 using Elecciones.src.logic;
 using Elecciones.src.mensajes;
@@ -48,7 +48,7 @@ namespace Elecciones
 
         //Escuchador
         public Escuchador escuchador;
-        //Bool para ver si mando actualización de datos o no
+        //Bool para ver si mando actualizaciï¿½n de datos o no
         public bool actualizacionActiva;
 
         //1 Nacionales, 2 Autonomia X
@@ -57,7 +57,7 @@ namespace Elecciones
         //0 Si utilizamos datos de la DB1, 1 de la DB2...
         private ObservableInt eleccionSeleccionada;
 
-        //Si tenemos algún partido seleccionado con el que se deba hacer algo
+        //Si tenemos algï¿½n partido seleccionado con el que se deba hacer algo
         public PartidoDTO? partidoSeleccionado;
 
         //Bool para hacer giro
@@ -77,7 +77,7 @@ namespace Elecciones
         bool sfBipartidismoDentro;
         bool sfGanadorDentro;
 
-        //Estas conexiones serán null si no están activadas por Configuración
+        //Estas conexiones serï¿½n null si no estï¿½n activadas por Configuraciï¿½n
         OrdenesIPF? ipf;
         OrdenesPrime? prime;
         GraphicController graficos;
@@ -196,13 +196,13 @@ namespace Elecciones
         {
             if (tipoElecciones == 1) // Elecciones generales
             {
-                // Cargar todas las autonomías (España ya está incluida al principio por el método FindAllAutonomias)
+                // Cargar todas las autonomï¿½as (Espaï¿½a ya estï¿½ incluida al principio por el mï¿½todo FindAllAutonomias)
                 CCAA = CircunscripcionController.GetInstance(conexionActiva).FindAllAutonomias(eleccionSeleccionada.Valor + 1);
-                autonomiasHeader = "AUTONOMÍAS";
+                autonomiasHeader = "AUTONOMï¿½AS";
             }
-            else if (tipoElecciones == 2) // Elecciones autonómicas
+            else if (tipoElecciones == 2) // Elecciones autonï¿½micas
             {
-                // Cargar solo la autonomía correspondiente (codigoRegional + 5 ceros)
+                // Cargar solo la autonomï¿½a correspondiente (codigoRegional + 5 ceros)
                 string codigoRegional = configuration.GetValue($"codigoRegionalBD{eleccionSeleccionada.Valor + 1}");
                 string codigoAutonomia = $"{codigoRegional}00000";
                 Circunscripcion autonomia = CircunscripcionController.GetInstance(conexionActiva).FindById(codigoAutonomia);
@@ -211,7 +211,7 @@ namespace Elecciones
                 {
                     CCAA.Add(autonomia);
                 }
-                autonomiasHeader = "AUTONOMÍA";
+                autonomiasHeader = "AUTONOMï¿½A";
             }
         }
 
@@ -223,8 +223,8 @@ namespace Elecciones
                 gridView.Columns[0].Header = autonomiasHeader;
             }
         }
-        //Por ahora, se modifican manualmente, pero se podría implementar un modo de introducir
-        //los tipos de gráficos en la ventana de configuración Avanzada
+        //Por ahora, se modifican manualmente, pero se podrï¿½a implementar un modo de introducir
+        //los tipos de grï¿½ficos en la ventana de configuraciï¿½n Avanzada
         public void InitializeListView()
         {
             graficosListView.Items.Clear();
@@ -233,23 +233,23 @@ namespace Elecciones
             switch (tablaPrincipal)
             {
                 case 1:
-                    graficosListView.Items.Add("CUENTA ATRÁS");
+                    graficosListView.Items.Add("CUENTA ATRï¿½S");
                     graficosListView.Items.Add("FICHAS");
                     graficosListView.Items.Add("SEDES");
                     //  graficosListView.Items.Add("INDEPENDENTISMO");
                     break;
                 case 2:
-                    graficosListView.Items.Add("PARTICIPACIÓN");
+                    graficosListView.Items.Add("PARTICIPACIï¿½N");
                     //graficosListView.Items.Add("CCAA");
                     graficosListView.Items.Add("FICHAS");
-                    //graficosListView.Items.Add("PACTÓMETRO");
-                    graficosListView.Items.Add("MAYORÍAS");
+                    //graficosListView.Items.Add("PACTï¿½METRO");
+                    graficosListView.Items.Add("MAYORï¿½AS");
                     //graficosListView.Items.Add("VS");
                     break;
                 case 3:
                     graficosListView.Items.Add("FICHAS");
-                    graficosListView.Items.Add("PACTÓMETRO");
-                    graficosListView.Items.Add("MAYORÍAS");
+                    graficosListView.Items.Add("PACTï¿½METRO");
+                    graficosListView.Items.Add("MAYORï¿½AS");
                     graficosListView.Items.Add("BIPARTIDISMO");
                     graficosListView.Items.Add("GANADOR");
                     break;
@@ -337,10 +337,10 @@ namespace Elecciones
                     // Use ObtenerDTO which now updates both dto and dtoSinFiltrar.
                     dto = ObtenerDTO(filtroSedes, elementoSeleccionado);
 
-                    if (string.Equals(graficosHeader.Header, "FALDÓN")) { UpdateFaldones(dtoAnterior); }
+                    if (string.Equals(graficosHeader.Header, "FALDï¿½N")) { UpdateFaldones(dtoAnterior); }
                     //Add cambios por actualizacion en vivo en cartones
-                    if (string.Equals(graficosHeader.Header, "CARTÓN")) { UpdateCartones(dtoAnterior); }
-                    if (string.Equals(graficosHeader.Header, "SUPERFADÓN")) { UpdateSuperfaldones(); }
+                    if (string.Equals(graficosHeader.Header, "CARTï¿½N")) { UpdateCartones(dtoAnterior); }
+                    if (string.Equals(graficosHeader.Header, "SUPERFADï¿½N")) { UpdateSuperfaldones(); }
                     if (pactos != null && pactos.pactoDentro == false) { pactos.RecargarDatos(dto, oficiales); }
                     ActualizarInfoInterfaz(seleccionada, dto);
                     EscribirFichero(desdeSede);
@@ -401,7 +401,7 @@ namespace Elecciones
         //LOGICA CONFIG
         private void imgConfig_MouseEnter(object sender, MouseEventArgs e)
         {
-            // Cambiar la imagen a la versión azul cuando el ratón entra
+            // Cambiar la imagen a la versiï¿½n azul cuando el ratï¿½n entra
             imgConfig.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/tuerca_pulsada.png", UriKind.Relative));
         }
         private void imgConfig_MouseLeave(object sender, MouseEventArgs e)
@@ -450,6 +450,15 @@ namespace Elecciones
             if (config != null) { config.Background = fondo; }
             if (pactos != null) { pactos.Background = fondo; }
             if (botonera != null) { botonera.Background = fondo; }
+        }
+
+        /// <summary>
+        /// Actualiza el panel visible de la botonera extra segÃºn tablasGraficosPrincipal.
+        /// Llamado desde Config cuando cambia el combo de grÃ¡ficos.
+        /// </summary>
+        public void ActualizarBotoneraGrupo()
+        {
+            if (botonera != null) { botonera.ConfigurarGrupoActivo(); }
 
             SolidColorBrush color = (SolidColorBrush)Application.Current.FindResource("PrimaryHueLightBrush");
             switch (avance)
@@ -477,8 +486,8 @@ namespace Elecciones
         }
 
         /// <summary>
-        /// Inicializa los controles de vídeo leyendo la configuración (si existe).
-        /// Guarda el estado inicial en el GraphicController para que el subsistema gráfico sepa la configuración.
+        /// Inicializa los controles de vï¿½deo leyendo la configuraciï¿½n (si existe).
+        /// Guarda el estado inicial en el GraphicController para que el subsistema grï¿½fico sepa la configuraciï¿½n.
         /// </summary>
         private void InitializeVideoConfigUI()
         {
@@ -657,7 +666,7 @@ namespace Elecciones
         private void ActualizarPorOfiSondeo()
         {
             graficos.SondeoUOficial(oficiales);
-            if (botonera != null) { botonera.AdaptarEntorno(); }
+            // AdaptarEntorno eliminado - funcionalidad ya no necesaria
             ActualizarDatosEnTabla();
             if (circunscripcionesListView.SelectedItem != null || autonomiasListView.SelectedItem != null)
             {
@@ -689,7 +698,7 @@ namespace Elecciones
             Binding bindingCol4;
             if (oficiales)
             {
-                columna3.Header = "ESCAÑOS";
+                columna3.Header = "ESCAï¿½OS";
                 bindingCol3 = new Binding("escaniosHasta");
                 columna3.DisplayMemberBinding = bindingCol3;
 
@@ -827,7 +836,7 @@ namespace Elecciones
             datosListView.SelectedItem = null;
             if (autonomiasListView.SelectedItem != null)
             {
-                //AÑADIR CIRCUNSCRIPCIONES SI LAS TIENE
+                //Aï¿½ADIR CIRCUNSCRIPCIONES SI LAS TIENE
                 string elementoSeleccionado = autonomiasListView.SelectedItem.ToString();
                 List<Circunscripcion> circunscripcionesSeleccionadas;
                 if (regional)
@@ -845,7 +854,7 @@ namespace Elecciones
                     circunscripcionNames.Add(cir.nombre);
                 });
 
-                //PONER LA INFORMACIÓN EN LA INTERFAZ
+                //PONER LA INFORMACIï¿½N EN LA INTERFAZ
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
                 {
@@ -871,7 +880,7 @@ namespace Elecciones
                 string elementoSeleccionado = circunscripcionesListView.SelectedItem.ToString();
                 autonomiasListView.SelectedItem = null;
 
-                //PONER LA INFORMACIÓN EN LA INTERFAZ
+                //PONER LA INFORMACIï¿½N EN LA INTERFAZ
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
                 {
@@ -951,15 +960,15 @@ namespace Elecciones
         {
             switch (tipoGrafico)
             {
-                case "CUENTA ATRÁS":
-                    // Ocultar la lista de datos al mostrar la cuenta atrás
+                case "CUENTA ATRï¿½S":
+                    // Ocultar la lista de datos al mostrar la cuenta atrï¿½s
                     datosListView.Visibility = Visibility.Collapsed;
                     break;
                 case "SEDES":
-                    // Restaurar visibilidad al volver de "CUENTA ATRÁS"
+                    // Restaurar visibilidad al volver de "CUENTA ATRï¿½S"
                     datosListView.Visibility = Visibility.Visible;
 
-                    columna3.Header = "ESCAÑOS";
+                    columna3.Header = "ESCAï¿½OS";
                     Binding binding3 = new Binding("escaniosHasta");
                     columna3.DisplayMemberBinding = binding3;
                     columna4.Header = "DIF ESC";
@@ -975,7 +984,7 @@ namespace Elecciones
                     }
                     break;
                 case "INDEPENDENTISMO":
-                    // Restaurar visibilidad al volver de "CUENTA ATRÁS"
+                    // Restaurar visibilidad al volver de "CUENTA ATRï¿½S"
                     datosListView.Visibility = Visibility.Visible;
 
                     ActualizarDatosEnTabla();
@@ -987,7 +996,7 @@ namespace Elecciones
                     break;
 
                 default:
-                    // Restaurar visibilidad al volver de "CUENTA ATRÁS"
+                    // Restaurar visibilidad al volver de "CUENTA ATRï¿½S"
                     datosListView.Visibility = Visibility.Visible;
 
                     ActualizarDatosEnTabla();
@@ -1216,18 +1225,18 @@ namespace Elecciones
         private void btnEntra_Click(object sender, RoutedEventArgs e)
         {
             if (!preparado) { EscribirFichero(); }
-            if (string.Equals(graficosHeader.Header, "FALDÓN")) { EntraFaldon(); }
-            if (string.Equals(graficosHeader.Header, "CARTÓN")) { EntraCarton(); }
-            if (string.Equals(graficosHeader.Header, "SUPERFALDÓN")) { EntraSuperfaldon(); }
+            if (string.Equals(graficosHeader.Header, "FALDï¿½N")) { EntraFaldon(); }
+            if (string.Equals(graficosHeader.Header, "CARTï¿½N")) { EntraCarton(); }
+            if (string.Equals(graficosHeader.Header, "SUPERFALDï¿½N")) { EntraSuperfaldon(); }
             if (string.Equals(graficosHeader.Header, "PANTALLA")) { EntraSuperfaldon(); }
             if (string.Equals(graficosHeader.Header, "REALIDAD AUMENTADA")) { EntraSuperfaldon(); }
             if (string.Equals(graficosHeader.Header, "DRON")) { EntraSuperfaldon(); }
         }
         private void btnSale_Click(object sender, RoutedEventArgs e)
         {
-            if (string.Equals(graficosHeader.Header, "FALDÓN")) { SaleFaldon(); }
-            if (string.Equals(graficosHeader.Header, "CARTÓN")) { SaleCarton(); }
-            if (string.Equals(graficosHeader.Header, "SUPERFALDÓN")) { SaleSuperfaldon(); }
+            if (string.Equals(graficosHeader.Header, "FALDï¿½N")) { SaleFaldon(); }
+            if (string.Equals(graficosHeader.Header, "CARTï¿½N")) { SaleCarton(); }
+            if (string.Equals(graficosHeader.Header, "SUPERFALDï¿½N")) { SaleSuperfaldon(); }
         }
         private void btnActualiza_Click(object sender, RoutedEventArgs e)
         {
@@ -1261,18 +1270,18 @@ namespace Elecciones
             }
             else
             {
-                MessageBox.Show($"Seleccione alguna circunscripción para ver su pestaña de pactos", "Circunscipción no seleccionada", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Seleccione alguna circunscripciï¿½n para ver su pestaï¿½a de pactos", "Circunscipciï¿½n no seleccionada", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        //LOGICA PARA LOS TIPOS DE GRÁFICOS DISTINTOS
+        //LOGICA PARA LOS TIPOS DE GRï¿½FICOS DISTINTOS
         private void EntraFaldon()
         {
             if (dto != null && graficosListView.SelectedIndex != -1)
             {
                 switch (graficosListView.SelectedValue.ToString())
                 {
-                    case "CUENTA ATRÁS":
+                    case "CUENTA ATRï¿½S":
                         int segundos = CalcularSegundosHastaHora();
                         if (segundos > 0)
                         {
@@ -1322,7 +1331,7 @@ namespace Elecciones
             {
                 switch (graficosListView.SelectedValue.ToString())
                 {
-                    case "PARTICIPACIÓN":
+                    case "PARTICIPACIï¿½N":
                         if (participacionDentro) { graficos.participacionEncadena(dtoSinFiltrar, avance); }
                         else
                         {
@@ -1338,7 +1347,7 @@ namespace Elecciones
                             fichaDentro = true;
                         }
                         break;
-                    case "MAYORÍAS":
+                    case "MAYORï¿½AS":
                         if (mayoriasDentro) { graficos.mayoriasEncadena(dto); }
                         else
                         {
@@ -1350,7 +1359,7 @@ namespace Elecciones
                         if (ccaaDentro) { graficos.ccaaEncadena(); }
                         else { graficos.ccaaEntra(dto); }
                         break;
-                    case "SUPERFALDÓN":
+                    case "SUPERFALDï¿½N":
                         if (superfaldonDentro) { graficos.superfaldonEntra(); }
                         else { graficos.superfaldonEntra(); }
                         break;
@@ -1373,12 +1382,12 @@ namespace Elecciones
                         else { graficos.sfFichasEntra(); }
                         sfFichasDentro = true;
                         break;
-                    case "PACTÓMETRO":
+                    case "PACTï¿½METRO":
                         if (sfPactometroDentro) { graficos.sfPactometroEncadena(); }
                         else { graficos.sfPactometroEntra(); }
                         sfPactometroDentro = true;
                         break;
-                    case "MAYORÍAS":
+                    case "MAYORï¿½AS":
                         if (sfMayoriasDentro) { graficos.sfMayoriasEncadena(); }
                         else { graficos.sfMayoriasEntra(); }
                         sfMayoriasDentro = true;
@@ -1405,7 +1414,7 @@ namespace Elecciones
             {
                 switch (graficosListView.SelectedValue.ToString())
                 {
-                    case "CUENTA ATRÁS":
+                    case "CUENTA ATRï¿½S":
                         graficos.SaleReloj();
                         break;
                     case "FICHAS":
@@ -1448,7 +1457,7 @@ namespace Elecciones
             {
                 switch (graficosListView.SelectedValue.ToString())
                 {
-                    case "PARTICIPACIÓN":
+                    case "PARTICIPACIï¿½N":
                         graficos.participacionSale();
                         participacionDentro = false;
                         break;
@@ -1456,7 +1465,7 @@ namespace Elecciones
                         graficos.ccaaSale();
                         ccaaDentro = false;
                         break;
-                    case "MAYORÍAS":
+                    case "MAYORï¿½AS":
                         graficos.mayoriasSale();
                         mayoriasDentro = false;
                         break;
@@ -1464,7 +1473,7 @@ namespace Elecciones
                         graficos.fichaSale(oficiales);
                         fichaDentro = false;
                         break;
-                    case "SUPERFALDÓN":
+                    case "SUPERFALDï¿½N":
                         graficos.superfaldonSale();
                         break;
                     case "VS":
@@ -1485,11 +1494,11 @@ namespace Elecciones
                         graficos.sfFichasSale();
                         sfFichasDentro = false;
                         break;
-                    case "PACTÓMETRO":
+                    case "PACTï¿½METRO":
                         graficos.sfPactometroSale();
                         sfPactometroDentro = false;
                         break;
-                    case "MAYORÍAS":
+                    case "MAYORï¿½AS":
                         graficos.sfMayoriasSale();
                         sfMayoriasDentro = false;
                         break;
@@ -1508,7 +1517,7 @@ namespace Elecciones
         }
 
 
-        // EVENTOS DE CONFIGURACIÓN AVANZADA
+        // EVENTOS DE CONFIGURACIï¿½N AVANZADA
         private bool primerosResultadosActivo = true;
         private bool sondeoAnimadoActivo = true;
         private void chkPrimerosResultados_Checked(object sender, RoutedEventArgs e)
@@ -1542,7 +1551,7 @@ namespace Elecciones
                 var ahora = DateTime.Now;
                 var destino = ahora.Date.Add(horaDestino.TimeOfDay);
 
-                // Si la hora ya pasó hoy, cuenta para mañana
+                // Si la hora ya pasï¿½ hoy, cuenta para maï¿½ana
                 if (destino <= ahora)
                     destino = destino.AddDays(1);
 

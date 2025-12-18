@@ -26,53 +26,58 @@ namespace Elecciones
     {
         GraphicController gController;
         ConfigManager configuration;
-
-        private bool oficial;
-        private bool relojPausado;
-
-        private BrainStormDTO dto;
-        private PartidoDTO partidoSeleccionado;
         private MainWindow main;
 
         public Botonera()
         {
             InitializeComponent();
             InitializeVariables();
-            AdaptarEntorno();
+            ConfigurarGrupoActivo();
             AdaptarColores();
-            // AdaptarChecks();
         }
 
         private void InitializeVariables()
         {
             main = Application.Current.MainWindow as MainWindow;
-            oficial = main?.oficiales ?? false;
             gController = GraphicController.GetInstance();
             configuration = ConfigManager.GetInstance();
             configuration.ReadConfig();
-            relojPausado = false;
         }
 
-        public void AdaptarEntorno()
+        /// <summary>
+        /// Configura la visibilidad de los paneles de grupo según tablasGraficosPrincipal.
+        /// Puede ser llamado externamente para actualizar dinámicamente sin reiniciar.
+        /// </summary>
+        public void ConfigurarGrupoActivo()
         {
-            var window = Application.Current.MainWindow as MainWindow;
-            oficial = window?.oficiales ?? false;
-            Brush color;
-            if (oficial)
+            configuration.ReadConfig();
+            string valorConfig = configuration.GetValue("tablasGraficosPrincipal");
+            int grupo = int.TryParse(valorConfig, out int g) ? g : 1;
+
+            // Ocultar todos los paneles
+            PanelGrupo1.Visibility = Visibility.Collapsed;
+            PanelGrupo2.Visibility = Visibility.Collapsed;
+            PanelGrupo3.Visibility = Visibility.Collapsed;
+
+            // Mostrar el panel correspondiente y actualizar header
+            switch (grupo)
             {
-                color = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#cb96f8"));
-                EntraHistButton.Background = color;
-                EntraHistButton.Content = "ENTRA HISTÓRICO";
-                // EntraMillonesButton.Visibility = Visibility.Visible;
-                // EntraEscanosButton.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                color = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#ff7979"));
-                EntraHistButton.Background = color;
-                EntraHistButton.Content = "SALE % VOTO";
-                // EntraMillonesButton.Visibility = Visibility.Hidden;
-                // EntraEscanosButton.Visibility = Visibility.Hidden;
+                case 1:
+                    PanelGrupo1.Visibility = Visibility.Visible;
+                    lblGrupoActivo.Text = "GRUPO 1 - " + (configuration.GetValue("headerTabla1") ?? "FALDÓN");
+                    break;
+                case 2:
+                    PanelGrupo2.Visibility = Visibility.Visible;
+                    lblGrupoActivo.Text = "GRUPO 2 - " + (configuration.GetValue("headerTabla2") ?? "CARTÓN");
+                    break;
+                case 3:
+                    PanelGrupo3.Visibility = Visibility.Visible;
+                    lblGrupoActivo.Text = "GRUPO 3 - " + (configuration.GetValue("headerTabla3") ?? "SUPERFALDÓN");
+                    break;
+                default:
+                    PanelGrupo1.Visibility = Visibility.Visible;
+                    lblGrupoActivo.Text = "GRUPO 1 - " + (configuration.GetValue("headerTabla1") ?? "FALDÓN");
+                    break;
             }
         }
         private void AdaptarColores()
@@ -81,83 +86,83 @@ namespace Elecciones
             Background = fondo;
         }
 
-        private void PrimerosResultadosCheck_Checked(object sender, RoutedEventArgs e)
+        #region Área 1: Ticker - Escaños/Voto/Históricos/Millones
+
+        private void btnEscanos_Click(object sender, RoutedEventArgs e)
         {
-            if (gController != null && gController.ipfActivo.Valor == 1) { gController.PrimerosResultados(true); }
-        }
-        private void PrimerosResultadosCheck_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (gController != null && gController.ipfActivo.Valor == 1) { gController.PrimerosResultados(false); }
+            // TODO: Implementar funcionalidad Escaños
+            gController.TickerMillonesSale(); // Placeholder - usar el método existente más similar
         }
 
-        private void SondeoAnimadoCheck_Checked(object sender, RoutedEventArgs e)
-        {
-            if (gController != null && gController.ipfActivo.Valor == 1) { gController.AnimacionSondeo(true); }
-        }
-        private void SondeoAnimadoCheck_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (gController != null && gController.ipfActivo.Valor == 1) { gController.AnimacionSondeo(false); }
-        }
-
-        private void EntraMillonesButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (oficial)
-                gController.TickerMillonesEntra();
-        }
-        private void EntraEscanosButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (oficial)
-                gController.TickerMillonesSale();
-        }
-        private void EntraPVotoButton_Click(object sender, RoutedEventArgs e)
+        private void btnPorcentajeVoto_Click(object sender, RoutedEventArgs e)
         {
             gController.TickerVotosEntra();
-            // MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
-            // var desplegado = mainWindow.desplegado;
-        }
-        private void EntraHistButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (oficial)
-            {
-                gController.TickerHistoricosEntraInd();
-            }
-            else
-            {
-                gController.TickerVotosSale();
-            }
-
         }
 
-        private void EntraPP_PSOEButton_Click(object sender, RoutedEventArgs e)
+        private void btnHistoricos_Click(object sender, RoutedEventArgs e)
         {
-            gController.PP_PSOEEntra();
-        }
-        private void SalePP_PSOEButton_Click(object sender, RoutedEventArgs e)
-        {
-            gController.PP_PSOESale();
+            gController.TickerHistoricosEntraInd();
         }
 
-        private void btnSubirRotulosTd_Click(object sender, RoutedEventArgs e)
+        private void btnMillones_Click(object sender, RoutedEventArgs e)
         {
-            // Enviar SubirRotulos a Prime para TeleDirecciones
+            gController.TickerMillonesEntra();
+        }
+
+        private void btnHistoricosCom_Click(object sender, RoutedEventArgs e)
+        {
+            gController.TickerHistoricosEntraCom();
+        }
+
+        #endregion
+
+        #region Área 2: Video In/Out, Entran/Salen Todos
+
+        private void btnVideoIn_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Implementar Video In
+        }
+
+        private void btnVideoOut_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Implementar Video Out
+        }
+
+        private void btnEntranTodos_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Implementar Entran Todos
+        }
+
+        private void btnSalenTodos_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Implementar Salen Todos
+        }
+
+        #endregion
+
+        #region Área 3: TD y Especial
+
+        private void btnEntraTD_Click(object sender, RoutedEventArgs e)
+        {
             gController.SubirRotulosPrimeTD();
         }
 
-        private void btnBajarRotulosTd_Click(object sender, RoutedEventArgs e)
+        private void btnSaleTD_Click(object sender, RoutedEventArgs e)
         {
-            // Enviar BajarRotulos a Prime para TeleDirecciones
             gController.BajarRotulosPrimeTD();
         }
 
-        private void btnSubirRotulosEsp_Click(object sender, RoutedEventArgs e)
+        private void btnEntraEspecial_Click(object sender, RoutedEventArgs e)
         {
             gController.SubirRotulosPrimeEsp();
         }
 
-        private void btnBajarRotulosEsp_Click(object sender, RoutedEventArgs e)
+        private void btnSaleEspecial_Click(object sender, RoutedEventArgs e)
         {
             gController.BajarRotulosPrimeEsp();
         }
+
+        #endregion
     }
 }
 

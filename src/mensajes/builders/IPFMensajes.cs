@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using Elecciones.src.conexion;
@@ -400,18 +401,194 @@ namespace Elecciones.src.mensajes.builders
             }
             return signal;
         }
-       // public string TickerTDEncadena(bool oficial, BrainStormDTO dto)
-       // {
-       //     return oficial ? Encadena("TICKER") : Encadena("TICKER_SONDEO");
-       // }
-        public string TickerTDActualiza(BrainStormDTO dto)
+        // public string TickerTDEncadena(bool oficial, BrainStormDTO dto)
+        // {
+        //     return oficial ? Encadena("TICKER") : Encadena("TICKER_SONDEO");
+        // }
+        public string TickerTDActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dtoNuevo)
         {
-            // Fix: pasar count como string y tipoItem explícito
-            return EventBuild("nPartidosConEscanio", "MAP_INT_PAR", $"{dto.partidos.Count}", 1);
+            var main = Application.Current.MainWindow as MainWindow;
+            List<string> siglasPartidos = main.dtoSinFiltrar.partidos.Select(x => x.siglas).ToList();
+            List<string> siglasNuevas = dtoNuevo.partidos.Select(x => x.siglas).ToList();
+            List<string> siglasAnteriores = dtoAnterior.partidos.Select(x => x.siglas).ToList();
+
+            string signal = "";
+
+            // Actualizar escrutado
+            signal += EventBuild("NumeroEscrutado", "TEXT_STRING", $"{dtoNuevo.circunscripcionDTO.escrutado}%", 2, 0.5, 0) + "\n";
+
+            // Comprobar si cambia el número de partidos
+            int nAnterior = dtoAnterior.partidos?.Count ?? 0;
+            int nNuevo = dtoNuevo.partidos?.Count ?? 0;
+
+            if (nAnterior != nNuevo)
+            {
+                // Si cambia el número de partidos, recalcular layout completo
+                // Mapping for 1..6 provided by the user
+                var layoutByCount = new Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)>()
+                {
+                    {1, (1341, new[] {512}, -1125, 61)},
+                    {2, (660, new[] {170,855}, -675, -390)},
+                    {3, (435, new[] {56,512,967}, -795, -279)},
+                    {4, (320, new[] {0,341,683,1024}, -621, -441)},
+                    {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
+                    {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
+                };
+
+                (int Size, int[] Positions, int LogoPos, int EscanosPos) layoutNuevo;
+
+                if (layoutByCount.ContainsKey(nNuevo))
+                {
+                    layoutNuevo = layoutByCount[nNuevo];
+                }
+                else if (nNuevo >= 1)
+                {
+                    // Fallback: distribuir posiciones linealmente
+                    int left = -60;
+                    int right = 1082;
+                    int[] positions = new int[nNuevo];
+                    if (nNuevo == 1)
+                    {
+                        positions[0] = (left + right) / 2;
+                    }
+                    else
+                    {
+                        double step = (double)(right - left) / (nNuevo - 1);
+                        for (int i = 0; i < nNuevo; i++)
+                        {
+                            positions[i] = (int)Math.Round(left + step * i);
+                        }
+                    }
+
+                    int approxSize = Math.Max(120, 1341 - (nNuevo - 1) * 220);
+                    int approxLogo = -600 - (nNuevo - 1) * 20;
+                    int approxEscanos = 100 - (nNuevo - 1) * 70;
+
+                    layoutNuevo = (approxSize, positions, approxLogo, approxEscanos);
+                }
+                else
+                {
+                    layoutNuevo = (1341, new[] { 512 }, -1125, 61);
+                }
+
+                // Actualizar tamaño de la pastilla
+                signal += EventBuild("Pastilla", "PRIM_BAR_LEN[0]", $"{layoutNuevo.Size}", 2, 0.5, 0) + "\n";
+
+                // Precompute mapping from sigla -> index dentro de los nuevos partidos
+                var newActiveIndex = siglasNuevas
+                    .Select((s, i) => new { Sigla = s, Index = i })
+                    .ToDictionary(x => x.Sigla, x => x.Index);
+
+                // Para cada partido, actualizar posiciones y visibilidad
+                for (int idx = 0; idx < siglasPartidos.Count; idx++)
+                {
+                    var siglas = siglasPartidos[idx];
+
+                    if (newActiveIndex.TryGetValue(siglas, out int newPosIndex) && newPosIndex >= 0 && newPosIndex < layoutNuevo.Positions.Length)
+                    {
+                        // Partido activo en el nuevo estado
+                        int newPos = layoutNuevo.Positions[newPosIndex];
+                        bool wasActive = siglasAnteriores.Contains(siglas);
+
+                        // Primero hacer visible si no lo estaba
+                        if (!wasActive)
+                        {
+                            signal += Oculta_Desoculta(false, $"Partidos/{siglas}") + "\n";
+                        }
+
+                        // Determinar si sube o baja de posición
+                        int oldPosIndex = siglasAnteriores.IndexOf(siglas);
+                        bool sube = oldPosIndex > newPosIndex; // índice menor = posición mejor
+
+                        if (sube)
+                        {
+                            // El partido sube: pasar por encima (Y = -100)
+                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[1]", "-100", 2, 0.25, 0) + "\n";
+                            // Desplazar en X
+                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0.25) + "\n";
+                            // Volver a Y = 0
+                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.25, 0.75) + "\n";
+                        }
+                        else
+                        {
+                            // El partido baja o no cambia: desplazamiento directo en X
+                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
+                        }
+
+                        // Actualizar offsets de Logo y Escaños
+                        signal += EventBuild($"Partidos/{siglas}/Logo", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.LogoPos}", 1) + "\n";
+                        signal += EventBuild($"Partidos/{siglas}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.EscanosPos}", 1) + "\n";
+
+                        // Actualizar texto de escaños
+                        PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglas);
+                        signal += EventBuild($"Escaños/{siglas}", "TEXT_STRING", $"{temp.escaniosHasta}", 2, 0.5, 0) + "\n";
+                    }
+                    else
+                    {
+                        // Partido no activo en el nuevo estado: ocultarlo con delay
+                        signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
+                        signal += Oculta_Desoculta(true, $"Partidos/{siglas}") + "\n";
+                        signal += EventBuild($"Escaños/{siglas}", "TEXT_STRING", "0", 2, 0.5, 0) + "\n";
+                    }
+                }
+            }
+            else
+            {
+                // Si no cambia el número de partidos, solo actualizar posiciones de los que se han reordenado
+                var layoutByCount = new Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)>()
+                {
+                    {1, (1341, new[] {512}, -1125, 61)},
+                    {2, (660, new[] {170,855}, -675, -390)},
+                    {3, (435, new[] {56,512,967}, -795, -279)},
+                    {4, (320, new[] {0,341,683,1024}, -621, -441)},
+                    {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
+                    {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
+                };
+
+                (int Size, int[] Positions, int LogoPos, int EscanosPos) layout = layoutByCount[nNuevo];
+
+                var newActiveIndex = siglasNuevas
+                    .Select((s, i) => new { Sigla = s, Index = i })
+                    .ToDictionary(x => x.Sigla, x => x.Index);
+
+                for (int idx = 0; idx < siglasAnteriores.Count; idx++)
+                {
+                    var siglas = siglasAnteriores[idx];
+
+                    if (newActiveIndex.TryGetValue(siglas, out int newPosIndex))
+                    {
+                        int newPos = layout.Positions[newPosIndex];
+                        bool sube = idx > newPosIndex; // idx es oldPosIndex
+
+                        if (sube)
+                        {
+                            // El partido sube: pasar por encima
+                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[1]", "-100", 2, 0.25, 0) + "\n";
+                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0.25) + "\n";
+                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.25, 0.75) + "\n";
+                        }
+                        else if (idx != newPosIndex)
+                        {
+                            // El partido baja pero no cambia completamente
+                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
+                        }
+
+                        // Actualizar escaños
+                        PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglas);
+                        signal += EventBuild($"Escaños/{siglas}", "TEXT_STRING", $"{temp.escaniosHasta}", 2, 0.5, 0) + "\n";
+                    }
+                }
+            }
+
+            return signal;
         }
         public string TickerTDSale()
         {
-            return "";
+            string signal = "";
+            signal += EventBuild("<>pipe", "PIPE_TYPE", "Perspective", 2, 0, 1);
+            signal += EventBuild("cam1", "CAM_PV[1]", "-925", 2, 0, 1);
+            //SALE
+            return signal;
         }
 
         //PP_PSOE

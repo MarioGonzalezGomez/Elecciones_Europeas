@@ -302,6 +302,10 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.TickerTDEntra(dto); }
         }
+        public void TickerTDActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerTDActualiza(dtoAnterior, dto); }
+        }
         public void TickerTDSale()
         {
             if (ipfActivo.Valor == 1) { ipf.TickerTDSale(); }

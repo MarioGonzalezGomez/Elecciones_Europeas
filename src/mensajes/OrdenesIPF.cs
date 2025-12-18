@@ -195,6 +195,10 @@ namespace Elecciones.src.mensajes
         {
             c.EnviarMensaje(builder.TickerTDEntra(dto));
         }
+        public void TickerTDActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.TickerTDActualiza(dtoAnterior, dto));
+        }
         public void TickerTDSale()
         {
             c.EnviarMensaje(builder.TickerTDSale());

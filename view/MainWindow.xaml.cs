@@ -377,7 +377,7 @@ namespace Elecciones
         {
             if (fichaDentro)
             {
-                graficos.fichaActualiza(oficiales, dto, dtoAnterior);
+                graficos.fichaActualiza(oficiales, dtoAnterior, dto);
             }
         }
         private void UpdateSuperfaldones()

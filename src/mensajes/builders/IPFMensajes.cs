@@ -1247,20 +1247,113 @@ namespace Elecciones.src.mensajes.builders
 
             return sb.ToString();
         }
-        public string fichaActualiza(bool oficiales, BrainStormDTO dto, BrainStormDTO dtoAnterior)
+        public string fichaActualiza(bool oficiales, BrainStormDTO dtoAnterior, BrainStormDTO dtoNuevo)
         {
-            //-Posición cartón que pasa por delante: itemset("Carton_Carrusel/Oficiales/Cs", "OBJ_DISPLACEMENT", (0, -0.3, 0))
-            //- Posición cartón que pasa por detrás: itemset("Carton_Carrusel/Oficiales/Cs", "OBJ_DISPLACEMENT", (0, 0, 0))
-            string signal = "";
-            if (oficiales)
+            string mode = oficiales ? "Oficiales" : "Sondeos";
+            StringBuilder sb = new StringBuilder();
+
+            // Determinar las siglas del nuevo DTO
+            List<string> siglasNuevas = dtoNuevo.partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList();
+            List<string> siglasAnteriores = dtoAnterior.partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList();
+
+            // Sigla del partido que actualmente está mostrando
+            string siglasYaDentro = siglas[indexCarrusel];
+            int oldIndex = indexCarrusel;
+            int newIndex = siglasNuevas.IndexOf(siglasYaDentro);
+
+            // Si el partido actual ya no existe en el nuevo DTO, usar el primero del nuevo DTO
+            if (newIndex == -1)
             {
-                signal += EventBuild("Oficial_Codigo", "MAP_LLSTRING_LOAD");
+                newIndex = 0;
+                siglasYaDentro = siglasNuevas.Count > 0 ? siglasNuevas[0] : "";
+            }
+
+            // Determinar si es un cambio de posición significativo
+            bool ganaposicion = oldIndex > newIndex; // índice menor = mejor posición
+            bool pierdeposicion = oldIndex < newIndex;
+
+            // Preparar todos los cartones fuera de pantalla (excepto los que van a ser animados)
+            foreach (string sigla in siglasNuevas)
+            {
+                string pathPartido = $"Carton_Carrusel/{mode}/{sigla}";
+                if (!sigla.Equals(siglasYaDentro))
+                {
+                    sb.Append(EventBuild(pathPartido, "OBJ_DISPLACEMENT[0]", "1920", 1));
+                    sb.Append("\n");
+                }
+            }
+
+            if (pierdeposicion)
+            {
+                // El partido pierde posición (baja en el ranking)
+                // El que está en 0 sale hacia la derecha (1920)
+                string pathSaliente = $"Carton_Carrusel/{mode}/{siglasYaDentro}";
+                sb.Append(EventBuild(pathSaliente, "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0.0));
+                sb.Append("\n");
+
+                // El partido que ahora ocupa su posición entra de la derecha (de 1920 a 0)
+                if (newIndex >= 0 && newIndex < siglasNuevas.Count)
+                {
+                    string siglaQueEntra = siglasNuevas[newIndex];
+                    string pathEntrante = $"Carton_Carrusel/{mode}/{siglaQueEntra}";
+                    sb.Append(EventBuild(pathEntrante, "OBJ_DISPLACEMENT[0]", "0", 2, 0.5, 0.0));
+                    sb.Append("\n");
+                }
+            }
+            else if (ganaposicion)
+            {
+                // El partido gana posición (sube en el ranking)
+                // El que está en 0 sale hacia la izquierda (-1920) con Y = -0.3 para pasar por encima
+                string pathSaliente = $"Carton_Carrusel/{mode}/{siglasYaDentro}";
+                sb.Append(EventBuild(pathSaliente, "OBJ_DISPLACEMENT[1]", "-0.3", 2, 0.25, 0.0));
+                sb.Append("\n");
+                sb.Append(EventBuild(pathSaliente, "OBJ_DISPLACEMENT[0]", "-1920", 2, 0.5, 0.25));
+                sb.Append("\n");
+
+                // El partido que estaba en la posición anterior (newIndex + 1 en el orden anterior) entra
+                int indexAnterior = newIndex + 1;
+                if (indexAnterior >= 0 && indexAnterior < siglasAnteriores.Count)
+                {
+                    string siglasDelAnterior = siglasAnteriores[indexAnterior];
+                    string pathEntrante = $"Carton_Carrusel/{mode}/{siglasDelAnterior}";
+
+                    // El partido que entra también sube, así que anima Y a -0.3
+                    sb.Append(EventBuild(pathEntrante, "OBJ_DISPLACEMENT[1]", "-0.3", 2, 0.25, 0.0));
+                    sb.Append("\n");
+                    sb.Append(EventBuild(pathEntrante, "OBJ_DISPLACEMENT[0]", "0", 2, 0.5, 0.25));
+                    sb.Append("\n");
+                    // Volver Y a 0
+                    sb.Append(EventBuild(pathEntrante, "OBJ_DISPLACEMENT[1]", "0", 2, 0.25, 0.75));
+                    sb.Append("\n");
+                }
+
+                // Volver Y a 0 del que sale
+                sb.Append(EventBuild(pathSaliente, "OBJ_DISPLACEMENT[1]", "0", 2, 0.25, 0.75));
+                sb.Append("\n");
+            }
+
+            // Finalizar con MAP_LLSTRING_LOAD
+            string codigoMap = oficiales ? "Oficial_Codigo" : "Sondeo_Codigo";
+            sb.Append(EventBuild(codigoMap, "MAP_LLSTRING_LOAD"));
+
+            // ===== Actualizar atributos de estado =====
+            // Actualizar la lista de siglas con las nuevas
+            siglas = siglasNuevas;
+
+            // Actualizar indexCarrusel con la nueva posición del partido que estaba dentro
+            indexCarrusel = newIndex >= 0 ? newIndex : 0;
+
+            // Actualizar fichaSeleccionada con el partido que ahora está dentro
+            if (indexCarrusel >= 0 && indexCarrusel < dtoNuevo.partidos.Count)
+            {
+                fichaSeleccionada = dtoNuevo.partidos[indexCarrusel];
             }
             else
             {
-                signal += EventBuild("Sondeo_Codigo", "MAP_LLSTRING_LOAD");
+                fichaSeleccionada = null;
             }
-            return signal;
+
+            return sb.ToString();
         }
         public string fichaSale(bool oficiales)
         {
@@ -1313,7 +1406,36 @@ namespace Elecciones.src.mensajes.builders
             // Set location text
             signal.Append(EventBuild("Mayorias/LugarTxt1", "TEXT_STRING", $"{dto.circunscripcionDTO.nombre}", 1) + "\n");
 
-            // Reveal map(s) for the selected circunscripción.
+            // Helper: choose top party by escaños (escaniosHasta). On tie, compare percentage (try property "porcentaje").
+            static string GetTopSiglaFromPartidos(List<PartidoDTO> partidos)
+            {
+                if (partidos == null || partidos.Count == 0) return "";
+
+                // Find max escaños
+                int maxEsc = partidos.Max(p => p.escaniosHasta);
+
+                // Candidates with max escaños
+                var candidates = partidos.Where(p => p.escaniosHasta == maxEsc).ToList();
+                if (candidates.Count == 1)
+                {
+                    return candidates[0].siglas.Replace("+", "_").Replace("-", "_");
+                }
+
+                // Tie-breaker: highest percentage (try property names commonly used). Use reflection-safe read via SafeGetDouble.
+                PartidoDTO best = candidates
+                    .OrderByDescending(p => SafeGetDouble(p, "porcentaje", SafeGetDouble(p, "porcentajeVotos", SafeGetDouble(p, "votosPorcentaje", 0.0))))
+                    .First();
+
+                return best.siglas.Replace("+", "_").Replace("-", "_");
+            }
+
+            // Determine pages to show: 1 per up to 6, 2 for 7..12, 3 for >12
+            var partidos = dto.partidos ?? new List<PartidoDTO>();
+            int count = partidos.Count;
+            int pagesToShow = count <= 6 ? 1 : (count <= 12 ? 2 : 3);
+
+            // Paint maps instead of culling them.
+            // If the circunscripción is an autonomía, try to get provinces; otherwise paint the single circunscripción map.
             if (!string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo) && dto.circunscripcionDTO.codigo.EndsWith("00000"))
             {
                 try
@@ -1322,38 +1444,53 @@ namespace Elecciones.src.mensajes.builders
                     var provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dto.circunscripcionDTO.nombre);
                     if (provincias != null && provincias.Count > 0)
                     {
+                        // Compute top party for the autonomy once (fallback) and use it for provinces unless province-specific data is available later.
+                        string topAutonomy = GetTopSiglaFromPartidos(partidos);
+
                         foreach (var prov in provincias)
                         {
-                            signal.Append(EventBuild($"Mapa_Mayorias/Mapa/{prov.nombre}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n");
+                            // Paint the province with the most represented party.
+                            // NOTE: if you later obtain province-specific results, replace topAutonomy with that result.
+                            signal.Append(EventBuild($"Mayorias/{prov.nombre}", "MAT_LIST_COLOR", $"{topAutonomy}", 1) + "\n");
                         }
                     }
                     else
                     {
-                        // Fallback: reveal the autonomía map object itself
-                        signal.Append(EventBuild($"Mapa_Mayorias/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n");
+                        // Fallback: paint the autonomía map object itself with the top party
+                        string top = GetTopSiglaFromPartidos(partidos);
+                        signal.Append(EventBuild($"Mayorias/{dto.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", $"{top}", 1) + "\n");
                     }
                 }
                 catch (Exception)
                 {
-                    // On error fallback to revealing the autonomía map object itself
-                    signal.Append(EventBuild($"Mapa_Mayorias/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n");
+                    // On error fallback to painting the autonomía map object itself
+                    string top = GetTopSiglaFromPartidos(partidos);
+                    signal.Append(EventBuild($"Mayorias/{dto.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", $"{top}", 1) + "\n");
                 }
             }
             else
             {
-                // Not an autonomía: reveal the single circunscripción selected
-                signal.Append(EventBuild($"Mapa_Mayorias/Mapa/{dto.circunscripcionDTO.nombre}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n");
+                // Not an autonomía: paint the single circunscripción selected
+                string top = GetTopSiglaFromPartidos(partidos);
+                signal.Append(EventBuild($"Mayorias/{dto.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", $"{top}", 1) + "\n");
             }
 
-            var partidos = dto.partidos ?? new List<PartidoDTO>();
             // Position party fichas on the MAYORIAS map: positions 0, -100, -200, ...
             var siglas = partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList();
             for (int i = 0; i < siglas.Count; i++)
             {
                 int posicion = i * -100;
                 signal.Append(EventBuild($"Mapa_Mayorias/Fichas/{siglas[i]}", "OBJ_DISPLACEMENT[2]", $"{posicion}", 1) + "\n");
-                // Ensure the ficha is visible
+                // Ensure the ficha is visible (we keep fichas visible as before)
                 signal.Append(EventBuild($"Mapa_Mayorias/Fichas/{siglas[i]}", "OBJ_CULL", "0", 1) + "\n");
+            }
+
+            // Show/hide the page indicators according to number of partidos.
+            // itemgo to animate OBJ_CULL to 0 (visible) or 1 (hidden) with 0.3s
+            for (int page = 1; page <= 3; page++)
+            {
+                string value = page <= pagesToShow ? "0" : "1";
+                signal.Append(EventBuild($"Mapa_Mayorias/Paginas/Pagina{page}", "OBJ_CULL", value, 2, 0.3, 0) + "\n");
             }
 
             // Enter MAYORIAS
@@ -1388,6 +1525,112 @@ namespace Elecciones.src.mensajes.builders
                 signal.Append(EventRunBuild("MAYORIAS/SUBE", 0.0, 3.0) + "\n");
             }
             return signal.ToString();
+        }
+
+        //PARTIDOS
+        public string cartonPartidosEntra(BrainStormDTO dto)
+        {
+            if (dto == null) return "";
+
+            StringBuilder sb = new StringBuilder();
+
+            // Prepare carton
+            sb.Append(Prepara("CARTON_PARTIDOS") + "\n");
+
+            // Location text (example used Mayorias1/LugarTxt)
+            sb.Append(EventBuild("Mayorias1/LugarTxt", "TEXT_STRING", $"{dto.circunscripcionDTO?.nombre ?? ""}", 1) + "\n");
+
+            var partidos = dto.partidos ?? new List<PartidoDTO>();
+            var siglas = partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList();
+
+            for (int i = 0; i < siglas.Count; i++)
+            {
+                string s = siglas[i];
+
+                // X: first column x=0, second column starts at x=918 when i >= 6
+                int x = i < 6 ? 0 : 918;
+
+                // Y: step -0.2 per item (0, -0.2, -0.4, ...)
+                string y = ((-0.2 * i).ToString("0.0", CultureInfo.InvariantCulture));
+
+                // Z: first column -100 * index (0, -100, -200,...), second column resets to 0 for i=6
+                int z = (i < 6) ? (-100 * i) : (-100 * (i - 6));
+
+                // Compose tuple exactly as desired by the downstream script (preserve parentheses and commas)
+                string tuple = $"({x},{y},{z})";
+
+                sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_DISPLACEMENT", tuple, 1) + "\n");
+                // Ensure visible
+                sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_CULL", "0", 1) + "\n");
+            }
+
+            // Enter carton
+            sb.Append(Entra("CARTON_PARTIDOS"));
+
+            return sb.ToString();
+        }
+        public string cartonPartidosActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dtoNuevo)
+        {
+            if (dtoNuevo == null) return "";
+
+            StringBuilder sb = new StringBuilder();
+
+            var anteriores = (dtoAnterior?.partidos ?? new List<PartidoDTO>())
+                .Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList();
+
+            var nuevos = (dtoNuevo.partidos ?? new List<PartidoDTO>())
+                .Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList();
+
+            // Animate each partido that remains or appears to its new target position (itemgo)
+            for (int i = 0; i < nuevos.Count; i++)
+            {
+                string s = nuevos[i];
+
+                int x = i < 6 ? 0 : 918;
+                string y = ((-0.2 * i).ToString("0.0", CultureInfo.InvariantCulture));
+                int z = (i < 6) ? (-100 * i) : (-100 * (i - 6));
+                string tuple = $"({x},{y},{z})";
+
+                // itemgo to new displacement (0.5s)
+                sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_DISPLACEMENT", tuple, 2, 0.5, 0) + "\n");
+                // ensure visible (instant)
+                sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_CULL", "0", 1) + "\n");
+            }
+
+            // Any partido that existed before but no longer present -> animate out to the right and hide
+            foreach (var s in anteriores.Except(nuevos))
+            {
+                // move out to the right and cull
+                sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_DISPLACEMENT", "(1920,0,0)", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_CULL", "1", 1) + "\n");
+            }
+
+            return sb.ToString();
+        }
+        public string cartonPartidosSale()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // Try to get the master list of parties from the main DTO (fallback: do nothing if not available)
+            try
+            {
+                var main = Application.Current.MainWindow as MainWindow;
+                var todas = main?.dtoSinFiltrar?.partidos?.Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList() ?? new List<string>();
+
+                foreach (var s in todas)
+                {
+                    // animate out to the left and then the container will be hidden by the SALE call
+                    sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_DISPLACEMENT", "(-1920,0,0)", 2, 0.5, 0) + "\n");
+                }
+            }
+            catch
+            {
+                // ignore errors and proceed to issue the SALE
+            }
+
+            sb.Append(Sale("CARTON_PARTIDOS"));
+
+            return sb.ToString();
         }
 
         //SUPERFALDON

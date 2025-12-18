@@ -452,9 +452,9 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.fichaEncadena(oficiales, dto, partido); }
         }
-        public void fichaActualiza(bool oficiales, BrainStormDTO dto, BrainStormDTO dtoAnterior)
+        public void fichaActualiza(bool oficiales, BrainStormDTO dtoAnterior, BrainStormDTO dto)
         {
-            if (ipfActivo.Valor == 1) { ipf.fichaActualiza(oficiales, dto, dtoAnterior); }
+            if (ipfActivo.Valor == 1) { ipf.fichaActualiza(oficiales, dtoAnterior, dto); }
         }
         public void fichaSale(bool oficiales)
         {

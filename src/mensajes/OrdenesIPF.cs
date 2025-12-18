@@ -346,9 +346,9 @@ namespace Elecciones.src.mensajes
         {
             c.EnviarMensaje(builder.fichaEncadena(oficiales, dto, partido));
         }
-        public void fichaActualiza(bool oficiales, BrainStormDTO dto, BrainStormDTO dtoAnterior)
+        public void fichaActualiza(bool oficiales, BrainStormDTO dtoAnterior, BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.fichaActualiza(oficiales, dto, dtoAnterior));
+            c.EnviarMensaje(builder.fichaActualiza(oficiales, dtoAnterior, dto));
         }
         public void fichaSale(bool oficiales)
         {

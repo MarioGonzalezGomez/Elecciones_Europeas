@@ -292,9 +292,97 @@ namespace Elecciones.src.mensajes.builders
 
             signal += EventBuild("NumeroEscrutado", "TEXT_STRING", $"{dto.circunscripcionDTO.escrutado}%", 2, 0.5, 0) + "\n";
 
-            //Tamano
-            //itemgo("Pastilla", "PRIM_BAR_LEN[0]", 1341, 0.5, 0) 
+            // --- Tamaño y posiciones dinámicas según número de partidos ---
+            int n = dto.partidos?.Count ?? 0;
 
+            // Mapping for 1..6 provided by the user
+            var layoutByCount = new Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)>()
+            {
+                {1, (1341, new[] {512}, -1125, 61)},
+                {2, (660, new[] {170,855}, -675, -390)},
+                {3, (435, new[] {56,512,967}, -795, -279)},
+                {4, (320, new[] {0,341,683,1024}, -621, -441)},
+                {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
+                {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
+            };
+
+            (int Size, int[] Positions, int LogoPos, int EscanosPos) layout;
+
+            if (layoutByCount.ContainsKey(n))
+            {
+                layout = layoutByCount[n];
+            }
+            else if (n >= 1)
+            {
+                // Fallback: distribuir posiciones linealmente entre un rango aproximado
+                // Rango tomado entre -60 .. 1082 (valores observados en datos) y tamaño aproximado decreciente
+                int left = -60;
+                int right = 1082;
+                int[] positions = new int[n];
+                if (n == 1)
+                {
+                    positions[0] = (left + right) / 2;
+                }
+                else
+                {
+                    double step = (double)(right - left) / (n - 1);
+                    for (int i = 0; i < n; i++)
+                    {
+                        positions[i] = (int)Math.Round(left + step * i);
+                    }
+                }
+
+                // approximate size: decrease with n, but clamp to reasonable range
+                int approxSize = Math.Max(120, 1341 - (n - 1) * 220);
+                // approximate logo/escaños offsets chosen to resemble provided data
+                int approxLogo = -600 - (n - 1) * 20;
+                int approxEscanos = 100 - (n - 1) * 70;
+
+                layout = (approxSize, positions, approxLogo, approxEscanos);
+            }
+            else
+            {
+                // no parties -> default safe values
+                layout = (1341, new[] { 512 }, -1125, 61);
+            }
+
+            // Aplicar tamaño de la "Pastilla" (animado)
+            signal += EventBuild("Pastilla", "PRIM_BAR_LEN[0]", $"{layout.Size}", 2, 0.5, 0) + "\n";
+
+            // Precompute mapping from sigla -> index dentro de los activos (dto.partidos)
+            var activeIndex = siglasActivos
+                .Select((s, i) => new { Sigla = s, Index = i })
+                .ToDictionary(x => x.Sigla, x => x.Index);
+
+            // Para cada partido (lista completa en el layout), colocar/ocultar y ajustar logo/escaños
+            for (int idx = 0; idx < siglasPartidos.Count; idx++)
+            {
+                var siglas = siglasPartidos[idx];
+
+                if (activeIndex.TryGetValue(siglas, out int posIndex) && posIndex >= 0 && posIndex < layout.Positions.Length)
+                {
+                    int pos = layout.Positions[posIndex];
+                    // Posición general del contenedor del partido (animada)
+                    signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", $"{pos}", 2, 0.5, 0) + "\n";
+
+                    // Logo y escaños dentro de la pastilla (colocados con itemset)
+                    signal += EventBuild($"Partidos/{siglas}/Logo", "OBJ_DISPLACEMENT[0]", $"{layout.LogoPos}", 1) + "\n";
+                    signal += EventBuild($"Partidos/{siglas}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layout.EscanosPos}", 1) + "\n";
+                }
+                else
+                {
+                    // Partido no activo: colocarlo fuera de la pantalla a la derecha y mantener offsets por defecto
+                    signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
+                    signal += EventBuild($"Partidos/{siglas}/Logo", "OBJ_DISPLACEMENT[0]", $"{layout.LogoPos}", 1) + "\n";
+                    signal += EventBuild($"Partidos/{siglas}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layout.EscanosPos}", 1) + "\n";
+                }
+
+                // visible / oculto y valor de escaños ya se manejan más arriba en el bucle original,
+                // aquí solo nos aseguramos de la posición y offsets.
+            }
+
+            //Fin colocación de posiciones/tamaño
+            // (el resto del método original ya añadía visibilidad y textos de escaños)
             foreach (var siglas in siglasPartidos)
             {
 
@@ -309,16 +397,7 @@ namespace Elecciones.src.mensajes.builders
                     signal += Oculta_Desoculta(true, $"Partidos/{siglas}") + "\n";
                     signal += EventBuild($"Escaños/{siglas}", "TEXT_STRING", $"0", 2, 0.5, 0) + "\n";
                 }
-                //Posiciones
-                //For de posiciones de fichas
-                //itemgo("Partidos/{sigla}", "OBJ_DISPLACEMENT[0]", 512, 0.5, 0)
-
-                //Posicion elementos dentro pastilla con for para cada elemento
-                //itemset("Partidos/{sigla}/Logo", "OBJ_DISPLACEMENT[0]", -1125)
-                //itemset("Partidos/{sigla}/Escaños", "OBJ_DISPLACEMENT[0]", 61)
-
             }
-
             return signal;
         }
         public string TickerTDEncadena(bool oficial, BrainStormDTO dto)

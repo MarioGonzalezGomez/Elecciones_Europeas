@@ -77,7 +77,7 @@ namespace Elecciones
         bool sfBipartidismoDentro;
         bool sfGanadorDentro;
         bool cartonPartidosDentro;
-        bool ultimoEscanoDentro;
+        public bool ultimoEscanoDentro;
 
         //Estas conexiones serán null si no están activadas por Configuración
         OrdenesIPF? ipf;

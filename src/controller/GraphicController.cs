@@ -9,6 +9,7 @@ using Elecciones.src.logic;
 using Elecciones.src.mensajes;
 using Elecciones.src.model.DTO.BrainStormDTO;
 using Elecciones.src.model.IPF;
+using Elecciones.src.model.IPF.DTO;
 using Elecciones.src.utils;
 
 namespace Elecciones.src.controller
@@ -521,7 +522,11 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.ultimoActualiza(dtoAnterior, dto); }
         }
-        public void ultimoEntraPartido(BrainStormDTO dto, PartidoDTO partido, bool esIzquierda)
+        public void ultimoLimpiaPartidos()
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoLimpiaPartidos(); }
+        }
+        public void ultimoEntraPartido(BrainStormDTO dto, CPDataDTO partido, bool esIzquierda)
         {
             if (ipfActivo.Valor == 1) { ipf.ultimoEntraPartido(dto, partido, esIzquierda); }
         }

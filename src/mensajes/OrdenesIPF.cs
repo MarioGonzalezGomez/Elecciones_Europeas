@@ -1,11 +1,12 @@
-using Elecciones.src.conexion;
-using Elecciones.src.mensajes.builders;
-using Elecciones.src.model.DTO.BrainStormDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Elecciones.src.conexion;
+using Elecciones.src.mensajes.builders;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.IPF.DTO;
 
 namespace Elecciones.src.mensajes
 {
@@ -415,9 +416,13 @@ namespace Elecciones.src.mensajes
         {
             c.EnviarMensaje(builder.ultimoActualiza(dtoAnterior, dto));
         }
-        public void ultimoEntraPartido(BrainStormDTO dto, PartidoDTO partido, bool esIzquierda)
+        public void ultimoEntraPartido(BrainStormDTO dto, CPDataDTO partido, bool esIzquierda)
         {
             c.EnviarMensaje(builder.ultimoEntraPartido(dto, partido, esIzquierda));
+        }
+        public void ultimoLimpiaPartidos()
+        {
+            c.EnviarMensaje(builder.ultimoLimpiaPartidos());
         }
         public void ultimoSale()
         {

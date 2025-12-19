@@ -6,6 +6,7 @@ using Elecciones.src.conexion;
 using Elecciones.src.controller;
 using Elecciones.src.model.DTO.BrainStormDTO;
 using Elecciones.src.model.IPF;
+using Elecciones.src.model.IPF.DTO;
 using Elecciones.src.utils;
 
 namespace Elecciones.src.mensajes.builders
@@ -1604,6 +1605,7 @@ namespace Elecciones.src.mensajes.builders
                 sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_DISPLACEMENT", "(1920,0,0)", 2, 0.5, 0) + "\n");
                 sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_CULL", "1", 1) + "\n");
             }
+            sb.Append(EventBuild("Oficial_Codigo", "MAP_LLSTRING_LOAD"));
 
             return sb.ToString();
         }
@@ -1702,22 +1704,22 @@ namespace Elecciones.src.mensajes.builders
                     {
                         foreach (var prov in provincias)
                         {
-                            signal.Append(EventBuild($"CCAA_Carton/{prov.nombre}", "MAT_LIST_COLOR", "Blanco", 1) + "\n");
+                            signal.Append(EventBuild($"Ultimo_Escano/{prov.nombre}", "MAT_LIST_COLOR", "Blanco", 1) + "\n");
                         }
                     }
                     else
                     {
-                        signal.Append(EventBuild($"CCAA_Carton/{dto.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "Blanco", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/{dto.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "Blanco", 1) + "\n");
                     }
                 }
                 catch (Exception)
                 {
-                    signal.Append(EventBuild($"CCAA_Carton/{dto.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "Blanco", 1) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/{dto.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "Blanco", 1) + "\n");
                 }
             }
             else if (!string.IsNullOrEmpty(dto.circunscripcionDTO?.nombre))
             {
-                signal.Append(EventBuild($"CCAA_Carton/{dto.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "Blanco", 1) + "\n");
+                signal.Append(EventBuild($"Ultimo_Escano/{dto.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "Blanco", 1) + "\n");
             }
 
             // Obtener los datos de último escaño
@@ -1738,9 +1740,13 @@ namespace Elecciones.src.mensajes.builders
                     {
                         siglasUltimoEscano = pUltimo.siglas.Replace("+", "_").Replace("-", "_");
                         // El partido con último escaño: posición frontal, escala 1, escaño visible
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT", "(-94, 0, 326)", 1) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE", "(1, 1, 1)", 1) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}/Escano", "OBJ_CULL", "false", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[0]", "-94", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[1]", "0", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[2]", "326", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[0]", "1", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[1]", "1", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[2]", "1", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}/Escano", "OBJ_CULL", "0", 1) + "\n");
                     }
                 }
 
@@ -1751,9 +1757,13 @@ namespace Elecciones.src.mensajes.builders
                     {
                         siglasLuchaEscano = pLucha.siglas.Replace("+", "_").Replace("-", "_");
                         // El partido que lucha: posición atrás, escala menor, escaño oculto
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT", "(-154, 0.1, 0)", 1) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE", "(0.86, 0.86, 0.86)", 1) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}/Escano", "OBJ_CULL", "true", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[0]", "-154", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[1]", "0.1)", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[2]", "0", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[0]", "0.86", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[1]", "0.86", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[2]", "0.86", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}/Escano", "OBJ_CULL", "0", 1) + "\n");
                     }
                 }
 
@@ -1783,7 +1793,7 @@ namespace Elecciones.src.mensajes.builders
         /// <param name="dto">DTO con los datos de la circunscripción</param>
         /// <param name="partido">Partido a añadir</param>
         /// <param name="esIzquierda">true para lado izquierdo, false para lado derecho</param>
-        public string ultimoEntraPartido(BrainStormDTO dto, PartidoDTO partido, bool esIzquierda)
+        public string ultimoEntraPartido(BrainStormDTO dto, CPDataDTO partido, bool esIzquierda)
         {
             if (dto == null || partido == null) return "";
 
@@ -1793,7 +1803,7 @@ namespace Elecciones.src.mensajes.builders
             string siglas = partido.siglas.Replace("+", "_").Replace("-", "_");
 
             // Calcular ancho de la barra: (TAMANO_MAXIMO / escaniosTotales) * escaniosPartido
-            int anchoPartido = (int)Math.Round((double)TAMANO_MAXIMO_FICHA / escaniosTotales * partido.escaniosHasta);
+            int anchoPartido = (int)Math.Round((double)TAMANO_MAXIMO_FICHA / escaniosTotales * int.Parse(partido.escaniosHasta));
 
             // Determinar qué barra usar (máximo 4 por lado)
             string[] barrasIzq = { "Barra_Izq", "Barra_Izq1", "Barra_Izq2", "Barra_Izq3" };
@@ -1814,13 +1824,13 @@ namespace Elecciones.src.mensajes.builders
             {
                 posX = POS_INICIAL_IZQ + anchoAcumuladoIzq;
                 anchoAcumuladoIzq += anchoPartido;
-                escaniosAcumuladosIzq += partido.escaniosHasta;
+                escaniosAcumuladosIzq += int.Parse(partido.escaniosHasta);
             }
             else
             {
                 posX = POS_INICIAL_DCH - anchoAcumuladoDch - anchoPartido;
                 anchoAcumuladoDch += anchoPartido;
-                escaniosAcumuladosDch += partido.escaniosHasta;
+                escaniosAcumuladosDch += int.Parse(partido.escaniosHasta);
             }
 
             // Guardar en estado
@@ -1872,6 +1882,15 @@ namespace Elecciones.src.mensajes.builders
             }
 
             return signal.ToString();
+        }
+        public string ultimoLimpiaPartidos()
+        {
+            anchoAcumuladoIzq = 0;
+            anchoAcumuladoDch = 0;
+            escaniosAcumuladosIzq = 0;
+            escaniosAcumuladosDch = 0;
+
+            return EventBuild("ULTIMO_ESCANO/SALE_BARRAS", "EVENT_RUN");
         }
         /// <summary>
         /// Actualiza el gráfico ULTIMO_ESCANO cuando cambian los datos.
@@ -2014,22 +2033,22 @@ namespace Elecciones.src.mensajes.builders
                         {
                             foreach (var prov in provinciasAnt)
                             {
-                                signal.Append(EventBuild($"CCAA_Carton/{prov.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
+                                signal.Append(EventBuild($"Ultimo_Escano/{prov.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
                             }
                         }
                         else
                         {
-                            signal.Append(EventBuild($"CCAA_Carton/{dtoAnterior.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
+                            signal.Append(EventBuild($"Ultimo_Escano/{dtoAnterior.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
                         }
                     }
                     catch (Exception)
                     {
-                        signal.Append(EventBuild($"CCAA_Carton/{dtoAnterior.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/{dtoAnterior.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
                     }
                 }
                 else
                 {
-                    signal.Append(EventBuild($"CCAA_Carton/{dtoAnterior.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/{dtoAnterior.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
                 }
             }
 
@@ -2063,7 +2082,7 @@ namespace Elecciones.src.mensajes.builders
             }
 
             // 5. Actualizar el texto de la circunscripción
-            signal.Append(EventBuild("Ultimo_Escano/Lugar", "TEXT_STRING", $"{dtoNuevo.circunscripcionDTO?.nombre ?? ""}", 2, 0.3, 0.5) + "\n");
+            signal.Append(EventBuild("Ultimo_Escano/Lugar", "TEXT_STRING", $"{dtoNuevo.circunscripcionDTO?.nombre ?? ""}", 1) + "\n");
 
             // 6. Cambiar los partidos de último escaño y lucha por último escaño
             try
@@ -2082,9 +2101,13 @@ namespace Elecciones.src.mensajes.builders
                     if (pUltimo != null)
                     {
                         siglasUltimoEscano = pUltimo.siglas.Replace("+", "_").Replace("-", "_");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT", "(-94, 0, 326)", 1) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE", "(1, 1, 1)", 1) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}/Escano", "OBJ_CULL", "false", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[0]", "-94", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[1]", "0", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[2]", "326", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[0]", "1", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[1]", "1", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[2]", "1", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}/Escano", "OBJ_CULL", "0", 1) + "\n");
                     }
                 }
 
@@ -2095,9 +2118,13 @@ namespace Elecciones.src.mensajes.builders
                     if (pLucha != null)
                     {
                         siglasLuchaEscano = pLucha.siglas.Replace("+", "_").Replace("-", "_");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT", "(-154, 0.1, 0)", 1) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE", "(0.86, 0.86, 0.86)", 1) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}/Escano", "OBJ_CULL", "true", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[0]", "-154", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[1]", "0.1", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[2]", "0", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[0]", "0.86", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[1]", "0.86", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[2]", "0.86", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}/Escano", "OBJ_CULL", "0", 1) + "\n");
                     }
                 }
 

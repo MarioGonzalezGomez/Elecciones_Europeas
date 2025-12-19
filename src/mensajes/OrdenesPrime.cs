@@ -29,6 +29,16 @@ namespace Elecciones_Europeas.src.mensajes
             return instance;
         }
 
+        public void SubirRotulosEspeciales()
+        {
+            c.EnviarMensaje(builder.SubirRotulosEspeciales());
+        }
+
+        public void BajarRotulosEspeciales()
+        {
+            c.EnviarMensaje(builder.BajarRotulosEspeciales());
+        }
+
         public void ReiniciarConexion()
         {
             c.ReiniciarConexion("prime");

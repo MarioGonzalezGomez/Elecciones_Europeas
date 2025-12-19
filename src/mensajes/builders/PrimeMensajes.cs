@@ -13,7 +13,9 @@ namespace Elecciones_Europeas.src.mensajes.builders
         bool primerPlay = true;
 
 
-        private PrimeMensajes() { }
+        private PrimeMensajes()
+        {
+        }
 
         public static PrimeMensajes GetInstance()
         {
@@ -24,6 +26,23 @@ namespace Elecciones_Europeas.src.mensajes.builders
             return instance;
         }
 
+        //METODOS ESPECIFICOS
+
+        public string SubirRotulosEspeciales()
+        {
+            string signal = "";
+            signal += CambioDeProyecto("Especiales_ConPicto_2026");
+            signal += CambioParametroProyecto("Par_Posicion_GrupoXY", "2");
+            return signal;
+        }
+
+        public string BajarRotulosEspeciales()
+        {
+            string signal = "";
+            signal += CambioDeProyecto("Especiales_ConPicto_2026");
+            signal += CambioParametroProyecto("Par_Posicion_GrupoXY", "1");
+            return signal;
+        }
 
 
         //MÉTODOS GENÉRICOS DONDE PODER ESPECIFICAR POR PARÁMETRO

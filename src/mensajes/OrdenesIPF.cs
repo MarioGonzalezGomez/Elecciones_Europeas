@@ -72,6 +72,7 @@ namespace Elecciones_Europeas.src.mensajes
         public void TickerActualiza() { c.EnviarMensaje(builder.TickerActualiza()); }
         public void TickerSale(bool oficial) { c.EnviarMensaje(builder.TickerSale(oficial)); }
 
+
         public void TickerActualizaEscrutado() { c.EnviarMensaje(builder.TickerActualizaEscrutado()); }
         public void TickerActualizaDatos() { c.EnviarMensaje(builder.TickerActualizaDatos()); }
         public void TickerActualizaDatosIndividualizado(List<PartidoDTO> partidos) { c.EnviarMensaje(builder.TickerActualizaDatosIndividualizado(partidos)); }

@@ -1633,6 +1633,20 @@ namespace Elecciones.src.mensajes.builders
             return sb.ToString();
         }
 
+        //ULTIMO
+        public string ultimoEntra()
+        {
+            return Entra("ULTIMO");
+        }
+        public string ultimoActualiza()
+        {
+            return "";
+        }
+        public string ultimoSale()
+        {
+            return Sale("ULTIMO");
+        }
+
         //SUPERFALDON
         public string superfaldonEntra()
         {

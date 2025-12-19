@@ -77,6 +77,7 @@ namespace Elecciones
         bool sfBipartidismoDentro;
         bool sfGanadorDentro;
         bool cartonPartidosDentro;
+        bool ultimoEscanoDentro;
 
         //Estas conexiones serán null si no están activadas por Configuración
         OrdenesIPF? ipf;
@@ -132,6 +133,7 @@ namespace Elecciones
             sfBipartidismoDentro = false;
             sfGanadorDentro = false;
             cartonPartidosDentro = false;
+            ultimoEscanoDentro = false;
             circunscripcionNames = new ObservableCollection<string>();
             listaDeDatos = new ObservableCollection<CPDataDTO>();
             tipoElecciones = int.Parse(configuration.GetValue("tipoElecciones"));
@@ -248,6 +250,7 @@ namespace Elecciones
                     graficosListView.Items.Add("MAYORÍAS");
                     //graficosListView.Items.Add("VS");
                     graficosListView.Items.Add("CARTÓN PARTIDOS");
+                    graficosListView.Items.Add("ÚLTIMO ESCAÑO");
                     break;
                 case 3:
                     graficosListView.Items.Add("FICHAS");
@@ -385,6 +388,10 @@ namespace Elecciones
             if (cartonPartidosDentro)
             {
                 graficos.cartonPartidosActualiza(dtoAnterior, dto);
+            }
+            if (ultimoEscanoDentro)
+            {
+                graficos.ultimoActualiza(dtoAnterior, dto);
             }
         }
         private void UpdateSuperfaldones()
@@ -1378,6 +1385,18 @@ namespace Elecciones
                         graficos.cartonPartidosEntra(dtoSinFiltrar);
                         cartonPartidosDentro = true;
                         break;
+                    case "ÚLTIMO ESCAÑO":
+                        if (ultimoEscanoDentro)
+                        {
+                            // Use a copy as "previous" if we don't have an explicit previous DTO in this context.
+                            graficos.ultimoEncadena(new BrainStormDTO(dto), dto);
+                        }
+                        else
+                        {
+                            graficos.ultimoEntra(dto);
+                            ultimoEscanoDentro = true;
+                        }
+                        break;
 
                     default: break;
                 }
@@ -1494,6 +1513,10 @@ namespace Elecciones
                     case "CARTÓN PARTIDOS":
                         graficos.cartonPartidosSale();
                         cartonPartidosDentro = false;
+                        break;
+                    case "ÚLTIMO ESCAÑO":
+                        graficos.ultimoSale();
+                        ultimoEscanoDentro = false;
                         break;
 
                     default: break;

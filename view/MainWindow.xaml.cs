@@ -356,27 +356,27 @@ namespace Elecciones
         }
         private void UpdateFaldones(BrainStormDTO dtoAnterior)
         {
-            List<PartidoDTO> partidosQueCambian = dtoAnterior.partidos.Except(dto.partidos, new PartidoDTOComparer()).ToList();
-            List<PartidoDTO> partidosQueNoEstan = dtoAnterior.partidos.Where(par => !dto.partidos.Any(par2 => par2.codigo.Equals(par.codigo))).ToList();
-            if (partidosQueCambian.Count != 0)
-            {
-                if (dto.numPartidos != dtoAnterior.numPartidos || partidosQueNoEstan.Count != 0)
-                {
-                    graficos.TickerActualizaNumPartidos();
-                    graficos.TickerYaNoEstaIndividualizado(partidosQueNoEstan);
-                }
-                else if (CompararOrden(dtoAnterior, dto))
-                {
-                    graficos.TickerActualizaDatosIndividualizado(partidosQueCambian);
-                    graficos.TickerActualizaDatos();
-                }
-                else
-                {
-                    graficos.TickerActualizaPosiciones();
-                }
-            }
-            graficos.TickerActualizaEscrutado();
-            graficos.TickerActualiza(dto);
+           // List<PartidoDTO> partidosQueCambian = dtoAnterior.partidos.Except(dto.partidos, new PartidoDTOComparer()).ToList();
+           // List<PartidoDTO> partidosQueNoEstan = dtoAnterior.partidos.Where(par => !dto.partidos.Any(par2 => par2.codigo.Equals(par.codigo))).ToList();
+           // if (partidosQueCambian.Count != 0)
+           // {
+           //     if (dto.numPartidos != dtoAnterior.numPartidos || partidosQueNoEstan.Count != 0)
+           //     {
+           //         graficos.TickerActualizaNumPartidos();
+           //         graficos.TickerYaNoEstaIndividualizado(partidosQueNoEstan);
+           //     }
+           //     else if (CompararOrden(dtoAnterior, dto))
+           //     {
+           //         graficos.TickerActualizaDatosIndividualizado(partidosQueCambian);
+           //         graficos.TickerActualizaDatos();
+           //     }
+           //     else
+           //     {
+           //         graficos.TickerActualizaPosiciones();
+           //     }
+           // }
+           // graficos.TickerActualizaEscrutado();
+           // graficos.TickerActualiza(dto);
             graficos.TickerTDActualiza(dtoAnterior, dto);
         }
         private void UpdateCartones(BrainStormDTO dtoAnterior)

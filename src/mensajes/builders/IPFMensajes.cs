@@ -289,10 +289,7 @@ namespace Elecciones.src.mensajes.builders
             List<string> siglasActivos = dto.partidos.Select(x => x.siglas).ToList();
             string signal = "";
             //Poner camara en su sitio
-            signal += EventBuild("<>pipe", "PIPE_TYPE", "Orthogonal", 1) + "\n";
-            signal += EventBuild("cam1", "CAM_PV[1]", "-535", 1) + "\n";
-
-            signal += EventBuild("NumeroEscrutado", "TEXT_STRING", $"{dto.circunscripcionDTO.escrutado}%", 2, 0.5, 0) + "\n";
+            signal += EventBuild("NumeroEscrutado", "TEXT_STRING", $"'{dto.circunscripcionDTO.escrutado}%'", 2, 0.5, 0) + "\n";
 
             // --- Tamaño y posiciones dinámicas según número de partidos ---
             int n = dto.partidos?.Count ?? 0;
@@ -356,27 +353,32 @@ namespace Elecciones.src.mensajes.builders
                 .Select((s, i) => new { Sigla = s, Index = i })
                 .ToDictionary(x => x.Sigla, x => x.Index);
 
+            // local helper to normalize object names (PUM+J -> PUM_J etc.)
+            static string Esc(string s) => s?.Replace("+", "_") ?? s;
+
             // Para cada partido (lista completa en el layout), colocar/ocultar y ajustar logo/escaños
             for (int idx = 0; idx < siglasPartidos.Count; idx++)
             {
-                var siglas = siglasPartidos[idx];
+                var siglaRaw = siglasPartidos[idx];
+                var siglaObj = Esc(siglaRaw);
+                //newActiveIndex.TryGetValue(siglaRaw, out int newPosIndex) && newPosIndex >= 0 && newPosIndex < layoutNuevo.Positions.Length
 
-                if (activeIndex.TryGetValue(siglas, out int posIndex) && posIndex >= 0 && posIndex < layout.Positions.Length)
+                if (activeIndex.TryGetValue(siglaRaw, out int posIndex) && posIndex >= 0 && posIndex < layout.Positions.Length)
                 {
                     int pos = layout.Positions[posIndex];
                     // Posición general del contenedor del partido (animada)
-                    signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", $"{pos}", 2, 0.5, 0) + "\n";
+                    signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{pos}", 2, 0.5, 0) + "\n";
 
                     // Logo y escaños dentro de la pastilla (colocados con itemset)
-                    signal += EventBuild($"Partidos/{siglas}/Logo", "OBJ_DISPLACEMENT[0]", $"{layout.LogoPos}", 1) + "\n";
-                    signal += EventBuild($"Partidos/{siglas}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layout.EscanosPos}", 1) + "\n";
+                    signal += EventBuild($"Partidos/{siglaObj}/Logo", "OBJ_DISPLACEMENT[0]", $"{layout.LogoPos}", 1) + "\n";
+                    signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layout.EscanosPos}", 1) + "\n";
                 }
                 else
                 {
                     // Partido no activo: colocarlo fuera de la pantalla a la derecha y mantener offsets por defecto
-                    signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
-                    signal += EventBuild($"Partidos/{siglas}/Logo", "OBJ_DISPLACEMENT[0]", $"{layout.LogoPos}", 1) + "\n";
-                    signal += EventBuild($"Partidos/{siglas}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layout.EscanosPos}", 1) + "\n";
+                    signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
+                    signal += EventBuild($"Partidos/{siglaObj}/Logo", "OBJ_DISPLACEMENT[0]", $"{layout.LogoPos}", 1) + "\n";
+                    signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layout.EscanosPos}", 1) + "\n";
                 }
 
                 // visible / oculto y valor de escaños ya se manejan más arriba en el bucle original,
@@ -385,21 +387,24 @@ namespace Elecciones.src.mensajes.builders
 
             //Fin colocación de posiciones/tamaño
             // (el resto del método original ya añadía visibilidad y textos de escaños)
-            foreach (var siglas in siglasPartidos)
+            foreach (var siglaRaw in siglasPartidos)
             {
 
-                if (siglasActivos.Contains(siglas))
+                var siglaObj = Esc(siglaRaw);
+
+                if (siglasActivos.Contains(siglaRaw))
                 {
-                    PartidoDTO temp = dto.partidos.FirstOrDefault(x => x.siglas == siglas);
-                    signal += Oculta_Desoculta(false, $"Partidos/{siglas}") + "\n";
-                    signal += EventBuild($"Escaños/{siglas}", "TEXT_STRING", $"{temp.escaniosHasta}", 2, 0.5, 0) + "\n";
+                    PartidoDTO temp = dto.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
+                    signal += Oculta_Desoculta(false, $"Partidos/{siglaObj}") + "\n";
+                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escaniosHasta}'", 2, 0.5, 0) + "\n";
                 }
                 else
                 {
-                    signal += Oculta_Desoculta(true, $"Partidos/{siglas}") + "\n";
-                    signal += EventBuild($"Escaños/{siglas}", "TEXT_STRING", $"0", 2, 0.5, 0) + "\n";
+                    signal += Oculta_Desoculta(true, $"Partidos/{siglaObj}") + "\n";
+                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'0'", 2, 0.5, 0) + "\n";
                 }
             }
+            signal += Entra("FALDON_TD");
             return signal;
         }
         // public string TickerTDEncadena(bool oficial, BrainStormDTO dto)
@@ -416,11 +421,14 @@ namespace Elecciones.src.mensajes.builders
             string signal = "";
 
             // Actualizar escrutado
-            signal += EventBuild("NumeroEscrutado", "TEXT_STRING", $"{dtoNuevo.circunscripcionDTO.escrutado}%", 2, 0.5, 0) + "\n";
+            signal += EventBuild("NumeroEscrutado", "TEXT_STRING", $"'{dtoNuevo.circunscripcionDTO.escrutado}%'", 2, 0.5, 0) + "\n";
 
             // Comprobar si cambia el número de partidos
             int nAnterior = dtoAnterior.partidos?.Count ?? 0;
             int nNuevo = dtoNuevo.partidos?.Count ?? 0;
+
+            // local helper to normalize object names (PUM+J -> PUM_J etc.)
+            static string Esc(string s) => s?.Replace("+", "_") ?? s;
 
             if (nAnterior != nNuevo)
             {
@@ -483,53 +491,54 @@ namespace Elecciones.src.mensajes.builders
                 // Para cada partido, actualizar posiciones y visibilidad
                 for (int idx = 0; idx < siglasPartidos.Count; idx++)
                 {
-                    var siglas = siglasPartidos[idx];
+                    var siglaRaw = siglasPartidos[idx];
+                    var siglaObj = Esc(siglaRaw);
 
-                    if (newActiveIndex.TryGetValue(siglas, out int newPosIndex) && newPosIndex >= 0 && newPosIndex < layoutNuevo.Positions.Length)
+                    if (newActiveIndex.TryGetValue(siglaRaw, out int newPosIndex) && newPosIndex >= 0 && newPosIndex < layoutNuevo.Positions.Length)
                     {
                         // Partido activo en el nuevo estado
                         int newPos = layoutNuevo.Positions[newPosIndex];
-                        bool wasActive = siglasAnteriores.Contains(siglas);
+                        bool wasActive = siglasAnteriores.Contains(siglaRaw);
 
                         // Primero hacer visible si no lo estaba
                         if (!wasActive)
                         {
-                            signal += Oculta_Desoculta(false, $"Partidos/{siglas}") + "\n";
+                            signal += Oculta_Desoculta(false, $"Partidos/{siglaObj}") + "\n";
                         }
 
                         // Determinar si sube o baja de posición
-                        int oldPosIndex = siglasAnteriores.IndexOf(siglas);
+                        int oldPosIndex = siglasAnteriores.IndexOf(siglaRaw);
                         bool sube = oldPosIndex > newPosIndex; // índice menor = posición mejor
 
                         if (sube)
                         {
                             // El partido sube: pasar por encima (Y = -100)
-                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[1]", "-100", 2, 0.25, 0) + "\n";
+                            signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[1]", "-100", 2, 0.25, 0) + "\n";
                             // Desplazar en X
-                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0.25) + "\n";
+                            signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0.25) + "\n";
                             // Volver a Y = 0
-                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.25, 0.75) + "\n";
+                            signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.25, 0.75) + "\n";
                         }
                         else
                         {
                             // El partido baja o no cambia: desplazamiento directo en X
-                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
+                            signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
                         }
 
                         // Actualizar offsets de Logo y Escaños
-                        signal += EventBuild($"Partidos/{siglas}/Logo", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.LogoPos}", 1) + "\n";
-                        signal += EventBuild($"Partidos/{siglas}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.EscanosPos}", 1) + "\n";
+                        signal += EventBuild($"Partidos/{siglaObj}/Logo", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.LogoPos}", 1) + "\n";
+                        signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.EscanosPos}", 1) + "\n";
 
                         // Actualizar texto de escaños
-                        PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglas);
-                        signal += EventBuild($"Escaños/{siglas}", "TEXT_STRING", $"{temp.escaniosHasta}", 2, 0.5, 0) + "\n";
+                        PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
+                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escaniosHasta}'", 2, 0.5, 0) + "\n";
                     }
                     else
                     {
                         // Partido no activo en el nuevo estado: ocultarlo con delay
-                        signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
-                        signal += Oculta_Desoculta(true, $"Partidos/{siglas}") + "\n";
-                        signal += EventBuild($"Escaños/{siglas}", "TEXT_STRING", "0", 2, 0.5, 0) + "\n";
+                        signal += EventBuild($"Partidos/{Esc(siglaRaw)}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
+                        signal += Oculta_Desoculta(true, $"Partidos/{Esc(siglaRaw)}") + "\n";
+                        signal += EventBuild($"Escaños/{Esc(siglaRaw)}", "TEXT_STRING", "'0'", 2, 0.5, 0) + "\n";
                     }
                 }
             }
@@ -554,9 +563,10 @@ namespace Elecciones.src.mensajes.builders
 
                 for (int idx = 0; idx < siglasAnteriores.Count; idx++)
                 {
-                    var siglas = siglasAnteriores[idx];
+                    var siglaRaw = siglasAnteriores[idx];
+                    var siglaObj = Esc(siglaRaw);
 
-                    if (newActiveIndex.TryGetValue(siglas, out int newPosIndex))
+                    if (newActiveIndex.TryGetValue(siglaRaw, out int newPosIndex))
                     {
                         int newPos = layout.Positions[newPosIndex];
                         bool sube = idx > newPosIndex; // idx es oldPosIndex
@@ -564,19 +574,19 @@ namespace Elecciones.src.mensajes.builders
                         if (sube)
                         {
                             // El partido sube: pasar por encima
-                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[1]", "-100", 2, 0.25, 0) + "\n";
-                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0.25) + "\n";
-                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.25, 0.75) + "\n";
+                            signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[1]", "-100", 2, 0.25, 0) + "\n";
+                            signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0.25) + "\n";
+                            signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.25, 0.75) + "\n";
                         }
                         else if (idx != newPosIndex)
                         {
                             // El partido baja pero no cambia completamente
-                            signal += EventBuild($"Partidos/{siglas}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
+                            signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
                         }
 
                         // Actualizar escaños
-                        PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglas);
-                        signal += EventBuild($"Escaños/{siglas}", "TEXT_STRING", $"{temp.escaniosHasta}", 2, 0.5, 0) + "\n";
+                        PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
+                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escaniosHasta}'", 2, 0.5, 0) + "\n";
                     }
                 }
             }
@@ -585,11 +595,7 @@ namespace Elecciones.src.mensajes.builders
         }
         public string TickerTDSale()
         {
-            string signal = "";
-            signal += EventBuild("<>pipe", "PIPE_TYPE", "Perspective", 2, 0, 1);
-            signal += EventBuild("cam1", "CAM_PV[1]", "-925", 2, 0, 1);
-            //SALE
-            return signal;
+            return Sale("FALDON_TD");
         }
 
         //PP_PSOE
@@ -2382,7 +2388,10 @@ namespace Elecciones.src.mensajes.builders
         {
             return $"itemset('<{_bd}>{objeto}','{propiedad}');";
         }
-
+        private string CambioPipe(string objeto, string propiedad, string value)
+        {
+            return $"itemset('{objeto}','{propiedad}', '{value}');";
+        }
         /// <summary>
         /// Build an EVENT_RUN signal. If animTime or delay are non-zero the signal will be an itemgo with placeholders,
         /// otherwise it will be a simple itemset acting as a "play" button.
@@ -2401,6 +2410,7 @@ namespace Elecciones.src.mensajes.builders
         }
 
         //MENSAJES COMUNES
+
         public string Reset()
         {
             return EventRunBuild("RESET");

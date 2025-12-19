@@ -137,6 +137,7 @@ namespace Elecciones
 
         private void btnEntraTD_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
             gController.TickerTDEntra(main.dto);
             gController.SubirRotulosPrimeTD();
         }
@@ -148,6 +149,7 @@ namespace Elecciones
 
         private void btnEntraEspecial_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
             gController.TickerTDEntra(main.dto);
             gController.SubirRotulosPrimeEsp();
         }

@@ -142,7 +142,8 @@ namespace Elecciones.src.mensajes.builders
         public string TickerActualiza(BrainStormDTO dto)
         {
             // Fix: pasar count como string y tipoItem explícito
-            return EventBuild("nPartidosConEscanio", "MAP_INT_PAR", $"{dto.partidos.Count}", 1);
+            return EventRunBuild("TICKER/ACTUALIZO");
+           // return EventBuild("nPartidosConEscanio", "MAP_INT_PAR", $"{dto.partidos.Count}", 1);
         }
         public string TickerSale(bool oficial)
         {

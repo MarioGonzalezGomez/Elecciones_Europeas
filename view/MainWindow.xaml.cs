@@ -76,6 +76,7 @@ namespace Elecciones
         bool sfMayoriasDentro;
         bool sfBipartidismoDentro;
         bool sfGanadorDentro;
+        bool cartonPartidosDentro;
 
         //Estas conexiones serán null si no están activadas por Configuración
         OrdenesIPF? ipf;
@@ -130,6 +131,7 @@ namespace Elecciones
             sfMayoriasDentro = false;
             sfBipartidismoDentro = false;
             sfGanadorDentro = false;
+            cartonPartidosDentro = false;
             circunscripcionNames = new ObservableCollection<string>();
             listaDeDatos = new ObservableCollection<CPDataDTO>();
             tipoElecciones = int.Parse(configuration.GetValue("tipoElecciones"));
@@ -245,6 +247,7 @@ namespace Elecciones
                     //graficosListView.Items.Add("PACTÓMETRO");
                     graficosListView.Items.Add("MAYORÍAS");
                     //graficosListView.Items.Add("VS");
+                    graficosListView.Items.Add("CARTÓN PARTIDOS");
                     break;
                 case 3:
                     graficosListView.Items.Add("FICHAS");
@@ -378,6 +381,10 @@ namespace Elecciones
             if (fichaDentro)
             {
                 graficos.fichaActualiza(oficiales, dtoAnterior, dto);
+            }
+            if (cartonPartidosDentro)
+            {
+                graficos.cartonPartidosActualiza(dtoAnterior, dto);
             }
         }
         private void UpdateSuperfaldones()
@@ -1367,6 +1374,10 @@ namespace Elecciones
                     case "VS":
                         //graficos.superfaldonEntra();
                         break;
+                    case "CARTÓN PARTIDOS":
+                        graficos.cartonPartidosEntra(dtoSinFiltrar);
+                        cartonPartidosDentro = true;
+                        break;
 
                     default: break;
                 }
@@ -1479,6 +1490,10 @@ namespace Elecciones
                         break;
                     case "VS":
                         // graficos.superfaldonEntra();
+                        break;
+                    case "CARTÓN PARTIDOS":
+                        graficos.cartonPartidosSale();
+                        cartonPartidosDentro = false;
                         break;
 
                     default: break;

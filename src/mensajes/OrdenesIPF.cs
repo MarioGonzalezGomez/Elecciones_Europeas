@@ -388,6 +388,20 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(builder.mayoriasSale());
         }
 
+        //CARTON PARTIDO
+        public void cartonPartidosEntra(BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.cartonPartidosEntra(dto));
+        }
+        public void cartonPartidosActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.cartonPartidosActualiza(dtoAnterior, dto));
+        }
+        public void cartonPartidosSale()
+        {
+            c.EnviarMensaje(builder.cartonPartidosSale());
+        }
+
         //SUPERFALDON
         public void superfaldonEntra()
         {

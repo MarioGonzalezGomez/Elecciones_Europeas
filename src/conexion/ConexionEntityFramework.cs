@@ -123,6 +123,9 @@ namespace Elecciones.src.conexion
                 entity.Property("siglas").HasColumnName("sigla");
                 entity.Property("nombre").HasColumnName("descripcion");
                 entity.Property("independentismo").HasColumnName("tendencia");
+                entity.Property("esUltimoEscano").HasColumnName("ult_escano");
+                entity.Property("luchaUltimoEscano").HasColumnName("sig_escano");
+                entity.Property("restoVotos").HasColumnName("restos");
 
             });
             modelBuilder.Entity<Circunscripcion>(entity =>

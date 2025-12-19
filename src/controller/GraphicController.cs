@@ -494,6 +494,20 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.mayoriasSale(); }
         }
 
+        //CARTON PARTIDOS
+        public void cartonPartidosEntra(BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.cartonPartidosEntra(dto); }
+        }
+        public void cartonPartidosActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.cartonPartidosActualiza(dtoAnterior, dto); }
+        }
+        public void cartonPartidosSale()
+        {
+            if (ipfActivo.Valor == 1) { ipf.cartonPartidosSale(); }
+        }
+
         //SUPERFALDON
         public void superfaldonEntra()
         {

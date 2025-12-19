@@ -1967,6 +1967,172 @@ namespace Elecciones.src.mensajes.builders
         }
 
         /// <summary>
+        /// Encadena entre circunscripciones en el gráfico ULTIMO_ESCANO.
+        /// Anima la salida, cambia los datos, y anima la entrada.
+        /// </summary>
+        /// <param name="dtoAnterior">DTO de la circunscripción saliente</param>
+        /// <param name="dtoNuevo">DTO de la circunscripción entrante</param>
+        public string ultimoEncadena(BrainStormDTO dtoAnterior, BrainStormDTO dtoNuevo)
+        {
+            if (dtoNuevo == null) return "";
+
+            StringBuilder signal = new StringBuilder();
+
+            // 1. Animar salida del contenedor Ultimo_Escano/Ultimo_Escano
+            signal.Append(EventBuild("Ultimo_Escano/Ultimo_Escano", "OBJ_DISPLACEMENT[0]", "860", 2, 0.5, 0) + "\n");
+
+            // 2. Resetear las barras (ancho a 0 y posición a valores por defecto) con animación
+            string[] barrasIzq = { "Barra_Izq", "Barra_Izq1", "Barra_Izq2", "Barra_Izq3" };
+            string[] barrasDch = { "Barra_Dch", "Barra_Dch1", "Barra_Dch2", "Barra_Dch3" };
+
+            // Resetear barras izquierda: posición inicial 90
+            for (int i = 0; i < barrasIzq.Length; i++)
+            {
+                signal.Append(EventBuild($"Ultimo_Escano/Barras/{barrasIzq[i]}", "PRIM_RECGLO_LEN[0]", "0", 2, 0.5, 0.5) + "\n");
+                signal.Append(EventBuild($"Ultimo_Escano/Barras/{barrasIzq[i]}", "OBJ_DISPLACEMENT[0]", $"{POS_INICIAL_IZQ}", 2, 0.5, 0.5) + "\n");
+            }
+
+            // Resetear barras derecha: posición inicial 1844
+            for (int i = 0; i < barrasDch.Length; i++)
+            {
+                signal.Append(EventBuild($"Ultimo_Escano/Barras/{barrasDch[i]}", "PRIM_RECGLO_LEN[0]", "0", 2, 0.5, 0.5) + "\n");
+                signal.Append(EventBuild($"Ultimo_Escano/Barras/{barrasDch[i]}", "OBJ_DISPLACEMENT[0]", $"{POS_INICIAL_DCH}", 2, 0.5, 0.5) + "\n");
+            }
+
+            // 3. Resetear contadores de escaños a 0
+            signal.Append(EventBuild("Ultimo_Escano/Mayoria/Escanos_Izq", "TEXT_STRING", "0", 2, 0.5, 0.5) + "\n");
+            signal.Append(EventBuild("Ultimo_Escano/Mayoria/Escanos_Dch", "TEXT_STRING", "0", 2, 0.5, 0.5) + "\n");
+
+            // 4. Actualizar mapas: poner las anteriores en "NoSel" y las nuevas en "Blanco"
+            // Mapas de la circunscripción anterior -> NoSel
+            if (dtoAnterior != null && !string.IsNullOrEmpty(dtoAnterior.circunscripcionDTO?.nombre))
+            {
+                if (!string.IsNullOrEmpty(dtoAnterior.circunscripcionDTO?.codigo) && dtoAnterior.circunscripcionDTO.codigo.EndsWith("00000"))
+                {
+                    try
+                    {
+                        using var con = new ConexionEntityFramework();
+                        var provinciasAnt = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dtoAnterior.circunscripcionDTO.nombre);
+                        if (provinciasAnt != null && provinciasAnt.Count > 0)
+                        {
+                            foreach (var prov in provinciasAnt)
+                            {
+                                signal.Append(EventBuild($"CCAA_Carton/{prov.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
+                            }
+                        }
+                        else
+                        {
+                            signal.Append(EventBuild($"CCAA_Carton/{dtoAnterior.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        signal.Append(EventBuild($"CCAA_Carton/{dtoAnterior.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
+                    }
+                }
+                else
+                {
+                    signal.Append(EventBuild($"CCAA_Carton/{dtoAnterior.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "NoSel", 2, 0.3, 0.5) + "\n");
+                }
+            }
+
+            // Mapas de la circunscripción nueva -> Blanco
+            if (!string.IsNullOrEmpty(dtoNuevo.circunscripcionDTO?.codigo) && dtoNuevo.circunscripcionDTO.codigo.EndsWith("00000"))
+            {
+                try
+                {
+                    using var con = new ConexionEntityFramework();
+                    var provinciasNuevo = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dtoNuevo.circunscripcionDTO.nombre);
+                    if (provinciasNuevo != null && provinciasNuevo.Count > 0)
+                    {
+                        foreach (var prov in provinciasNuevo)
+                        {
+                            signal.Append(EventBuild($"CCAA_Carton/{prov.nombre}", "MAT_LIST_COLOR", "Blanco", 2, 0.3, 0.5) + "\n");
+                        }
+                    }
+                    else
+                    {
+                        signal.Append(EventBuild($"CCAA_Carton/{dtoNuevo.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "Blanco", 2, 0.3, 0.5) + "\n");
+                    }
+                }
+                catch (Exception)
+                {
+                    signal.Append(EventBuild($"CCAA_Carton/{dtoNuevo.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "Blanco", 2, 0.3, 0.5) + "\n");
+                }
+            }
+            else if (!string.IsNullOrEmpty(dtoNuevo.circunscripcionDTO?.nombre))
+            {
+                signal.Append(EventBuild($"CCAA_Carton/{dtoNuevo.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "Blanco", 2, 0.3, 0.5) + "\n");
+            }
+
+            // 5. Actualizar el texto de la circunscripción
+            signal.Append(EventBuild("Ultimo_Escano/Lugar", "TEXT_STRING", $"{dtoNuevo.circunscripcionDTO?.nombre ?? ""}", 2, 0.3, 0.5) + "\n");
+
+            // 6. Cambiar los partidos de último escaño y lucha por último escaño
+            try
+            {
+                using var con = new ConexionEntityFramework();
+                var cpList = CPController.GetInstance(con).FindByIdCircunscripcionOficial(dtoNuevo.circunscripcionDTO.codigo);
+
+                CircunscripcionPartido? cpUltimoNuevo = cpList?.FirstOrDefault(cp => cp.esUltimoEscano == 1);
+                CircunscripcionPartido? cpLuchaNuevo = cpList?.FirstOrDefault(cp => cp.luchaUltimoEscano == 1);
+                CircunscripcionPartido? cpRestoNuevo = cpList?.FirstOrDefault(cp => cp.restoVotos != -1);
+
+                // Actualizar partido con último escaño
+                if (cpUltimoNuevo != null)
+                {
+                    Partido? pUltimo = PartidoController.GetInstance(con).FindById(cpUltimoNuevo.codPartido);
+                    if (pUltimo != null)
+                    {
+                        siglasUltimoEscano = pUltimo.siglas.Replace("+", "_").Replace("-", "_");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT", "(-94, 0, 326)", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE", "(1, 1, 1)", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}/Escano", "OBJ_CULL", "false", 1) + "\n");
+                    }
+                }
+
+                // Actualizar partido que lucha
+                if (cpLuchaNuevo != null)
+                {
+                    Partido? pLucha = PartidoController.GetInstance(con).FindById(cpLuchaNuevo.codPartido);
+                    if (pLucha != null)
+                    {
+                        siglasLuchaEscano = pLucha.siglas.Replace("+", "_").Replace("-", "_");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT", "(-154, 0.1, 0)", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE", "(0.86, 0.86, 0.86)", 1) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}/Escano", "OBJ_CULL", "true", 1) + "\n");
+                    }
+                }
+
+                // 7. Actualizar diferencia de votos
+                if (cpRestoNuevo != null && cpRestoNuevo.restoVotos != -1)
+                {
+                    signal.Append(EventBuild("Ultimo_Escano/Diferencia", "TEXT_STRING", $"{cpRestoNuevo.restoVotos}", 1) + "\n");
+                }
+                else
+                {
+                    signal.Append(EventBuild("Ultimo_Escano/Diferencia", "TEXT_STRING", "", 1) + "\n");
+                }
+            }
+            catch (Exception)
+            {
+                // Si hay error, continuar
+            }
+
+            // 8. Resetear estado de partidos añadidos
+            ultimoEscanoPartidos.Clear();
+            anchoAcumuladoIzq = 0;
+            anchoAcumuladoDch = 0;
+            escaniosAcumuladosIzq = 0;
+            escaniosAcumuladosDch = 0;
+
+            // 9. Animar entrada del contenedor Ultimo_Escano/Ultimo_Escano (después de 1 segundo para dar tiempo a los cambios)
+            signal.Append(EventBuild("Ultimo_Escano/Ultimo_Escano", "OBJ_DISPLACEMENT[0]", "0", 2, 0.5, 1.0) + "\n");
+
+            return signal.ToString();
+        }
+
+        /// <summary>
         /// Sale del gráfico ULTIMO_ESCANO y resetea el estado.
         /// </summary>
         public string ultimoSale()

@@ -30,6 +30,7 @@ namespace Elecciones_Europeas.src.conexion
             _notificationService = NotificationService.GetInstance();
             _loggerService = FileLoggerService.GetInstance();
             configuration = ConfigManager.GetInstance();
+            configuration.ReadConfig();
             if (String.Equals(programaGrafico, "prime", StringComparison.OrdinalIgnoreCase))
             {
                 _ip = configuration.GetValue("ipPrime");

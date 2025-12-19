@@ -8,15 +8,31 @@ namespace Elecciones.src.model.IPF
 {
     public class Partido
     {
-        public string codigo { get; set; }
-        public string codigoPadre { get; set; }
-        public string siglas { get; set; }
-        public string nombre { get; set; }
-        public string candidato { get; set; }
-        public int independentismo { get; set; }
-        public int esUltimoEscano{ get; set; }
-        public int luchaUltimoEscano{ get; set; }
-        public int restoVotos{ get; set; }
+        public string codigo
+        {
+            get; set;
+        }
+        public string codigoPadre
+        {
+            get; set;
+        }
+        public string siglas
+        {
+            get; set;
+        }
+        public string nombre
+        {
+            get; set;
+        }
+        public string candidato
+        {
+            get; set;
+        }
+        public int independentismo
+        {
+            get; set;
+        }
+
 
         ConfigManager configuration;
 
@@ -24,7 +40,7 @@ namespace Elecciones.src.model.IPF
         {
             configuration = ConfigManager.GetInstance();
         }
-        public Partido(string codigo, string codigoPadre, string siglas, string nombre, string candidato, int independentismo, int esUltimoEscano, int luchaUltimoEscano, int restoVotos, ConfigManager configuration)
+        public Partido(string codigo, string codigoPadre, string siglas, string nombre, string candidato, int independentismo)
         {
             configuration = ConfigManager.GetInstance();
             this.codigo = codigo;
@@ -33,9 +49,6 @@ namespace Elecciones.src.model.IPF
             this.nombre = nombre;
             this.candidato = candidato;
             this.independentismo = independentismo;
-            this.esUltimoEscano = esUltimoEscano;
-            this.luchaUltimoEscano = luchaUltimoEscano;
-            this.restoVotos = restoVotos;
         }
         public override string ToString()
         {

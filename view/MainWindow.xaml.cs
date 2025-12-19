@@ -326,7 +326,8 @@ namespace Elecciones_Europeas
         private void UpdateFaldones(BrainStormDTO dtoAnterior)
         {
             List<PartidoDTO> partidosQueCambian = dtoAnterior.partidos.Except(dto.partidos, new PartidoDTOComparer()).ToList();
-            List<PartidoDTO> partidosQueNoEstan = dtoAnterior.partidos.Where(par => !dto.partidos.Any(par2 => par2.codigo.Equals(par.codigo))).ToList();
+            // Compare using padre instead of codigo
+            List<PartidoDTO> partidosQueNoEstan = dtoAnterior.partidos.Where(par => !dto.partidos.Any(par2 => par2.padre.Equals(par.padre))).ToList();
             if (partidosQueCambian.Count != 0)
             {
                 if (dto.numPartidos != dtoAnterior.numPartidos || partidosQueNoEstan.Count != 0)
@@ -354,7 +355,8 @@ namespace Elecciones_Europeas
             List<PartidoDTO> filtrado = anterior.partidos.Where(par => par.escaniosHasta > 0).ToList();
             for (int i = 0; i < filtrado.Count; i++)
             {
-                if (filtrado[i].codigo != actual.partidos[i].codigo) { return false; }
+                // Compare using padre instead of codigo
+                if (filtrado[i].padre != actual.partidos[i].padre) { return false; }
             }
             return true;
         }
@@ -762,7 +764,7 @@ namespace Elecciones_Europeas
                 cpdatas = CPDataDTO.FromBSDto(dtoSinFiltrar);
                 if (partidoSeleccionado != null)
                 {
-                    partidoSeleccionado = dtoSinFiltrar.partidos.Find(par => par.siglas.Equals(partidoSeleccionado.siglas));
+                    partidoSeleccionado = dtoSinFiltrar.partidos.Find(par => par.padre.Equals(partidoSeleccionado.padre));
                 }
             }
             else { cpdatas = CPDataDTO.FromBSDto(dto); }
@@ -779,7 +781,7 @@ namespace Elecciones_Europeas
                 cpdatas = CPDataDTO.FromBSDto(dtoSinFiltrar);
                 if (partidoSeleccionado != null)
                 {
-                    partidoSeleccionado = dtoSinFiltrar.partidos.Find(par => par.siglas.Equals(partidoSeleccionado.siglas));
+                    partidoSeleccionado = dtoSinFiltrar.partidos.Find(par => par.padre.Equals(partidoSeleccionado.padre));
                 }
             }
             else { cpdatas = CPDataDTO.FromBSDto(dto); }
@@ -895,10 +897,11 @@ namespace Elecciones_Europeas
                         {
                             if (!sedeDentro)
                             {
-                                graficos.SedesEntra(false, partidoSeleccionado.codigo);
+                                // pass padre instead of codigo
+                                graficos.SedesEntra(false, partidoSeleccionado.padre);
                                 dtoDesdeSedes = new BrainStormDTO(dto);
                             }
-                            else { graficos.SedesEncadena(false, partidoSeleccionado.codigo); }
+                            else { graficos.SedesEncadena(false, partidoSeleccionado.padre); }
                             sedeDentro = true;
                         }
                         break;
@@ -961,7 +964,8 @@ namespace Elecciones_Europeas
                     case "SEDES":
                         if (partidoSeleccionado != null)
                         {
-                            graficos.SedesSale(false, partidoSeleccionado.codigo);
+                            // pass padre instead of codigo
+                            graficos.SedesSale(false, partidoSeleccionado.padre);
                             sedeDentro = false;
                             if (tickerDentro)
                             {
@@ -1129,11 +1133,12 @@ namespace Elecciones_Europeas
                 {
                     if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES") && dtoSinFiltrar != null)
                     {
-                        partidoSeleccionado = dtoSinFiltrar.partidos.Find(par => par.codigo.Equals(dataActual.codigo));
+                        // partidoSeleccionado should be looked up by padre (we now set CPDataDTO.codigo = padre)
+                        partidoSeleccionado = dtoSinFiltrar.partidos.Find(par => par.padre.Equals(dataActual.codigo));
                     }
                     else
                     {
-                        partidoSeleccionado = dto.partidos.Find(par => string.Equals(par.codigo, dataActual.codigo));
+                        partidoSeleccionado = dto.partidos.Find(par => string.Equals(par.padre, dataActual.codigo));
                     }
                 }
                 preparado = false;

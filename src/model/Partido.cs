@@ -8,7 +8,10 @@ namespace Elecciones_Europeas.src.model.IPF
 {
     public class Partido
     {
-        public string codigo { get; set; }
+        public string codigo
+        {
+            get; set;
+        }
         public string codigoPadre
         {
             get => codigo;
@@ -16,10 +19,22 @@ namespace Elecciones_Europeas.src.model.IPF
             { /* intentionally ignored - codigo is the source of truth */
             }
         }
-        public string siglas { get; set; }
-        public string nombre { get; set; }
-        public string candidato { get; set; }
-        public int independentismo { get; set; }
+        public string siglas
+        {
+            get; set;
+        }
+        public string nombre
+        {
+            get; set;
+        }
+        public string candidato
+        {
+            get; set;
+        }
+        public int independentismo
+        {
+            get; set;
+        }
 
         ConfigManager configuration;
 
@@ -41,7 +56,8 @@ namespace Elecciones_Europeas.src.model.IPF
         public override string ToString()
         {
             // codigoPadre returns codigo, so this prints codigo for both fields
-            return $"{codigo};{codigoPadre};{siglas};{nombre};{candidato};{independentismo}";
+            string cod = "00" + codigo.Substring(2);
+            return $"{cod};{cod};{siglas};{nombre};{candidato};{independentismo}";
         }
         public async Task ToJson()
         {

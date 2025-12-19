@@ -310,15 +310,16 @@ namespace Elecciones_Europeas.src.mensajes.builders
         public string SedesEntra(bool tickerIn, string codPartido)
         {
             string signal;
+            string cod = "00" + codPartido.Substring(2);
             if (tickerIn)
             {
-                signal = EventBuild("TOTAL/CualPartidoATotal", "MAP_STRING_PAR", $"'{codPartido}'", 1);
+                signal = EventBuild("TOTAL/CualPartidoATotal", "MAP_STRING_PAR", $"'{cod}'", 1);
                 signal += EventBuild($"TOTAL/FCN_INI", "MAP_EXE", 1);
                 signal += EventBuild($"TOTAL/FCN_Total", "MAP_EXE", 1);
             }
             else
             {
-                signal = EventBuild($"SEDES/Partido1", "MAP_STRING_PAR", $"'{codPartido}'", 1);
+                signal = EventBuild($"SEDES/Partido1", "MAP_STRING_PAR", $"'{cod}'", 1);
                 signal += Entra($"SEDES");
             }
             return signal;
@@ -326,15 +327,17 @@ namespace Elecciones_Europeas.src.mensajes.builders
         public string SedesEncadena(bool tickerIn, string codPartidoSiguiente, string codPartidoAnterior)
         {
             string signal;
+            string codAnterior = "00" + codPartidoAnterior.Substring(2);
+            string codSiguiente = "00" + codPartidoSiguiente.Substring(2);
             if (tickerIn)
             {
-                signal = EventBuild("TOTAL/CualPartidoAEncadenar", "MAP_STRING_PAR", $"'{codPartidoSiguiente}'", 1);
+                signal = EventBuild("TOTAL/CualPartidoAEncadenar", "MAP_STRING_PAR", $"'{codSiguiente}'", 1);
                 signal += EventBuild($"TOTAL/FCN_Sube", "MAP_EXE", 1);
                 signal += EventBuild($"TOTAL/FCN_Encad", "MAP_EXE", 1);
             }
             else
             {
-                signal = EventBuild("SEDES/Partido2", "MAP_STRING_PAR", $"'{codPartidoSiguiente}'", 1);
+                signal = EventBuild("SEDES/Partido2", "MAP_STRING_PAR", $"'{codSiguiente}'", 1);
                 signal += EventRunBuild($"SEDES/ENCADENO");
             }
             return signal;

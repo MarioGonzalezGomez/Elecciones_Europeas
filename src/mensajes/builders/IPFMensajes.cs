@@ -1777,7 +1777,6 @@ namespace Elecciones.src.mensajes.builders
 
             return signal.ToString();
         }
-
         /// <summary>
         /// Añade un partido al gráfico ULTIMO_ESCANO en el lado especificado.
         /// </summary>
@@ -1874,7 +1873,6 @@ namespace Elecciones.src.mensajes.builders
 
             return signal.ToString();
         }
-
         /// <summary>
         /// Actualiza el gráfico ULTIMO_ESCANO cuando cambian los datos.
         /// Detecta si los partidos que luchan se han intercambiado (el que tenía el escaño ahora lucha y viceversa).
@@ -1965,7 +1963,6 @@ namespace Elecciones.src.mensajes.builders
 
             return signal.ToString();
         }
-
         /// <summary>
         /// Encadena entre circunscripciones en el gráfico ULTIMO_ESCANO.
         /// Anima la salida, cambia los datos, y anima la entrada.
@@ -2131,7 +2128,6 @@ namespace Elecciones.src.mensajes.builders
 
             return signal.ToString();
         }
-
         /// <summary>
         /// Sale del gráfico ULTIMO_ESCANO y resetea el estado.
         /// </summary>

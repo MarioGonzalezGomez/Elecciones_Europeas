@@ -402,6 +402,28 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(builder.cartonPartidosSale());
         }
 
+        //ULTIMO ESCANO
+        public void ultimoEntra(BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.ultimoEntra(dto));
+        }
+        public void ultimoEncadena(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.ultimoEncadena(dtoAnterior, dto));
+        }
+        public void ultimoActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.ultimoActualiza(dtoAnterior, dto));
+        }
+        public void ultimoEntraPartido(BrainStormDTO dto, PartidoDTO partido, bool esIzquierda)
+        {
+            c.EnviarMensaje(builder.ultimoEntraPartido(dto, partido, esIzquierda));
+        }
+        public void ultimoSale()
+        {
+            c.EnviarMensaje(builder.ultimoSale());
+        }
+
         //SUPERFALDON
         public void superfaldonEntra()
         {

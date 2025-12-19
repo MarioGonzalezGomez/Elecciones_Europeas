@@ -508,6 +508,28 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.cartonPartidosSale(); }
         }
 
+        //ULTIMO
+        public void ultimoEntra(BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoEntra(dto); }
+        }
+        public void ultimoEncadena(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoEncadena(dtoAnterior, dto); }
+        }
+        public void ultimoActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoActualiza(dtoAnterior, dto); }
+        }
+        public void ultimoEntraPartido(BrainStormDTO dto, PartidoDTO partido, bool esIzquierda)
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoEntraPartido(dto, partido, esIzquierda); }
+        }
+        public void ultimoSale()
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoSale(); }
+        }
+
         //SUPERFALDON
         public void superfaldonEntra()
         {

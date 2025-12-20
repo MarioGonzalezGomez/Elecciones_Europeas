@@ -455,8 +455,16 @@ namespace Elecciones
                 else { ipf.ReiniciarConexion(); }
             }
             else { ipf = null; }
+            
+            // Invalidar todos los singletons para que se recreen con la nueva conexion
+            ConexionEntityFramework.InvalidateAllSingletons();
+            
             conexionActiva.CloseConection();
             CambioDeElecciones();
+            
+            // Actualizar el escuchador con la nueva conexion
+            escuchador.ActualizarConexion(conexionActiva);
+            
             EscribirConexiones();
             SeleccionarCircunscripcion();
         }

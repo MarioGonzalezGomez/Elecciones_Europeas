@@ -434,8 +434,8 @@ namespace Elecciones.src.mensajes.builders
             var layoutByCount = new Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)>()
             {
                 {1, (1341, new[] {512}, -1125, 61)},
-                {2, (660, new[] {170,855}, -765, -300)},
-                {3, (435, new[] {56,512,967}, -675, -400)},
+                {2, (660, new[] {170,855}, -675, -390)},
+                {3, (435, new[] {56,512,967}, -795, -279)},
                 {4, (320, new[] {0,341,683,1024}, -621, -441)},
                 {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
                 {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
@@ -531,48 +531,15 @@ namespace Elecciones.src.mensajes.builders
                 var layoutByCount = new Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)>()
                 {
                     {1, (1341, new[] {512}, -1125, 61)},
-                    {2, (660, new[] {170,855}, -765, -300)},
-                    {3, (435, new[] {56,512,967}, -675, -400)},
+                    {2, (660, new[] {170,855}, -675, -390)},
+                    {3, (435, new[] {56,512,967}, -795, -279)},
                     {4, (320, new[] {0,341,683,1024}, -621, -441)},
                     {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
                     {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
                 };
 
-                (int Size, int[] Positions, int LogoPos, int EscanosPos) layoutNuevo;
-
-                if (layoutByCount.ContainsKey(nNuevo))
-                {
-                    layoutNuevo = layoutByCount[nNuevo];
-                }
-                else if (nNuevo >= 1)
-                {
-                    // Fallback: distribuir posiciones linealmente
-                    int left = -60;
-                    int right = 1082;
-                    int[] positions = new int[nNuevo];
-                    if (nNuevo == 1)
-                    {
-                        positions[0] = (left + right) / 2;
-                    }
-                    else
-                    {
-                        double step = (double)(right - left) / (nNuevo - 1);
-                        for (int i = 0; i < nNuevo; i++)
-                        {
-                            positions[i] = (int)Math.Round(left + step * i);
-                        }
-                    }
-
-                    int approxSize = Math.Max(120, 1341 - (nNuevo - 1) * 220);
-                    int approxLogo = -600 - (nNuevo - 1) * 20;
-                    int approxEscanos = 100 - (nNuevo - 1) * 70;
-
-                    layoutNuevo = (approxSize, positions, approxLogo, approxEscanos);
-                }
-                else
-                {
-                    layoutNuevo = (1341, new[] { 512 }, -1125, 61);
-                }
+                // Usar layout definido o fallback a 1 partido (sin calcular posiciones)
+                var layoutNuevo = layoutByCount.ContainsKey(nNuevo) ? layoutByCount[nNuevo] : layoutByCount[1];
 
                 // Actualizar tamaño de la pastilla
                 signal += EventBuild("Pastilla", "PRIM_BAR_LEN[0]", $"{layoutNuevo.Size}", 2, 0.5, 0) + "\n";

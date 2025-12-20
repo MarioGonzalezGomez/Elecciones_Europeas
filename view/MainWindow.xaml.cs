@@ -778,14 +778,6 @@ namespace Elecciones
             graficos.CambioElecciones(europa);
             autonomiasListView.SelectedIndex = 0;
 
-            if (eleccionSeleccionada.Valor == 1)
-            {
-                graficosListView.Items.Remove("SEDES");
-            }
-            else
-            {
-                graficosListView.Items.Add("SEDES");
-            }
         }
 
         //LOGICA BOTONES DE AVANCE

@@ -309,7 +309,7 @@ namespace Elecciones.src.conexion
             try
             {
                 configuration.SetValue("conexionDefault1", _tipoConexion.ToString());
-                main?.EscribirConexiones();
+                main?.Dispatcher.Invoke(() => main.EscribirConexiones());
             }
             catch (Exception ex)
             {

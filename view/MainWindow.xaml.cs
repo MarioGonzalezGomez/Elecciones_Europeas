@@ -358,7 +358,7 @@ namespace Elecciones
         {
             List<PartidoDTO> partidosQueCambian = dtoAnterior.partidos.Except(dto.partidos, new PartidoDTOComparer()).ToList();
             List<PartidoDTO> partidosQueNoEstan = dtoAnterior.partidos.Where(par => !dto.partidos.Any(par2 => par2.codigo.Equals(par.codigo))).ToList();
-            if (partidosQueCambian.Count != 0)
+            if (partidosQueCambian.Count != 0 || dto.numPartidos != dtoAnterior.numPartidos)
             {
                 if (dto.numPartidos != dtoAnterior.numPartidos || partidosQueNoEstan.Count != 0)
                 {
@@ -377,7 +377,10 @@ namespace Elecciones
             }
             graficos.TickerActualizaEscrutado();
             graficos.TickerActualiza(dto);
-            graficos.TickerTDActualiza(dtoAnterior, dto);
+            if (botonera.tickerTDIn)
+            {
+                graficos.TickerTDActualiza(dtoAnterior, dto);
+            }
         }
         private void UpdateCartones(BrainStormDTO dtoAnterior)
         {
@@ -393,6 +396,7 @@ namespace Elecciones
             {
                 graficos.ultimoActualiza(dtoAnterior, dto);
             }
+            graficos.CartonesActualiza();
         }
         private void UpdateSuperfaldones()
         {

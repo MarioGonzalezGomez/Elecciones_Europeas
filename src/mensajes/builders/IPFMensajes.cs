@@ -64,15 +64,14 @@ namespace Elecciones.src.mensajes.builders
         //CAMBIO ENTRE OFI Y SONDEO
         public string SondeoUOficial(bool oficiales)
         {
-            // return oficiales ? EventBuild("Sondeo_Oficiales", "MAP_INT_PAR", "1", 1) : EventBuild("Sondeo_Oficiales", "MAP_INT_PAR", "0", 1);
-            return "";
+            return oficiales ? EventBuild("Sondeo_Oficiales", "MAP_INT_PAR", "1", 1) : EventBuild("Sondeo_Oficiales", "MAP_INT_PAR", "0", 1);
         }
 
         //ANIMACIONES
-        public void PrimerosResultados(bool activo)
+        public string PrimerosResultados(bool activo)
         {
             animacionPrimeros = activo;
-            //return activo ? EventBuild("PRIMEROS", "MAP_INT_PAR", "1", 1) : EventBuild("PRIMEROS", "MAP_INT_PAR", "0", 1);
+            return activo ? EventBuild("PRIMEROS", "MAP_INT_PAR", "1", 1) : EventBuild("PRIMEROS", "MAP_INT_PAR", "0", 1);
         }
         public void AnimacionSondeo(bool activo)
         {
@@ -182,6 +181,7 @@ namespace Elecciones.src.mensajes.builders
             codigos.ForEach(cod =>
             {
                 signal.Append(EventBuild($"TICKER/{cod}/YaNoEsta", "MAP_INT_PAR", "1", 1));
+                signal.Append(EventBuild($"TICKER/PARTIDOS/{cod}", "OBJ_CULL", "1", 2, 0.2, 0));
             }
                 );
             return signal.ToString();
@@ -227,6 +227,37 @@ namespace Elecciones.src.mensajes.builders
         public string TickerFotosSale()
         {
             return EventRunBuild("TICKER/FOTOS/SALE");
+        }
+
+        public string VideoIn(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
+        {
+            string signal = "";
+            signal += EventBuild($"TICKER/FNC_Video{partidoSeleccionado.codigo}", "MAP_EXE");
+            return signal;
+        }
+        public string VideoOut(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
+        {
+            string signal = "";
+            signal += EventBuild($"TICKER/FNC_CierroVideo{partidoSeleccionado.codigo}", "MAP_EXE");
+            return signal;
+        }
+        public string VideoOutTodos(BrainStormDTO dto)
+        {
+            string signal = "";
+            foreach (var partido in dto.partidos)
+            {
+                signal += signal += EventBuild($"TICKER/FNC_CierroVideo{partido.codigo}", "MAP_EXE") + "\n";
+            }
+            return signal;
+        }
+        public string VideoInTodos(BrainStormDTO dto)
+        {
+            string signal = "";
+            foreach (var partido in dto.partidos)
+            {
+                signal += signal += EventBuild($"TICKER/FNC_Video{partido.codigo}", "MAP_EXE") + "\n";
+            }
+            return signal;
         }
         //TICKER VERSION PAULA
         //   public string TickerEntra(bool oficial, BrainStormDTO dto)
@@ -457,7 +488,7 @@ namespace Elecciones.src.mensajes.builders
                 if (siglasActivos.Contains(siglaRaw))
                 {
                     PartidoDTO temp = dto.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
-                    signal += Oculta_Desoculta(false, $"Partidos/{siglaObj}") + "\n";
+                    signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "0", 2, 0.2, 0) + "\n";
                     signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escaniosHasta}'", 2, 0.5, 0) + "\n";
                 }
                 else
@@ -488,6 +519,10 @@ namespace Elecciones.src.mensajes.builders
 
             // local helper to normalize object names (PUM+J -> PUM_J etc.)
             static string Esc(string s) => s?.Replace("+", "_") ?? s;
+
+            // Identificar partidos que salen y que entran
+            var siglasQueSalen = siglasAnteriores.Except(siglasNuevas).ToList();
+            var siglasQueEntran = siglasNuevas.Except(siglasAnteriores).ToList();
 
             if (nAnterior != nNuevo)
             {
@@ -596,7 +631,7 @@ namespace Elecciones.src.mensajes.builders
                     {
                         // Partido no activo en el nuevo estado: ocultarlo con delay
                         signal += EventBuild($"Partidos/{Esc(siglaRaw)}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
-                        signal += Oculta_Desoculta(true, $"Partidos/{Esc(siglaRaw)}") + "\n";
+                        signal += EventBuild($"Partidos/{Esc(siglaRaw)}", "OBJ_CULL", "1", 2, 0.3, 0) + "\n";
                         signal += EventBuild($"Escaños/{Esc(siglaRaw)}", "TEXT_STRING", "'0'", 2, 0.5, 0) + "\n";
                     }
                 }
@@ -642,6 +677,34 @@ namespace Elecciones.src.mensajes.builders
                             // El partido baja pero no cambia completamente
                             signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
                         }
+
+                        // Actualizar escaños
+                        PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
+                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escaniosHasta}'", 2, 0.5, 0) + "\n";
+                    }
+                }
+
+                // Ocultar partidos que ya no están
+                foreach (var siglaRaw in siglasQueSalen)
+                {
+                    var siglaObj = Esc(siglaRaw);
+                    signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
+                    signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "1", 2, 0.3, 0) + "\n";
+                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", "'0'", 2, 0.5, 0) + "\n";
+                }
+
+                // Mostrar partidos nuevos
+                foreach (var siglaRaw in siglasQueEntran)
+                {
+                    var siglaObj = Esc(siglaRaw);
+                    signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "0", 1) + "\n";
+
+                    // Obtener su posición en el nuevo DTO
+                    if (newActiveIndex.TryGetValue(siglaRaw, out int newPosIndex) && newPosIndex >= 0)
+                    {
+                        var layout2 = layoutByCount[nNuevo];
+                        int newPos = layout2.Positions[newPosIndex];
+                        signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
 
                         // Actualizar escaños
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
@@ -1177,6 +1240,11 @@ namespace Elecciones.src.mensajes.builders
             return Sale("PARTICIPACION");
         }
 
+        public string CartonesActualiza()
+        {
+            string codigoMap = "Oficial_Codigo";
+            return EventBuild(codigoMap, "MAP_LLSTRING_LOAD");
+        }
         //CCAA
         public string ccaaEntra(BrainStormDTO dto)
         {
@@ -1586,7 +1654,7 @@ namespace Elecciones.src.mensajes.builders
                 int posicion = i * -100;
                 signal.Append(EventBuild($"Mapa_Mayorias/Fichas/{siglas[i]}", "OBJ_DISPLACEMENT[2]", $"{posicion}", 1) + "\n");
                 // Ensure the ficha is visible (we keep fichas visible as before)
-                signal.Append(EventBuild($"Mapa_Mayorias/Fichas/{siglas[i]}", "OBJ_CULL", "0", 1) + "\n");
+                signal.Append(EventBuild($"Mapa_Mayorias/Fichas/{siglas[i]}", "OBJ_CULL", "0", 2, 0, 0.5) + "\n");
             }
 
             // Show/hide the page indicators according to number of partidos.
@@ -1665,7 +1733,7 @@ namespace Elecciones.src.mensajes.builders
 
                 sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_DISPLACEMENT", tuple, 1) + "\n");
                 // Ensure visible
-                sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_CULL", "0", 1) + "\n");
+                sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_CULL", "0", 2, 0, 0.5) + "\n");
             }
 
             // Enter carton
@@ -1833,7 +1901,6 @@ namespace Elecciones.src.mensajes.builders
 
                 CircunscripcionPartido? cpUltimo = cpList?.FirstOrDefault(cp => cp.esUltimoEscano == 1);
                 CircunscripcionPartido? cpLucha = cpList?.FirstOrDefault(cp => cp.luchaUltimoEscano == 1);
-                CircunscripcionPartido? cpResto = cpList?.FirstOrDefault(cp => cp.restoVotos != -1);
 
                 // Obtener siglas de los partidos
                 if (cpUltimo != null)
@@ -1873,9 +1940,9 @@ namespace Elecciones.src.mensajes.builders
                 }
 
                 // Mostrar la diferencia de votos
-                if (cpResto != null && cpResto.restoVotos != -1)
+                if (cpLucha != null && cpLucha.restoVotos != -1)
                 {
-                    signal.Append(EventBuild("Diferencia", "MAP_FLOAT_PAR", $"{cpResto.restoVotos}", 1) + "\n");
+                    signal.Append(EventBuild("Diferencia", "MAP_FLOAT_PAR", $"{cpLucha.restoVotos}", 1) + "\n");
                 }
                 else
                 {
@@ -1960,11 +2027,11 @@ namespace Elecciones.src.mensajes.builders
                 {
                     if (anchoPartido < THRESHOLD_ANCHO_PEQUENO)
                     {
-                        signal.Append(EventBuild("OBJ_DISPLACEMENT3", "BIND_VOFFSET[0]", "120", 1) + "\n");
+                        signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "120", 1) + "\n");
                     }
                     else
                     {
-                        signal.Append(EventBuild("OBJ_DISPLACEMENT3", "BIND_VOFFSET[0]", "0", 0) + "\n");
+                        signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "0", 0) + "\n");
                     }
                 }
             }
@@ -1977,11 +2044,11 @@ namespace Elecciones.src.mensajes.builders
                 {
                     if (anchoPartido < THRESHOLD_ANCHO_PEQUENO)
                     {
-                        signal.Append(EventBuild("OBJ_DISPLACEMENT4", "BIND_VOFFSET[0]", "-70", 1) + "\n");
+                        signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "-70", 1) + "\n");
                     }
                     else
                     {
-                        signal.Append(EventBuild("OBJ_DISPLACEMENT4", "BIND_VOFFSET[0]", "46", 1) + "\n");
+                        signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "46", 1) + "\n");
                     }
                 }
             }
@@ -2513,6 +2580,7 @@ namespace Elecciones.src.mensajes.builders
         {
             return EventRunBuild($"{objeto}/SALE");
         }
+
 
     }
 }

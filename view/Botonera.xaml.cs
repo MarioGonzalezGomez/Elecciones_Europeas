@@ -32,6 +32,8 @@ namespace Elecciones
         bool histIn;
         bool millonesIn;
 
+        public bool tickerTDIn = false;
+
         public Botonera()
         {
             InitializeComponent();
@@ -121,12 +123,15 @@ namespace Elecciones
             histIn = true;
         }
         private void btnMillones_Click(object sender, RoutedEventArgs e)
-        {
-            gController.TickerMillonesEntra();
+        {   //ENTRA FOTOS
+            //gController.TickerMillonesEntra();
+            gController.TickerFotosEntra();
         }
         private void btnHistoricosCom_Click(object sender, RoutedEventArgs e)
         {
-            gController.TickerHistoricosEntraCom();
+            //SALE FOTOS
+            //gController.TickerHistoricosEntraCom();
+            gController.TickerFotosSale();
         }
 
         #endregion
@@ -135,19 +140,34 @@ namespace Elecciones
 
         private void btnVideoIn_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
+            if (main.partidoSeleccionado != null)
+            {
+                gController.VideoIn(main.dto, main.partidoSeleccionado);
+            }
             // TODO: Implementar Video In
+
         }
         private void btnVideoOut_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
+            if (main.partidoSeleccionado != null)
+            {
+                gController.VideoOut(main.dto, main.partidoSeleccionado);
+            }
             // TODO: Implementar Video Out
         }
 
         private void btnEntranTodos_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
+            gController.VideoInTodos(main.dto);
             // TODO: Implementar Entran Todos
         }
         private void btnSalenTodos_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
+            gController.VideoOutTodos(main.dto);
             // TODO: Implementar Salen Todos
         }
 
@@ -160,11 +180,13 @@ namespace Elecciones
             main = Application.Current.MainWindow as MainWindow;
             gController.TickerTDEntra(main.dto);
             gController.SubirRotulosPrimeTD();
+            tickerTDIn = true;
         }
         private void btnSaleTD_Click(object sender, RoutedEventArgs e)
         {
             gController.TickerTDSale();
             gController.BajarRotulosPrimeTD();
+            tickerTDIn = false;
         }
 
         private void btnEntraEspecial_Click(object sender, RoutedEventArgs e)

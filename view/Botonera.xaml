@@ -45,11 +45,11 @@
                             <!-- Primera fila: 3 botones -->
                             <Grid Margin="0,0,0,6">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="0"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Button x:Name="btnEscanos" Content="Escaños" Grid.Column="0" Margin="2" Padding="8,6"
+                                <Button x:Name="btnEscanos" Content="Escaños" Grid.Column="0" Margin="2" Padding="8,6" Visibility="Collapsed"
                                         Background="{DynamicResource PrimaryHueMidBrush}" Foreground="White"
                                         Click="btnEscanos_Click"/>
                                 <Button x:Name="btnPorcentajeVoto" Content="% Voto" Grid.Column="1" Margin="2" Padding="8,6"
@@ -65,10 +65,10 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Button x:Name="btnMillones" Content="Millones" Grid.Column="0" Margin="2" Padding="8,6" Visibility="Collapsed"
+                                <Button x:Name="btnMillones" Content="Entra Fotos" Grid.Column="0" Margin="2" Padding="8,6" 
                                         Background="{DynamicResource PrimaryHueLightBrush}"
                                         Click="btnMillones_Click"/>
-                                <Button x:Name="btnHistoricosCom" Content="Históricos Com" Grid.Column="1" Margin="2" Padding="8,6" Visibility="Collapsed"
+                                <Button x:Name="btnHistoricosCom" Content="Sale Fotos" Grid.Column="1" Margin="2" Padding="8,6" 
                                         Background="{DynamicResource PrimaryHueLightBrush}"
                                         Click="btnHistoricosCom_Click"/>
                             </Grid>

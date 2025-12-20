@@ -308,6 +308,25 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.TickerFotosSale(); }
         }
 
+        //VIDEOS EN TICKER
+        public void VideoIn(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
+        {
+            if (ipfActivo.Valor == 1) { ipf.VideoIn(dto, partidoSeleccionado); }
+        }
+        public void VideoOut(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
+        {
+            if (ipfActivo.Valor == 1) { ipf.VideoOut(dto, partidoSeleccionado); }
+        }
+        public void VideoOutTodos(BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.VideoOutTodos(dto); }
+        }
+        public void VideoInTodos(BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.VideoInTodos(dto); }
+        }
+
+
         //TICKER TD
         public void TickerTDEntra(BrainStormDTO dto)
         {
@@ -427,6 +446,12 @@ namespace Elecciones.src.controller
 
         //CARTONES
         //PARTICIPACION
+
+        internal void CartonesActualiza()
+        {
+            if (ipfActivo.Valor == 1) { ipf.CartonesActualiza(); }
+        }
+
         public void participacionEntra(BrainStormDTO dto, int avance)
         {
             if (ipfActivo.Valor == 1) { ipf.participacionEntra(dto, avance); }
@@ -642,5 +667,7 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.sfGanadorSale(); }
         }
+
+      
     }
 }

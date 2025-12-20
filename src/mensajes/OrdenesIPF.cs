@@ -205,6 +205,23 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(builder.TickerFotosSale());
         }
 
+        public void VideoIn(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
+        {
+            c.EnviarMensaje(builder.VideoIn(dto, partidoSeleccionado));
+        }
+        public void VideoOut(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
+        {
+            c.EnviarMensaje(builder.VideoOut(dto, partidoSeleccionado));
+        }
+        public void VideoOutTodos(BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.VideoOutTodos(dto));
+        }
+        public void VideoInTodos(BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.VideoInTodos(dto));
+        }
+
         //TICKER TD
         public void TickerTDEntra(BrainStormDTO dto)
         {
@@ -326,6 +343,11 @@ namespace Elecciones.src.mensajes
 
         //CARTONES
         //PARTICIPACION
+        public void CartonesActualiza()
+        {
+            c.EnviarMensaje(builder.CartonesActualiza());
+        }
+
         public void participacionEntra(BrainStormDTO dto, int avance)
         {
             c.EnviarMensaje(builder.participacionEntra(dto, avance));
@@ -537,5 +559,7 @@ namespace Elecciones.src.mensajes
         {
             c.EnviarMensaje(builder.sfGanadorSale());
         }
+
+       
     }
 }

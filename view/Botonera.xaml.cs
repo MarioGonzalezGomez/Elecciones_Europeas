@@ -28,6 +28,10 @@ namespace Elecciones
         ConfigManager configuration;
         private MainWindow main;
 
+        bool votosIn;
+        bool histIn;
+        bool millonesIn;
+
         public Botonera()
         {
             InitializeComponent();
@@ -90,15 +94,31 @@ namespace Elecciones
 
         private void btnEscanos_Click(object sender, RoutedEventArgs e)
         {
-            gController.TickerEscanosEntra();
+            main = Application.Current.MainWindow as MainWindow;
+            if (votosIn)
+            {
+                gController.TickerVotosSale(main.oficiales);
+                votosIn = false;
+            }
+            if (histIn)
+            {
+                gController.TickerHistoricosSale(main.oficiales);
+                histIn = false;
+            }
+            // gController.TickerEscanosEntra();
         }
         private void btnPorcentajeVoto_Click(object sender, RoutedEventArgs e)
         {
-            gController.TickerVotosEntra();
+            main = Application.Current.MainWindow as MainWindow;
+            gController.TickerVotosEntra(main.oficiales);
+            votosIn = true;
         }
         private void btnHistoricos_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
+            gController.TickerHistoricosEntra(main.oficiales);
             gController.TickerHistoricosEntraInd();
+            histIn = true;
         }
         private void btnMillones_Click(object sender, RoutedEventArgs e)
         {
@@ -150,13 +170,14 @@ namespace Elecciones
         private void btnEntraEspecial_Click(object sender, RoutedEventArgs e)
         {
             main = Application.Current.MainWindow as MainWindow;
-            gController.TickerTDEntra(main.dto);
             gController.SubirRotulosPrimeEsp();
+            gController.TickerEntra(main.oficiales, main.dto);
         }
         private void btnSaleEspecial_Click(object sender, RoutedEventArgs e)
         {
-            gController.TickerTDSale();
+            main = Application.Current.MainWindow as MainWindow;
             gController.BajarRotulosPrimeEsp();
+            gController.TickerSale(main.oficiales);
         }
 
         #endregion

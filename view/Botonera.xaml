@@ -65,10 +65,10 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Button x:Name="btnMillones" Content="Millones" Grid.Column="0" Margin="2" Padding="8,6"
+                                <Button x:Name="btnMillones" Content="Millones" Grid.Column="0" Margin="2" Padding="8,6" Visibility="Collapsed"
                                         Background="{DynamicResource PrimaryHueLightBrush}"
                                         Click="btnMillones_Click"/>
-                                <Button x:Name="btnHistoricosCom" Content="Históricos Com" Grid.Column="1" Margin="2" Padding="8,6"
+                                <Button x:Name="btnHistoricosCom" Content="Históricos Com" Grid.Column="1" Margin="2" Padding="8,6" Visibility="Collapsed"
                                         Background="{DynamicResource PrimaryHueLightBrush}"
                                         Click="btnHistoricosCom_Click"/>
                             </Grid>

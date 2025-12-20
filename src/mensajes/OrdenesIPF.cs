@@ -90,7 +90,8 @@ namespace Elecciones.src.mensajes
         //TIMER
         public void RelojEntra(int segundos)
         {
-            c.EnviarMensaje(builder.EntraReloj(segundos));
+            c.EnviarMensaje(builder.EntraReloj());
+            //  c.EnviarMensaje(builder.EntraReloj(segundos));
         }
         public void RelojSale()
         {
@@ -100,15 +101,18 @@ namespace Elecciones.src.mensajes
         //TICKER
         public void TickerEntra(bool oficial, BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.TickerEntra(oficial, dto));
+            c.EnviarMensaje(builder.TickerEntra(oficial));
+            //  c.EnviarMensaje(builder.TickerEntra(oficial, dto));
         }
         public void TickerEncadena(bool oficial, BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.TickerEncadena(oficial, dto));
+            c.EnviarMensaje(builder.TickerEncadena(oficial));
+            // c.EnviarMensaje(builder.TickerEncadena(oficial, dto));
         }
         public void TickerActualiza(BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.TickerActualiza(dto));
+            c.EnviarMensaje(builder.TickerActualiza());
+            //c.EnviarMensaje(builder.TickerActualiza(dto));
         }
         public void TickerSale(bool oficial)
         {
@@ -143,35 +147,45 @@ namespace Elecciones.src.mensajes
 
         public void TickerEscanosEntra()
         {
-            c.EnviarMensaje(builder.TickerEscanosEntra());
+            // c.EnviarMensaje(builder.TickerEscanosEntra());
         }
         public void TickerEscanosSale()
         {
-            c.EnviarMensaje(builder.TickerEscanosSale());
+            // c.EnviarMensaje(builder.TickerEscanosSale());
         }
-        public void TickerVotosEntra()
+        public void TickerVotosEntra(bool oficiales)
         {
-            c.EnviarMensaje(builder.TickerVotosEntra());
+            c.EnviarMensaje(builder.TickerVotosEntra(oficiales));
         }
-        public void TickerVotosSale()
+        public void TickerVotosSale(bool oficiales)
         {
-            c.EnviarMensaje(builder.TickerVotosSale());
+            c.EnviarMensaje(builder.TickerVotosSale(oficiales));
+            // c.EnviarMensaje(builder.TickerVotosSale());
+        }
+        public void TickerHistoricosEntra(bool oficiales)
+        {
+            c.EnviarMensaje(builder.TickerHistoricosEntra(oficiales));
+            // c.EnviarMensaje(builder.TickerHistoricosEntraInd());
+        }
+        public void TickerHistoricosSale(bool oficiales)
+        {
+            c.EnviarMensaje(builder.TickerHistoricosSale(oficiales));
         }
         public void TickerHistoricosEntraInd()
         {
-            c.EnviarMensaje(builder.TickerHistoricosEntraInd());
+            // c.EnviarMensaje(builder.TickerHistoricosEntraInd());
         }
         public void TickerHistoricosSaleInd()
         {
-            c.EnviarMensaje(builder.TickerHistoricosSaleInd());
+            //c.EnviarMensaje(builder.TickerHistoricosSaleInd());
         }
         public void TickerHistoricosEntraCom()
         {
-            c.EnviarMensaje(builder.TickerHistoricosEntraCom());
+            //  c.EnviarMensaje(builder.TickerHistoricosEntraCom());
         }
         public void TickerHistoricosSaleCom()
         {
-            c.EnviarMensaje(builder.TickerHistoricosSaleCom());
+            //  c.EnviarMensaje(builder.TickerHistoricosSaleCom());
         }
         public void TickerMillonesEntra()
         {
@@ -297,7 +311,8 @@ namespace Elecciones.src.mensajes
         //SEDES
         public void SedesEntra(bool tickerIn, BrainStormDTO dto, PartidoDTO seleccionado)
         {
-            c.EnviarMensaje(builder.SedesEntra(tickerIn, dto, seleccionado));
+            c.EnviarMensaje(builder.SedesEntra(tickerIn, seleccionado.codigo));
+            // c.EnviarMensaje(builder.SedesEntra(tickerIn, dto, seleccionado));
         }
         public void SedesEncadena(bool tickerIn, string codPartidoSiguiente, string codPartidoAnterior)
         {

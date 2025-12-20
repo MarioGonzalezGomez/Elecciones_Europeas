@@ -256,18 +256,28 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.TickerEscanosSale(); }
         }
-        public void TickerVotosEntra()
+        public void TickerVotosEntra(bool oficiales)
         {
-            if (ipfActivo.Valor == 1) { ipf.TickerVotosEntra(); }
+            if (ipfActivo.Valor == 1) { ipf.TickerVotosEntra(oficiales); }
+            //if (ipfActivo.Valor == 1) { ipf.TickerVotosEntra(); }
         }
-        public void TickerVotosSale()
+        public void TickerVotosSale(bool oficiales)
         {
-            if (ipfActivo.Valor == 1) { ipf.TickerVotosSale(); }
+            if (ipfActivo.Valor == 1) { ipf.TickerVotosSale(oficiales); }
+        }
+        public void TickerHistoricosEntra(bool oficiales)
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerHistoricosEntra(oficiales); }
+        }
+        public void TickerHistoricosSale(bool oficiales)
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerHistoricosSale(oficiales); }
         }
         public void TickerHistoricosEntraInd()
         {
             if (ipfActivo.Valor == 1) { ipf.TickerHistoricosEntraInd(); }
         }
+
         public void TickerHistoricosSaleInd()
         {
             if (ipfActivo.Valor == 1) { ipf.TickerHistoricosSaleInd(); }

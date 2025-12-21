@@ -1474,12 +1474,7 @@ namespace Elecciones
                         graficos.SedesSale(false);
                         //   }
                         sedeDentro = false;
-                        //if (tickerDentro)
-                        //{
-                        //    Update(true);
                         //}
-                        //}
-                        sedeDentro = false;
                         if (dto != null)
                         {
                             ObtenerDTO(true, dto.circunscripcionDTO.nombre);

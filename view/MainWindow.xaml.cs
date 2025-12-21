@@ -251,6 +251,7 @@ namespace Elecciones
                     //graficosListView.Items.Add("VS");
                     graficosListView.Items.Add("CARTÓN PARTIDOS");
                     graficosListView.Items.Add("ÚLTIMO ESCAÑO");
+                    graficosListView.Items.Add("ÚLTIMO SUPERFALDÓN");
                     break;
                 case 3:
                     graficosListView.Items.Add("FICHAS");
@@ -333,7 +334,7 @@ namespace Elecciones
                 {
                     if (desdeSede) { dtoAnterior = new BrainStormDTO(dtoDesdeSedes); }
                     else { dtoAnterior = new BrainStormDTO(dto); }
-
+                    dtoAnterior = new BrainStormDTO(dto);
                     seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
 
                     // Determine whether we should request the filtered DTO for UI (true) or the unfiltered one (false).
@@ -455,16 +456,16 @@ namespace Elecciones
                 else { ipf.ReiniciarConexion(); }
             }
             else { ipf = null; }
-            
+
             // Invalidar todos los singletons para que se recreen con la nueva conexion
             ConexionEntityFramework.InvalidateAllSingletons();
-            
+
             conexionActiva.CloseConection();
             CambioDeElecciones();
-            
+
             // Actualizar el escuchador con la nueva conexion
             escuchador.ActualizarConexion(conexionActiva);
-            
+
             EscribirConexiones();
             SeleccionarCircunscripcion();
         }
@@ -1302,10 +1303,10 @@ namespace Elecciones
                 {
                     case "CUENTA ATRÁS":
                         int segundos = CalcularSegundosHastaHora();
-                        if (segundos > 0)
-                        {
-                            graficos.EntraReloj(segundos);
-                        }
+                        // if (segundos > 0)
+                        // {
+                        graficos.EntraReloj(segundos);
+                        // }
                         break;
                     case "FICHAS":
                         if (sondeoEnElAire && oficiales)
@@ -1401,6 +1402,9 @@ namespace Elecciones
                             ultimoEscanoDentro = true;
                         }
                         break;
+                    case "ÚLTIMO SUPERFALDÓN":
+                        graficos.ultimoSuperEntra();
+                        break;
 
                     default: break;
                 }
@@ -1458,22 +1462,22 @@ namespace Elecciones
                         tickerDentro = false;
                         break;
                     case "SEDES":
-                        if (partidoSeleccionado != null)
-                        {
-                            if (partidoSeleccionado.escaniosHasta > 0)
-                            {
-                                graficos.SedesSale(tickerDentro);
-                            }
-                            else
-                            {
-                                graficos.SedesSale(false);
-                            }
-                            sedeDentro = false;
-                            if (tickerDentro)
-                            {
-                                Update(true);
-                            }
-                        }
+                        // if (partidoSeleccionado != null)
+                        // {
+                        //   if (partidoSeleccionado.escaniosHasta > 0)
+                        //  {
+                        //      graficos.SedesSale(tickerDentro);
+                        //  }
+                        //  else
+                        //  {
+                        graficos.SedesSale(false);
+                        //   }
+                        sedeDentro = false;
+                        //if (tickerDentro)
+                        //{
+                        //    Update(true);
+                        //}
+                        //}
                         break;
                     case "INDEPENDENTISMO":
                         graficos.independentismoSale();
@@ -1522,7 +1526,9 @@ namespace Elecciones
                         graficos.ultimoSale();
                         ultimoEscanoDentro = false;
                         break;
-
+                    case "ÚLTIMO SUPERFALDÓN":
+                        graficos.ultimoSuperSale();
+                        break;
                     default: break;
                 }
             }
@@ -1566,18 +1572,35 @@ namespace Elecciones
         private void chkPrimerosResultados_Checked(object sender, RoutedEventArgs e)
         {
             primerosResultadosActivo = true;
+            if (graficos != null)
+            {
+                graficos.PrimerosResultados(true);
+            }
+
         }
         private void chkPrimerosResultados_Unchecked(object sender, RoutedEventArgs e)
         {
             primerosResultadosActivo = false;
+            if (graficos != null)
+            {
+                graficos.PrimerosResultados(false);
+            }
         }
         private void chkSondeoAnimado_Checked(object sender, RoutedEventArgs e)
         {
             sondeoAnimadoActivo = true;
+            if (graficos != null)
+            {
+                graficos.AnimacionSondeo(true);
+            }
         }
         private void chkSondeoAnimado_Unchecked(object sender, RoutedEventArgs e)
         {
             sondeoAnimadoActivo = false;
+            if (graficos != null)
+            {
+                graficos.AnimacionSondeo(false);
+            }
         }
         private void timePickerCuentaAtras_SelectedTimeChanged(object sender, RoutedPropertyChangedEventArgs<DateTime?> e)
         {

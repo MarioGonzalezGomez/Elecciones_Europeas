@@ -202,6 +202,11 @@ namespace Elecciones
             gController.TickerSale(main.oficiales);
         }
 
+        private void btnDespliega4_Click(object sender, RoutedEventArgs e)
+        {
+            gController.Despliega4();
+        }
+
         #endregion
 
         #region Grupo 2: Mayoría y CCAA

@@ -570,6 +570,17 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.ultimoSale(); }
         }
 
+        //ULTIMO SUPERFADON
+
+        public void ultimoSuperEntra()
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoSuperEntra(); }
+        }
+        public void ultimoSuperSale()
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoSuperSale(); }
+        }
+
         //SUPERFALDON
         public void superfaldonEntra()
         {
@@ -667,7 +678,5 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.sfGanadorSale(); }
         }
-
-      
     }
 }

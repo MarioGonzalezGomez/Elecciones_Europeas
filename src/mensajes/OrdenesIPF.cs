@@ -53,11 +53,11 @@ namespace Elecciones.src.mensajes
         //ANIMACIONES
         public void PrimerosResultados(bool activo)
         {
-            builder.PrimerosResultados(activo);
+            c.EnviarMensaje(builder.PrimerosResultados(activo));
         }
         public void AnimacionSondeo(bool activo)
         {
-            builder.AnimacionSondeo(activo);
+            c.EnviarMensaje(builder.AnimacionSondeo(activo));
         }
 
         public string RecibirPrimerosResultados()
@@ -466,6 +466,17 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(builder.ultimoSale());
         }
 
+        //ULTIMO SUPERFALDON
+
+        public void ultimoSuperEntra()
+        {
+            c.EnviarMensaje(builder.ultimoSuperEntra());
+        }
+        public void ultimoSuperSale()
+        {
+            c.EnviarMensaje(builder.ultimoSuperSale());
+        }
+
         //SUPERFALDON
         public void superfaldonEntra()
         {
@@ -560,6 +571,5 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(builder.sfGanadorSale());
         }
 
-       
     }
 }

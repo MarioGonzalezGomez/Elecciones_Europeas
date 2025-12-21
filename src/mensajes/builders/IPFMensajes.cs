@@ -2048,106 +2048,213 @@ namespace Elecciones.src.mensajes.builders
         /// </summary>
         public string ultimoActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dtoNuevo)
         {
-            //if (dtoNuevo == null) return "";
-            //
-            //StringBuilder signal = new StringBuilder();
-            //
-            //try
-            //{
-            //    using var con = new ConexionEntityFramework();
-            //    var cpList = CPController.GetInstance(con).FindByIdCircunscripcionOficial(dtoNuevo.circunscripcionDTO.codigo);
-            //
-            //    CircunscripcionPartido? cpUltimoNuevo = cpList?.FirstOrDefault(cp => cp.esUltimoEscano == 1);
-            //    CircunscripcionPartido? cpLuchaNuevo = cpList?.FirstOrDefault(cp => cp.luchaUltimoEscano == 1);
-            //    CircunscripcionPartido? cpRestoNuevo = cpList?.FirstOrDefault(cp => cp.restoVotos != -1);
-            //
-            //    string nuevoSiglasUltimo = "";
-            //    string nuevoSiglasLucha = "";
-            //
-            //    if (cpUltimoNuevo != null)
-            //    {
-            //        Partido? p = PartidoController.GetInstance(con).FindById(cpUltimoNuevo.codPartido);
-            //        if (p != null) nuevoSiglasUltimo = p.siglas.Replace("+", "_").Replace("-", "_");
-            //    }
-            //    if (cpLuchaNuevo != null)
-            //    {
-            //        Partido? p = PartidoController.GetInstance(con).FindById(cpLuchaNuevo.codPartido);
-            //        if (p != null) nuevoSiglasLucha = p.siglas.Replace("+", "_").Replace("-", "_");
-            //    }
-            //
-            //    // Detectar intercambio: el que tenía el escaño ahora lucha y viceversa
-            //    bool intercambio = !string.IsNullOrEmpty(siglasUltimoEscano) &&
-            //                       !string.IsNullOrEmpty(siglasLuchaEscano) &&
-            //                       siglasUltimoEscano == nuevoSiglasLucha &&
-            //                       siglasLuchaEscano == nuevoSiglasUltimo;
-            //
-            //    if (intercambio)
-            //    {
-            //        // Animar el intercambio de posiciones (0.5 segundos)
-            //
-            //        // El que antes tenía el escaño (siglasUltimoEscano) ahora lucha -> mover atrás
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[0]", "-154", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[1]", "0.1", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[0]", "0.86", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[1]", "0.86", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[2]", "0.86", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}/Escano", "OBJ_CULL", "1", 2, 0.5, 0) + "\n");
-            //
-            //        // El que antes luchaba (siglasLuchaEscano) ahora tiene el escaño -> mover adelante
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[0]", "-94", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[2]", "326", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[0]", "1", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[1]", "1", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[2]", "1", 2, 0.5, 0) + "\n");
-            //        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}/Escano", "OBJ_CULL", "0", 2, 0.5, 0) + "\n");
-            //
-            //        // Actualizar estado
-            //        siglasUltimoEscano = nuevoSiglasUltimo;
-            //        siglasLuchaEscano = nuevoSiglasLucha;
-            //    }
-            //    else if (nuevoSiglasUltimo != siglasUltimoEscano || nuevoSiglasLucha != siglasLuchaEscano)
-            //    {
-            //        // Cambio diferente (no un simple intercambio), actualizar directamente
-            //        if (!string.IsNullOrEmpty(nuevoSiglasUltimo))
-            //        {
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_DISPLACEMENT[0]", "-94", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_DISPLACEMENT[2]", "326", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_SCALE[0]", "1", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_SCALE[1]", "1", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_SCALE[2]", "1", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}/Escano", "OBJ_CULL", "0", 2, 0.5, 0) + "\n");
-            //        }
-            //        if (!string.IsNullOrEmpty(nuevoSiglasLucha))
-            //        {
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_DISPLACEMENT[0]", "-154", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_DISPLACEMENT[1]", "0.1", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_SCALE[0]", "0.86", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_SCALE[1]", "0.86", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_SCALE[2]", "0.86", 2, 0.5, 0) + "\n");
-            //            signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}/Escano", "OBJ_CULL", "0", 2, 0.5, 0) + "\n");
-            //
-            //            siglasUltimoEscano = nuevoSiglasUltimo;
-            //            siglasLuchaEscano = nuevoSiglasLucha;
-            //        }
-            //    }
-            //
-            //    // Actualizar diferencia de votos
-            //    if (cpRestoNuevo != null && cpRestoNuevo.restoVotos != -1)
-            //    {
-            //        signal.Append(EventBuild("Diferencia", "MAP_FLOAT_PAR", $"{cpRestoNuevo.restoVotos}", 2, 0.5, 0) + "\n");
-            //    }
-            //}
-            //catch (Exception)
-            //{
-            //    // Si hay error, devolver vacío
-            //}
-            //
-            //return signal.ToString();
-            return "";
+            if (dtoNuevo == null) return "";
+
+            StringBuilder signal = new StringBuilder();
+
+            try
+            {
+                using var con = new ConexionEntityFramework();
+                var cpList = CPController.GetInstance(con).FindByIdCircunscripcionOficial(dtoNuevo.circunscripcionDTO.codigo);
+
+                CircunscripcionPartido? cpUltimoNuevo = cpList?.FirstOrDefault(cp => cp.esUltimoEscano == 1);
+                CircunscripcionPartido? cpLuchaNuevo = cpList?.FirstOrDefault(cp => cp.luchaUltimoEscano == 1);
+                CircunscripcionPartido? cpRestoNuevo = cpList?.FirstOrDefault(cp => cp.restoVotos != -1);
+
+                string nuevoSiglasUltimo = "";
+                string nuevoSiglasLucha = "";
+
+                if (cpUltimoNuevo != null)
+                {
+                    Partido? p = PartidoController.GetInstance(con).FindById(cpUltimoNuevo.codPartido);
+                    if (p != null) nuevoSiglasUltimo = p.siglas.Replace("+", "_").Replace("-", "_");
+                }
+                if (cpLuchaNuevo != null)
+                {
+                    Partido? p = PartidoController.GetInstance(con).FindById(cpLuchaNuevo.codPartido);
+                    if (p != null) nuevoSiglasLucha = p.siglas.Replace("+", "_").Replace("-", "_");
+                }
+
+                // Detectar intercambio: el que tenía el escaño ahora lucha y viceversa
+                bool intercambio = !string.IsNullOrEmpty(siglasUltimoEscano) &&
+                                   !string.IsNullOrEmpty(siglasLuchaEscano) &&
+                                   siglasUltimoEscano == nuevoSiglasLucha &&
+                                   siglasLuchaEscano == nuevoSiglasUltimo;
+
+                if (intercambio)
+                {
+                    // Animar el intercambio de posiciones (0.5 segundos)
+
+                    // El que antes tenía el escaño (siglasUltimoEscano) ahora lucha -> mover atrás
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[0]", "-154", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[1]", "0.1", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[0]", "0.86", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[1]", "0.86", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[2]", "0.86", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}/Escano", "OBJ_CULL", "1", 2, 0.5, 0) + "\n");
+
+                    // El que antes luchaba (siglasLuchaEscano) ahora tiene el escaño -> mover adelante
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[0]", "-94", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[2]", "326", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[0]", "1", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[1]", "1", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[2]", "1", 2, 0.5, 0) + "\n");
+                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}/Escano", "OBJ_CULL", "0", 2, 0.5, 0) + "\n");
+
+                    // Actualizar estado
+                    siglasUltimoEscano = nuevoSiglasUltimo;
+                    siglasLuchaEscano = nuevoSiglasLucha;
+                }
+                else if (nuevoSiglasUltimo != siglasUltimoEscano || nuevoSiglasLucha != siglasLuchaEscano)
+                {
+                    // Cambio diferente (no un simple intercambio), actualizar directamente
+                    if (!string.IsNullOrEmpty(nuevoSiglasUltimo))
+                    {
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_DISPLACEMENT[0]", "-94", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_DISPLACEMENT[2]", "326", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_SCALE[0]", "1", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_SCALE[1]", "1", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_SCALE[2]", "1", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}/Escano", "OBJ_CULL", "0", 2, 0.5, 0) + "\n");
+                    }
+                    if (!string.IsNullOrEmpty(nuevoSiglasLucha))
+                    {
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_DISPLACEMENT[0]", "-154", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_DISPLACEMENT[1]", "0.1", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_SCALE[0]", "0.86", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_SCALE[1]", "0.86", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_SCALE[2]", "0.86", 2, 0.5, 0) + "\n");
+                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}/Escano", "OBJ_CULL", "0", 2, 0.5, 0) + "\n");
+
+                        siglasUltimoEscano = nuevoSiglasUltimo;
+                        siglasLuchaEscano = nuevoSiglasLucha;
+                    }
+                }
+
+                // Actualizar diferencia de votos
+                if (cpRestoNuevo != null && cpRestoNuevo.restoVotos != -1)
+                {
+                    signal.Append(EventBuild("Diferencia", "MAP_FLOAT_PAR", $"{cpRestoNuevo.restoVotos}", 2, 0.5, 0) + "\n");
+                }
+            }
+            catch (Exception)
+            {
+                // Si hay error, intentar continuar
+            }
+
+            // --- ACTUALIZACION DE BARRAS LATERALES (ultimoEscanoPartidos) ---
+            // Recalcular anchos y posiciones si han cambiado los escaños de los partidos en la lista
+            int escaniosTotales = dtoNuevo.circunscripcionDTO?.escaniosTotales ?? 65;
+            
+            // Resetear acumuladores para recalcular
+            anchoAcumuladoIzq = 0;
+            anchoAcumuladoDch = 0;
+            escaniosAcumuladosIzq = 0;
+            escaniosAcumuladosDch = 0;
+
+            // Lista temporal para guardar el estado actualizado
+            var nuevaListaPartidos = new List<(bool esIzquierda, string siglas, int ancho)>();
+
+            // Arrays de nombres de barras (mismos que en entraPartido)
+            string[] barrasIzq = { "Barra_Izq", "Barra_Izq1", "Barra_Izq2", "Barra_Izq3" };
+            string[] barrasDch = { "Barra_Dch", "Barra_Dch1", "Barra_Dch2", "Barra_Dch3" };
+
+            // Contadores para saber qué barra (índice 0-3) corresponde a cada partido en cada lado
+            int idxIzq = 0;
+            int idxDch = 0;
+
+            foreach (var item in ultimoEscanoPartidos)
+            {
+                bool esIzquierda = item.esIzquierda;
+                string siglas = item.siglas;
+                
+                // Buscar datos nuevos del partido
+                var partidoNuevo = dtoNuevo.partidos.FirstOrDefault(p => p.siglas.Replace("+", "_").Replace("-", "_") == siglas);
+
+                int nuevosEscanios = 0;
+                if (partidoNuevo != null)
+                {
+                    nuevosEscanios = partidoNuevo.escaniosHasta;
+                }
+
+                // Calcular nuevo ancho
+                int nuevoAncho = (int)Math.Round((double)TAMANO_MAXIMO_FICHA / escaniosTotales * nuevosEscanios);
+
+                // Determinar barra y grupo
+                string nombreBarra = "";
+                string nombreGrupo = esIzquierda ? "Barras_Izq" : "Barras_Dch";
+                
+                if (esIzquierda)
+                {
+                    if (idxIzq < barrasIzq.Length) nombreBarra = barrasIzq[idxIzq];
+                    idxIzq++;
+                }
+                else
+                {
+                    if (idxDch < barrasDch.Length) nombreBarra = barrasDch[idxDch];
+                    idxDch++;
+                }
+
+                if (!string.IsNullOrEmpty(nombreBarra))
+                {
+                    // Calcular nueva posición X
+                    int posX;
+                    if (esIzquierda)
+                    {
+                        posX = POS_INICIAL_IZQ + anchoAcumuladoIzq;
+                        anchoAcumuladoIzq += nuevoAncho;
+                        escaniosAcumuladosIzq += nuevosEscanios;
+                    }
+                    else
+                    {
+                        posX = POS_INICIAL_DCH - anchoAcumuladoDch;
+                        anchoAcumuladoDch += nuevoAncho;
+                        escaniosAcumuladosDch += nuevosEscanios;
+                    }
+
+                    // Actualizar posición X (animado)
+                    signal.Append(EventBuild($"Ultimo_Escano/Mayoria_Absoluta/Barras/{nombreGrupo}/{nombreBarra}", "OBJ_DISPLACEMENT[0]", $"{posX}", 2, 0.5, 0) + "\n");
+
+                    // Actualizar ancho (animado)
+                    signal.Append(EventBuild($"Ultimo_Escano/Barras/{nombreBarra}", "PRIM_RECGLO_LEN[0]", $"{nuevoAncho}", 2, 0.5, 0) + "\n");
+                    
+                    // Ajustar offset texto si es el primero y es pequeño (replicar lógica de entrada)
+                    bool esPrimero = (esIzquierda && idxIzq == 1) || (!esIzquierda && idxDch == 1); // 1 porque ya incrementamos
+                    if (esPrimero)
+                    {
+                        if (esIzquierda)
+                        {
+                            if (nuevoAncho < THRESHOLD_ANCHO_PEQUENO)
+                                signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "120", 2, 0.5, 0) + "\n");
+                            else
+                                signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "0", 2, 0.5, 0) + "\n");
+                        }
+                        else
+                        {
+                            if (nuevoAncho < THRESHOLD_ANCHO_PEQUENO)
+                                signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "-50", 2, 0.5, 0) + "\n");
+                            else
+                                signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "46", 2, 0.5, 0) + "\n");
+                        }
+                    }
+                }
+
+                // Guardar estado actualizado
+                nuevaListaPartidos.Add((esIzquierda, siglas, nuevoAncho));
+            }
+
+            // Actualizar la lista de estado
+            ultimoEscanoPartidos = nuevaListaPartidos;
+
+            // Actualizar contadores totales de escaños (animado)
+            signal.Append(EventBuild("Num_Izq", "MAP_FLOAT_PAR", $"{escaniosAcumuladosIzq}", 2, 0.5, 0) + "\n");
+            signal.Append(EventBuild("Num_Dch", "MAP_FLOAT_PAR", $"{escaniosAcumuladosDch}", 2, 0.5, 0) + "\n");
+
+            return signal.ToString();
         }
         /// <summary>
         /// Encadena entre circunscripciones en el gráfico ULTIMO_ESCANO.

@@ -339,7 +339,8 @@ namespace Elecciones
 
                     // Determine whether we should request the filtered DTO for UI (true) or the unfiltered one (false).
                     // Preserve previous behavior: when the current grafico is "SEDES" use unfiltered for UI; otherwise use filtered.
-                    bool filtroSedes = graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES");
+                    // NEW: If sedeDentro is true, ALWAYS use unfiltered (filtroSedes = false).
+                    bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"));
 
                     // Use ObtenerDTO which now updates both dto and dtoSinFiltrar.
                     dto = ObtenerDTO(filtroSedes, elementoSeleccionado);
@@ -700,7 +701,7 @@ namespace Elecciones
             {
                 string elementoSeleccionado = circunscripcionesListView.SelectedItem != null ? circunscripcionesListView.SelectedItem.ToString() : autonomiasListView.SelectedItem.ToString();
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
+                if (sedeDentro || (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES")))
                 {
                     ObtenerDTO(false, elementoSeleccionado);
                 }
@@ -821,7 +822,7 @@ namespace Elecciones
             {
                 elementoSeleccionado = circunscripcionesListView.SelectedItem.ToString();
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                bool filtroSedes = graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES");
+                bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"));
                 dto = ObtenerDTO(filtroSedes, seleccionada.nombre);
                 ActualizarInfoInterfaz(seleccionada, dto);
                 preparado = false;
@@ -830,7 +831,7 @@ namespace Elecciones
             {
                 elementoSeleccionado = autonomiasListView.SelectedItem.ToString();
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                bool filtroSedes = graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES");
+                bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"));
                 dto = ObtenerDTO(filtroSedes, seleccionada.nombre);
                 ActualizarInfoInterfaz(seleccionada, dto);
                 preparado = false;
@@ -876,7 +877,7 @@ namespace Elecciones
 
                 //PONER LA INFORMACIÓN EN LA INTERFAZ
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
+                if (sedeDentro || (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES")))
                 {
                     ObtenerDTO(false, elementoSeleccionado);
                 }
@@ -902,7 +903,7 @@ namespace Elecciones
 
                 //PONER LA INFORMACIÓN EN LA INTERFAZ
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
+                if (sedeDentro || (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES")))
                 {
                     ObtenerDTO(false, elementoSeleccionado);
                 }
@@ -1022,7 +1023,7 @@ namespace Elecciones
                     ActualizarDatosEnTabla();
                     if (dto != null)
                     {
-                        ObtenerDTO(true, dto.circunscripcionDTO.nombre);
+                        ObtenerDTO(!sedeDentro, dto.circunscripcionDTO.nombre);
                         ActualizarInfoInterfaz(dto);
                     }
                     break;
@@ -1478,6 +1479,13 @@ namespace Elecciones
                         //    Update(true);
                         //}
                         //}
+                        sedeDentro = false;
+                        if (dto != null)
+                        {
+                            ObtenerDTO(true, dto.circunscripcionDTO.nombre);
+                            ActualizarInfoInterfaz(dto);
+                        }
+                        EscribirFichero();
                         break;
                     case "INDEPENDENTISMO":
                         graficos.independentismoSale();

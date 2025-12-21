@@ -340,7 +340,8 @@ namespace Elecciones
                     // Determine whether we should request the filtered DTO for UI (true) or the unfiltered one (false).
                     // Preserve previous behavior: when the current grafico is "SEDES" use unfiltered for UI; otherwise use filtered.
                     // NEW: If sedeDentro is true, ALWAYS use unfiltered (filtroSedes = false).
-                    bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"));
+                    // If tickerDentro is true, ALWAYS use filtered (filtroSedes = true), unless sedeDentro overrides.
+                    bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || (!string.Equals(graficosListView.SelectedValue, "SEDES") && !string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO")) || tickerDentro);
 
                     // Use ObtenerDTO which now updates both dto and dtoSinFiltrar.
                     dto = ObtenerDTO(filtroSedes, elementoSeleccionado);
@@ -1263,7 +1264,7 @@ namespace Elecciones
         {
             bool temp = actualizacionActiva;
             actualizacionActiva = true;
-            if (graficosListView.SelectedItem != null && (string.Equals(graficosListView.SelectedValue, "SEDES") || string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO")))
+            if (graficosListView.SelectedItem != null && (string.Equals(graficosListView.SelectedValue, "SEDES") || string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO")) && !tickerDentro)
             {
                 Update(true);
             }

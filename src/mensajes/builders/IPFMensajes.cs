@@ -1999,34 +1999,26 @@ namespace Elecciones.src.mensajes.builders
             {
                 signal.Append(EventBuild("Num_Izq", "MAP_FLOAT_PAR", $"{escaniosAcumuladosIzq}", 2, 0.5, 0) + "\n");
 
-                // Ajustar posición del texto si el primer partido de la izquierda tiene ancho pequeño
-                if (indexPartido == 0)
+                if (anchoAcumuladoIzq < THRESHOLD_ANCHO_PEQUENO)
                 {
-                    if (anchoPartido < THRESHOLD_ANCHO_PEQUENO)
-                    {
-                        signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "120", 1) + "\n");
-                    }
-                    else
-                    {
-                        signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "0", 0) + "\n");
-                    }
+                    signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "120", 1) + "\n");
+                }
+                else
+                {
+                    signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "0", 1) + "\n");
                 }
             }
             else
             {
                 signal.Append(EventBuild("Num_Dch", "MAP_FLOAT_PAR", $"{escaniosAcumuladosDch}", 2, 0.5, 0) + "\n");
 
-                // Ajustar posición del texto si el primer partido de la derecha tiene ancho pequeño
-                if (indexPartido == 0)
+                if (anchoAcumuladoDch < THRESHOLD_ANCHO_PEQUENO)
                 {
-                    if (anchoPartido < THRESHOLD_ANCHO_PEQUENO)
-                    {
-                        signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "-50", 1) + "\n");
-                    }
-                    else
-                    {
-                        signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "46", 1) + "\n");
-                    }
+                    signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "-50", 1) + "\n");
+                }
+                else
+                {
+                    signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "46", 1) + "\n");
                 }
             }
 
@@ -2081,65 +2073,6 @@ namespace Elecciones.src.mensajes.builders
                                    siglasUltimoEscano == nuevoSiglasLucha &&
                                    siglasLuchaEscano == nuevoSiglasUltimo;
 
-                if (intercambio)
-                {
-                    // Animar el intercambio de posiciones (0.5 segundos)
-
-                    // El que antes tenía el escaño (siglasUltimoEscano) ahora lucha -> mover atrás
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[0]", "-154", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[1]", "0.1", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[0]", "0.86", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[1]", "0.86", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}", "OBJ_SCALE[2]", "0.86", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasUltimoEscano}/Escano", "OBJ_CULL", "1", 2, 0.5, 0) + "\n");
-
-                    // El que antes luchaba (siglasLuchaEscano) ahora tiene el escaño -> mover adelante
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[0]", "-94", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_DISPLACEMENT[2]", "326", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[0]", "1", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[1]", "1", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}", "OBJ_SCALE[2]", "1", 2, 0.5, 0) + "\n");
-                    signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasLuchaEscano}/Escano", "OBJ_CULL", "0", 2, 0.5, 0) + "\n");
-
-                    // Actualizar estado
-                    siglasUltimoEscano = nuevoSiglasUltimo;
-                    siglasLuchaEscano = nuevoSiglasLucha;
-                }
-                else if (nuevoSiglasUltimo != siglasUltimoEscano || nuevoSiglasLucha != siglasLuchaEscano)
-                {
-                    // Cambio diferente (no un simple intercambio), actualizar directamente
-                    if (!string.IsNullOrEmpty(nuevoSiglasUltimo))
-                    {
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_DISPLACEMENT[0]", "-94", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_DISPLACEMENT[1]", "0", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_DISPLACEMENT[2]", "326", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_SCALE[0]", "1", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_SCALE[1]", "1", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}", "OBJ_SCALE[2]", "1", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasUltimo}/Escano", "OBJ_CULL", "0", 2, 0.5, 0) + "\n");
-                    }
-                    if (!string.IsNullOrEmpty(nuevoSiglasLucha))
-                    {
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_DISPLACEMENT[0]", "-154", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_DISPLACEMENT[1]", "0.1", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_SCALE[0]", "0.86", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_SCALE[1]", "0.86", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}", "OBJ_SCALE[2]", "0.86", 2, 0.5, 0) + "\n");
-                        signal.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{nuevoSiglasLucha}/Escano", "OBJ_CULL", "0", 2, 0.5, 0) + "\n");
-
-                        siglasUltimoEscano = nuevoSiglasUltimo;
-                        siglasLuchaEscano = nuevoSiglasLucha;
-                    }
-                }
-
-                // Actualizar diferencia de votos
-                if (cpRestoNuevo != null && cpRestoNuevo.restoVotos != -1)
-                {
-                    signal.Append(EventBuild("Diferencia", "MAP_FLOAT_PAR", $"{cpRestoNuevo.restoVotos}", 2, 0.5, 0) + "\n");
-                }
             }
             catch (Exception)
             {
@@ -2222,24 +2155,20 @@ namespace Elecciones.src.mensajes.builders
                     // Actualizar ancho (animado)
                     signal.Append(EventBuild($"Ultimo_Escano/Barras/{nombreBarra}", "PRIM_RECGLO_LEN[0]", $"{nuevoAncho}", 2, 0.5, 0) + "\n");
                     
-                    // Ajustar offset texto si es el primero y es pequeño (replicar lógica de entrada)
-                    bool esPrimero = (esIzquierda && idxIzq == 1) || (!esIzquierda && idxDch == 1); // 1 porque ya incrementamos
-                    if (esPrimero)
+                    // Ajustar offset texto basándose en el ancho acumulado
+                    if (esIzquierda)
                     {
-                        if (esIzquierda)
-                        {
-                            if (nuevoAncho < THRESHOLD_ANCHO_PEQUENO)
-                                signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "120", 2, 0.5, 0) + "\n");
-                            else
-                                signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "0", 2, 0.5, 0) + "\n");
-                        }
+                        if (anchoAcumuladoIzq < THRESHOLD_ANCHO_PEQUENO)
+                            signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "120", 2, 0.5, 0) + "\n");
                         else
-                        {
-                            if (nuevoAncho < THRESHOLD_ANCHO_PEQUENO)
-                                signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "-50", 2, 0.5, 0) + "\n");
-                            else
-                                signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "46", 2, 0.5, 0) + "\n");
-                        }
+                            signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "0", 2, 0.5, 0) + "\n");
+                    }
+                    else
+                    {
+                        if (anchoAcumuladoDch < THRESHOLD_ANCHO_PEQUENO)
+                            signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "-50", 2, 0.5, 0) + "\n");
+                        else
+                            signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "46", 2, 0.5, 0) + "\n");
                     }
                 }
 

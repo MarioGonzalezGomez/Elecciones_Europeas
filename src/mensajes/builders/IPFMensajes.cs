@@ -892,7 +892,8 @@ namespace Elecciones.src.mensajes.builders
                 Circunscripcion? circ = null;
                 try
                 {
-                    using var con = new ConexionEntityFramework();
+                    var main = Application.Current.MainWindow as MainWindow;
+                    var con = main.conexionActiva;
                     // Prefer lookup by código si existe, otherwise by nombre.
                     if (!string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo))
                     {
@@ -1091,7 +1092,8 @@ namespace Elecciones.src.mensajes.builders
                 {
                     try
                     {
-                        using var con = new ConexionEntityFramework();
+                        var main = Application.Current.MainWindow as MainWindow;
+                        var con = main.conexionActiva;
                         var provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dto.circunscripcionDTO.nombre);
                         if (provincias != null && provincias.Count > 0)
                         {
@@ -1237,7 +1239,8 @@ namespace Elecciones.src.mensajes.builders
             {
                 try
                 {
-                    using var con = new ConexionEntityFramework();
+                    var mainCcaa = Application.Current.MainWindow as MainWindow;
+                    var con = mainCcaa.conexionActiva;
                     var provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dto.circunscripcionDTO.nombre);
                     if (provincias != null && provincias.Count > 0)
                     {
@@ -1583,7 +1586,8 @@ namespace Elecciones.src.mensajes.builders
             {
                 try
                 {
-                    using var con = new ConexionEntityFramework();
+                    var mainMay = Application.Current.MainWindow as MainWindow;
+                    var con = mainMay.conexionActiva;
                     var provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dto.circunscripcionDTO.nombre);
                     if (provincias != null && provincias.Count > 0)
                     {
@@ -2047,7 +2051,8 @@ namespace Elecciones.src.mensajes.builders
 
             try
             {
-                using var con = new ConexionEntityFramework();
+                var mainUlt = Application.Current.MainWindow as MainWindow;
+                var con = mainUlt.conexionActiva;
                 var cpList = CPController.GetInstance(con).FindByIdCircunscripcionOficial(dtoNuevo.circunscripcionDTO.codigo);
 
                 CircunscripcionPartido? cpUltimoNuevo = cpList?.FirstOrDefault(cp => cp.esUltimoEscano == 1);
@@ -2218,7 +2223,8 @@ namespace Elecciones.src.mensajes.builders
             {
                 try
                 {
-                    using var con = new ConexionEntityFramework();
+                    var mainEnc = Application.Current.MainWindow as MainWindow;
+                    var con = mainEnc.conexionActiva;
                     var provinciasNuevo = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dtoNuevo.circunscripcionDTO.nombre);
                     if (provinciasNuevo != null && provinciasNuevo.Count > 0)
                     {
@@ -2248,7 +2254,8 @@ namespace Elecciones.src.mensajes.builders
             // 6. Cambiar los partidos de último escaño y lucha por último escaño
             try
             {
-                using var con = new ConexionEntityFramework();
+                var mainEnc2 = Application.Current.MainWindow as MainWindow;
+                var con = mainEnc2.conexionActiva;
                 var cpList = CPController.GetInstance(con).FindByIdCircunscripcionOficial(dtoNuevo.circunscripcionDTO.codigo);
 
                 CircunscripcionPartido? cpUltimoNuevo = cpList?.FirstOrDefault(cp => cp.esUltimoEscano == 1);

@@ -36,7 +36,7 @@ namespace Elecciones
         List<Circunscripcion> CCAA;
         ObservableCollection<string> circunscripcionNames;
         ObservableCollection<CPDataDTO> listaDeDatos;
-        ConexionEntityFramework conexionActiva;
+        public ConexionEntityFramework conexionActiva;
         private int avance;
         public BrainStormDTO dto;
         public BrainStormDTO dtoSinFiltrar;

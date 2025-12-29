@@ -19,6 +19,7 @@ namespace Elecciones.src.conexion
         private Socket client;
         private string _ip;
         private int _port;
+        private string _programaGrafico;  // Track connection type for auto-reconnect
         public bool conectado = false;
 
         ConfigManager configuration;
@@ -40,6 +41,7 @@ namespace Elecciones.src.conexion
                 _ip = configuration.GetValue("ipIPF");
                 _port = int.Parse(configuration.GetValue("puertoIPF"));
             }
+            _programaGrafico = programaGrafico;  // Store for auto-reconnect
             AbrirConexion(programaGrafico);
         }
         private ConexionGraficos(string ip, int port)
@@ -120,9 +122,42 @@ namespace Elecciones.src.conexion
 
         public void EnviarMensaje(string mensaje)
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(mensaje);
-            client.Send(bytes);
-            Console.WriteLine($"{mensaje}");
+            try
+            {
+                if (!conectado)
+                {
+                    // Try to reconnect if not connected
+                    _loggerService.LogError($"Not connected to {_programaGrafico}, attempting reconnect...", null);
+                    AbrirConexion(_programaGrafico);
+                }
+                
+                byte[] bytes = Encoding.UTF8.GetBytes(mensaje);
+                client.Send(bytes);
+                Console.WriteLine($"{mensaje}");
+            }
+            catch (Exception ex)
+            {
+                _loggerService.LogError($"Error sending message to {_programaGrafico}, attempting reconnect...", ex);
+                conectado = false;
+                
+                // Try to reconnect and resend once
+                try
+                {
+                    AbrirConexion(_programaGrafico);
+                    if (conectado)
+                    {
+                        byte[] bytes = Encoding.UTF8.GetBytes(mensaje);
+                        client.Send(bytes);
+                        Console.WriteLine($"[RECONNECTED] {mensaje}");
+                        _notificationService.ShowInfo($"Reconectado a {_programaGrafico?.ToUpper()} correctamente", "Reconexión exitosa");
+                    }
+                }
+                catch (Exception retryEx)
+                {
+                    _loggerService.LogError($"Reconnection to {_programaGrafico} failed", retryEx);
+                    _notificationService.ShowError($"No se pudo reconectar a {_programaGrafico?.ToUpper()}", "Error de reconexión");
+                }
+            }
         }
 
         public string RecibirMensaje(string solicitud)

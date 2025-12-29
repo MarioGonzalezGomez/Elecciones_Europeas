@@ -85,7 +85,13 @@ namespace Elecciones.src.conexion
             try
             {
                 client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                client.Connect(_ip, _port);
+                // Use a 3-second timeout for connection attempts
+                var connectTask = client.ConnectAsync(_ip, _port);
+                if (!connectTask.Wait(TimeSpan.FromSeconds(2)))
+                {
+                    client.Close();
+                    throw new TimeoutException($"Connection to {_ip}:{_port} timed out after 3 seconds");
+                }
                 conectado = true;
             }
             catch (Exception ex)
@@ -215,7 +221,13 @@ namespace Elecciones.src.conexion
             {
                 int port = int.Parse(puertoStr);
                 using var client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                client.Connect(ip, port);
+                // Use a 3-second timeout for connection attempts
+                var connectTask = client.ConnectAsync(ip, port);
+                if (!connectTask.Wait(TimeSpan.FromSeconds(2)))
+                {
+                    loggerService.LogError($"Connection to IPF2 at {ip}:{port} timed out after 3 seconds", null);
+                    return;
+                }
                 client.Send(Encoding.UTF8.GetBytes(mensaje));
                 client.Close();
                 Console.WriteLine($"[IPF2] {mensaje}");

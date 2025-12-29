@@ -10,566 +10,707 @@ using Elecciones.src.model.IPF.DTO;
 
 namespace Elecciones.src.mensajes
 {
+    /// <summary>
+    /// Clase que orquesta el envío de mensajes IPF usando los builders especializados.
+    /// Cada tipo de rótulo usa su builder correspondiente.
+    /// </summary>
     internal class OrdenesIPF
     {
-        public static OrdenesIPF instance;
-        private IPFMensajes builder;
+        public static OrdenesIPF? instance;
+        
+        // Builders especializados por tipo de rótulo
+        private readonly FaldonMensajes faldonBuilder;
+        private readonly CartonMensajes cartonBuilder;
+        private readonly SuperfaldonMensajes superfaldonBuilder;
+        private readonly DronMensajes dronBuilder;
+        
         public ConexionGraficos c;
 
         private OrdenesIPF()
         {
-            builder = IPFMensajes.GetInstance();
+            faldonBuilder = FaldonMensajes.GetInstance();
+            cartonBuilder = CartonMensajes.GetInstance();
+            superfaldonBuilder = SuperfaldonMensajes.GetInstance();
+            dronBuilder = DronMensajes.GetInstance();
             c = ConexionGraficos.GetInstanceIPF();
         }
 
         public static OrdenesIPF GetInstance()
         {
-            if (instance == null)
-            {
-                instance = new OrdenesIPF();
-            }
+            instance ??= new OrdenesIPF();
             return instance;
         }
 
-        //ESPECIALES
+        #region Especiales
+
         public void ReiniciarConexion()
         {
             c.ReiniciarConexion("ipf");
         }
+
         public void Reset()
         {
-            c.EnviarMensaje(builder.Reset());
+            c.EnviarMensaje(faldonBuilder.Reset());
         }
 
-        //ESPECIFICAS
+        #endregion
 
-        //FALDONES
-        //CAMBIO ENTRE OFI Y SONDEO
+        #region Faldón - Cambio Sondeo/Oficial
+
         public void SondeoUOficial(bool oficiales)
         {
-            c.EnviarMensaje(builder.SondeoUOficial(oficiales));
+            c.EnviarMensaje(faldonBuilder.SondeoUOficial(oficiales));
         }
 
-        //ANIMACIONES
+        #endregion
+
+        #region Faldón - Animaciones
+
         public void PrimerosResultados(bool activo)
         {
-            c.EnviarMensaje(builder.PrimerosResultados(activo));
+            c.EnviarMensaje(faldonBuilder.PrimerosResultados(activo));
         }
+
         public void AnimacionSondeo(bool activo)
         {
-            c.EnviarMensaje(builder.AnimacionSondeo(activo));
+            c.EnviarMensaje(faldonBuilder.AnimacionSondeo(activo));
         }
 
         public string RecibirPrimerosResultados()
         {
-            return c.RecibirMensaje(builder.RecibirPrimerosResultados());
+            return c.RecibirMensaje(faldonBuilder.RecibirPrimerosResultados());
         }
+
         public string RecibirAnimacionSondeo()
         {
-            return c.RecibirMensaje(builder.RecibirAnimacionSondeo());
+            return c.RecibirMensaje(faldonBuilder.RecibirAnimacionSondeo());
         }
 
-        //PROYECCION
+        #endregion
+
+        #region Faldón - Proyección
+
         public void Proyeccion(bool activo)
         {
-            c.EnviarMensaje(builder.Proyeccion(activo));
+            c.EnviarMensaje(faldonBuilder.Proyeccion(activo));
         }
 
-        //GIROS
+        #endregion
+
+        #region Faldón - Giros
+
         public void DeSondeoAOficiales()
         {
-            c.EnviarMensaje(builder.DeSondeoAOficiales());
+            c.EnviarMensaje(faldonBuilder.DeSondeoAOficiales());
         }
 
-        //CAMBIO DE ELECCIONES
+        #endregion
+
+        #region Faldón - Cambio Elecciones
+
         public void CambioElecciones(bool europa)
         {
-            c.EnviarMensaje(builder.CambioElecciones(europa));
+            c.EnviarMensaje(faldonBuilder.CambioElecciones(europa));
         }
 
-        //TIMER
+        #endregion
+
+        #region Faldón - Reloj
+
         public void RelojEntra(int segundos)
         {
-            c.EnviarMensaje(builder.EntraReloj());
-            //  c.EnviarMensaje(builder.EntraReloj(segundos));
-        }
-        public void RelojSale()
-        {
-            c.EnviarMensaje(builder.SaleReloj());
+            c.EnviarMensaje(faldonBuilder.EntraReloj());
         }
 
-        //TICKER
+        public void RelojSale()
+        {
+            c.EnviarMensaje(faldonBuilder.SaleReloj());
+        }
+
+        #endregion
+
+        #region Faldón - Ticker
+
         public void TickerEntra(bool oficial, BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.TickerEntra(oficial));
-            //  c.EnviarMensaje(builder.TickerEntra(oficial, dto));
+            c.EnviarMensaje(faldonBuilder.TickerEntra(oficial));
         }
+
         public void TickerEncadena(bool oficial, BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.TickerEncadena(oficial));
-            // c.EnviarMensaje(builder.TickerEncadena(oficial, dto));
+            c.EnviarMensaje(faldonBuilder.TickerEncadena(oficial));
         }
+
         public void TickerActualiza(BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.TickerActualiza());
-            //c.EnviarMensaje(builder.TickerActualiza(dto));
+            c.EnviarMensaje(faldonBuilder.TickerActualiza());
         }
+
         public void TickerSale(bool oficial)
         {
-            c.EnviarMensaje(builder.TickerSale(oficial));
+            c.EnviarMensaje(faldonBuilder.TickerSale(oficial));
         }
 
         public void TickerActualizaEscrutado()
         {
-            c.EnviarMensaje(builder.TickerActualizaEscrutado());
+            c.EnviarMensaje(faldonBuilder.TickerActualizaEscrutado());
         }
+
         public void TickerActualizaDatos()
         {
-            c.EnviarMensaje(builder.TickerActualizaDatos());
+            c.EnviarMensaje(faldonBuilder.TickerActualizaDatos());
         }
+
         public void TickerActualizaDatosIndividualizado(List<PartidoDTO> partidos)
         {
-            c.EnviarMensaje(builder.TickerActualizaDatosIndividualizado(partidos));
+            c.EnviarMensaje(faldonBuilder.TickerActualizaDatosIndividualizado(partidos));
         }
 
         public void TickerYaNoEstaIndividualizado(List<PartidoDTO> partidos)
         {
-            c.EnviarMensaje(builder.TickerYaNoEstaIndividualizado(partidos));
-        }
-        public void TickerActualizaPosiciones()
-        {
-            c.EnviarMensaje(builder.TickerActualizaPosiciones());
-        }
-        public void TickerActualizaNumPartidos()
-        {
-            c.EnviarMensaje(builder.TickerActualizaNumPartidos());
+            c.EnviarMensaje(faldonBuilder.TickerYaNoEstaIndividualizado(partidos));
         }
 
-        public void TickerEscanosEntra()
+        public void TickerActualizaPosiciones()
         {
-            // c.EnviarMensaje(builder.TickerEscanosEntra());
+            c.EnviarMensaje(faldonBuilder.TickerActualizaPosiciones());
         }
-        public void TickerEscanosSale()
+
+        public void TickerActualizaNumPartidos()
         {
-            // c.EnviarMensaje(builder.TickerEscanosSale());
+            c.EnviarMensaje(faldonBuilder.TickerActualizaNumPartidos());
         }
+
+        public void TickerEscanosEntra() { }
+        public void TickerEscanosSale() { }
+
         public void TickerVotosEntra(bool oficiales)
         {
-            c.EnviarMensaje(builder.TickerVotosEntra(oficiales));
+            c.EnviarMensaje(faldonBuilder.TickerVotosEntra(oficiales));
         }
+
         public void TickerVotosSale(bool oficiales)
         {
-            c.EnviarMensaje(builder.TickerVotosSale(oficiales));
-            // c.EnviarMensaje(builder.TickerVotosSale());
+            c.EnviarMensaje(faldonBuilder.TickerVotosSale(oficiales));
         }
+
         public void TickerHistoricosEntra(bool oficiales)
         {
-            c.EnviarMensaje(builder.TickerHistoricosEntra(oficiales));
-            // c.EnviarMensaje(builder.TickerHistoricosEntraInd());
+            c.EnviarMensaje(faldonBuilder.TickerHistoricosEntra(oficiales));
         }
+
         public void TickerHistoricosSale(bool oficiales)
         {
-            c.EnviarMensaje(builder.TickerHistoricosSale(oficiales));
+            c.EnviarMensaje(faldonBuilder.TickerHistoricosSale(oficiales));
         }
-        public void TickerHistoricosEntraInd()
-        {
-            // c.EnviarMensaje(builder.TickerHistoricosEntraInd());
-        }
-        public void TickerHistoricosSaleInd()
-        {
-            //c.EnviarMensaje(builder.TickerHistoricosSaleInd());
-        }
-        public void TickerHistoricosEntraCom()
-        {
-            //  c.EnviarMensaje(builder.TickerHistoricosEntraCom());
-        }
-        public void TickerHistoricosSaleCom()
-        {
-            //  c.EnviarMensaje(builder.TickerHistoricosSaleCom());
-        }
+
+        public void TickerHistoricosEntraInd() { }
+        public void TickerHistoricosSaleInd() { }
+        public void TickerHistoricosEntraCom() { }
+        public void TickerHistoricosSaleCom() { }
+
         public void TickerMillonesEntra()
         {
-            c.EnviarMensaje(builder.TickerMillonesEntra());
+            c.EnviarMensaje(faldonBuilder.TickerMillonesEntra());
         }
+
         public void TickerMillonesSale()
         {
-            c.EnviarMensaje(builder.TickerMillonesSale());
+            c.EnviarMensaje(faldonBuilder.TickerMillonesSale());
         }
 
         public void TickerFotosEntra()
         {
-            c.EnviarMensaje(builder.TickerFotosEntra());
+            c.EnviarMensaje(faldonBuilder.TickerFotosEntra());
         }
+
         public void TickerFotosSale()
         {
-            c.EnviarMensaje(builder.TickerFotosSale());
+            c.EnviarMensaje(faldonBuilder.TickerFotosSale());
         }
+
+        #endregion
+
+        #region Faldón - Video
 
         public void VideoIn(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
         {
-            c.EnviarMensaje(builder.VideoIn(dto, partidoSeleccionado));
+            c.EnviarMensaje(faldonBuilder.VideoIn(dto, partidoSeleccionado));
         }
+
         public void VideoOut(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
         {
-            c.EnviarMensaje(builder.VideoOut(dto, partidoSeleccionado));
+            c.EnviarMensaje(faldonBuilder.VideoOut(dto, partidoSeleccionado));
         }
+
         public void VideoOutTodos(BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.VideoOutTodos(dto));
+            c.EnviarMensaje(faldonBuilder.VideoOutTodos(dto));
         }
+
         public void VideoInTodos(BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.VideoInTodos(dto));
+            c.EnviarMensaje(faldonBuilder.VideoInTodos(dto));
         }
 
-        //TICKER TD
+        #endregion
+
+        #region Faldón - Ticker TD
+
         public void TickerTDEntra(BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.TickerTDEntra(dto));
+            c.EnviarMensaje(faldonBuilder.TickerTDEntra(dto));
         }
+
         public void TickerTDActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.TickerTDActualiza(dtoAnterior, dto));
+            c.EnviarMensaje(faldonBuilder.TickerTDActualiza(dtoAnterior, dto));
         }
+
         public void TickerTDSale()
         {
-            c.EnviarMensaje(builder.TickerTDSale());
+            c.EnviarMensaje(faldonBuilder.TickerTDSale());
         }
 
-        //PP_PSOE
+        #endregion
+
+        #region Faldón - PP_PSOE
+
         public void PP_PSOEEntra()
         {
-            c.EnviarMensaje(builder.PP_PSOEEntra());
+            c.EnviarMensaje(faldonBuilder.PP_PSOEEntra());
         }
+
         public void PP_PSOESale()
         {
-            c.EnviarMensaje(builder.PP_PSOESale());
+            c.EnviarMensaje(faldonBuilder.PP_PSOESale());
         }
 
+        #endregion
 
-        //DESPLIEGAS
+        #region Faldón - Despliegas
+
         public void Despliega4()
         {
-            c.EnviarMensaje(builder.Despliega4());
-        }
-        public void Despliega5()
-        {
-            c.EnviarMensaje(builder.Despliega5());
-        }
-        public void RecuperaTodos()
-        {
-            c.EnviarMensaje(builder.RecuperaTodos());
+            c.EnviarMensaje(faldonBuilder.Despliega4());
         }
 
-        //PACTOS
+        public void Despliega5()
+        {
+            c.EnviarMensaje(faldonBuilder.Despliega5());
+        }
+
+        public void RecuperaTodos()
+        {
+            c.EnviarMensaje(faldonBuilder.RecuperaTodos());
+        }
+
+        #endregion
+
+        #region Faldón - Pactos
+
         public void pactosEntra()
         {
-            c.EnviarMensaje(builder.pactosEntra());
+            c.EnviarMensaje(faldonBuilder.pactosEntra());
         }
+
         public void pactosReinicio()
         {
-            c.EnviarMensaje(builder.pactosReinicio());
+            c.EnviarMensaje(faldonBuilder.pactosReinicio());
         }
+
         public void pactosSale()
         {
-            c.EnviarMensaje(builder.pactosSale());
+            c.EnviarMensaje(faldonBuilder.pactosSale());
         }
 
         public void pactosEntraDerecha(int posicionPartido)
         {
-            c.EnviarMensaje(builder.pactosEntraDerecha(posicionPartido));
+            c.EnviarMensaje(faldonBuilder.pactosEntraDerecha(posicionPartido));
         }
+
         public void pactosEntraIzquierda(int posicionPartido)
         {
-            c.EnviarMensaje(builder.pactosEntraIzquierda(posicionPartido));
+            c.EnviarMensaje(faldonBuilder.pactosEntraIzquierda(posicionPartido));
         }
 
         public void pactosSaleDerecha(int posicionPartido)
         {
-            c.EnviarMensaje(builder.pactosSaleDerecha(posicionPartido));
-        }
-        public void pactosSaleIzquierda(int posicionPartido)
-        {
-            c.EnviarMensaje(builder.pactosSaleIzquierda(posicionPartido));
+            c.EnviarMensaje(faldonBuilder.pactosSaleDerecha(posicionPartido));
         }
 
-        //INDEPENDENTISMO
+        public void pactosSaleIzquierda(int posicionPartido)
+        {
+            c.EnviarMensaje(faldonBuilder.pactosSaleIzquierda(posicionPartido));
+        }
+
+        #endregion
+
+        #region Faldón - Independentismo
+
         public void independentismoEntra()
         {
-            c.EnviarMensaje(builder.independentismoEntra());
+            c.EnviarMensaje(faldonBuilder.independentismoEntra());
         }
+
         public void independentismoReinicio()
         {
-            c.EnviarMensaje(builder.independentismoReinicio());
+            c.EnviarMensaje(faldonBuilder.independentismoReinicio());
         }
+
         public void independentismoSale()
         {
-            c.EnviarMensaje(builder.independentismoSale());
+            c.EnviarMensaje(faldonBuilder.independentismoSale());
         }
 
         public void independentismoEntraDerecha(int posicionPartido)
         {
-            c.EnviarMensaje(builder.independentismoEntraDerecha(posicionPartido));
+            c.EnviarMensaje(faldonBuilder.independentismoEntraDerecha(posicionPartido));
         }
+
         public void independentismoEntraIzquierda(int posicionPartido)
         {
-            c.EnviarMensaje(builder.independentismoEntraIzquierda(posicionPartido));
+            c.EnviarMensaje(faldonBuilder.independentismoEntraIzquierda(posicionPartido));
         }
 
         public void independentismoSaleDerecha(int posicionPartido)
         {
-            c.EnviarMensaje(builder.independentismoSaleDerecha(posicionPartido));
+            c.EnviarMensaje(faldonBuilder.independentismoSaleDerecha(posicionPartido));
         }
+
         public void independentismoSaleIzquierda(int posicionPartido)
         {
-            c.EnviarMensaje(builder.independentismoSaleIzquierda(posicionPartido));
+            c.EnviarMensaje(faldonBuilder.independentismoSaleIzquierda(posicionPartido));
         }
 
-        //SEDES
+        #endregion
+
+        #region Faldón - Sedes
+
         public void SedesEntra(bool tickerIn, BrainStormDTO dto, PartidoDTO seleccionado)
         {
-            c.EnviarMensaje(builder.SedesEntra(tickerIn, seleccionado.codigo));
-            // c.EnviarMensaje(builder.SedesEntra(tickerIn, dto, seleccionado));
+            c.EnviarMensaje(faldonBuilder.SedesEntra(tickerIn, seleccionado.codigo));
         }
+
         public void SedesEncadena(bool tickerIn, string codPartidoSiguiente, string codPartidoAnterior)
         {
-            c.EnviarMensaje(builder.SedesEncadena(tickerIn, codPartidoSiguiente, codPartidoAnterior));
+            c.EnviarMensaje(faldonBuilder.SedesEncadena(tickerIn, codPartidoSiguiente, codPartidoAnterior));
         }
+
         public void SedesSale(bool tickerIn)
         {
-            c.EnviarMensaje(builder.SedesSale(tickerIn));
+            c.EnviarMensaje(faldonBuilder.SedesSale(tickerIn));
         }
 
+        #endregion
 
-        //CARTONES
-        //PARTICIPACION
+        #region Cartón - Actualiza
+
         public void CartonesActualiza()
         {
-            c.EnviarMensaje(builder.CartonesActualiza());
+            c.EnviarMensaje(cartonBuilder.CartonesActualiza());
         }
+
+        #endregion
+
+        #region Cartón - Participación
 
         public void participacionEntra(BrainStormDTO dto, int avance)
         {
-            c.EnviarMensaje(builder.participacionEntra(dto, avance));
+            c.EnviarMensaje(cartonBuilder.participacionEntra(dto, avance));
         }
+
         public void participacionEncadena(BrainStormDTO dto, int avance)
         {
-            c.EnviarMensaje(builder.participacionEncadena(dto, avance));
+            c.EnviarMensaje(cartonBuilder.participacionEncadena(dto, avance));
         }
+
         public void participacionSale()
         {
-            c.EnviarMensaje(builder.participacionSale());
+            c.EnviarMensaje(cartonBuilder.participacionSale());
         }
 
-        //CCAA
+        #endregion
+
+        #region Cartón - CCAA
+
         public void ccaaEntra(BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.ccaaEntra(dto));
+            c.EnviarMensaje(cartonBuilder.ccaaEntra(dto));
         }
+
         public void ccaaEncadena()
         {
-            c.EnviarMensaje(builder.ccaaEncadena());
+            c.EnviarMensaje(cartonBuilder.ccaaEncadena());
         }
+
         public void ccaaSale()
         {
-            c.EnviarMensaje(builder.ccaaSale());
+            c.EnviarMensaje(cartonBuilder.ccaaSale());
         }
 
-        //FICHAS DE PARTIDO
+        #endregion
+
+        #region Cartón - Fichas
+
         public void fichaEntra(bool oficiales, BrainStormDTO dto, PartidoDTO partido)
         {
-            c.EnviarMensaje(builder.fichaEntra(oficiales, dto, partido));
-        }
-        public void fichaEncadena(bool oficiales, BrainStormDTO dto, PartidoDTO partido)
-        {
-            c.EnviarMensaje(builder.fichaEncadena(oficiales, dto, partido));
-        }
-        public void fichaActualiza(bool oficiales, BrainStormDTO dtoAnterior, BrainStormDTO dto)
-        {
-            c.EnviarMensaje(builder.fichaActualiza(oficiales, dtoAnterior, dto));
-        }
-        public void fichaSale(bool oficiales)
-        {
-            c.EnviarMensaje(builder.fichaSale(oficiales));
+            c.EnviarMensaje(cartonBuilder.fichaEntra(oficiales, dto, partido));
         }
 
-        //PACTOMETRO
+        public void fichaEncadena(bool oficiales, BrainStormDTO dto, PartidoDTO partido)
+        {
+            c.EnviarMensaje(cartonBuilder.fichaEncadena(oficiales, dto, partido));
+        }
+
+        public void fichaActualiza(bool oficiales, BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            c.EnviarMensaje(cartonBuilder.fichaActualiza(oficiales, dtoAnterior, dto));
+        }
+
+        public void fichaSale(bool oficiales)
+        {
+            c.EnviarMensaje(cartonBuilder.fichaSale(oficiales));
+        }
+
+        #endregion
+
+        #region Cartón - Pactómetro
+
         public void pactometroEntra()
         {
-            c.EnviarMensaje(builder.pactometroEntra());
+            c.EnviarMensaje(cartonBuilder.pactometroEntra());
         }
+
         public void pactometroEncadena()
         {
-            c.EnviarMensaje(builder.pactometroEncadena());
+            c.EnviarMensaje(cartonBuilder.pactometroEncadena());
         }
+
         public void pactometroSale()
         {
-            c.EnviarMensaje(builder.pactometroSale());
+            c.EnviarMensaje(cartonBuilder.pactometroSale());
         }
 
         public void pactometroVictoria()
         {
-            c.EnviarMensaje(builder.pactometroVictoria());
+            c.EnviarMensaje(cartonBuilder.pactometroVictoria());
         }
 
-        //MAYORIAS
+        #endregion
+
+        #region Cartón - Mayorías
+
         public void mayoriasEntra(BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.mayoriasEntra(dto));
+            c.EnviarMensaje(cartonBuilder.mayoriasEntra(dto));
         }
+
         public void mayoriasEncadena(BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.mayoriasEncadena(dto));
+            c.EnviarMensaje(cartonBuilder.mayoriasEncadena(dto));
         }
+
         public void mayoriasSale()
         {
-            c.EnviarMensaje(builder.mayoriasSale());
+            c.EnviarMensaje(cartonBuilder.mayoriasSale());
         }
 
-        //CARTON PARTIDO
+        #endregion
+
+        #region Cartón - Partidos
+
         public void cartonPartidosEntra(BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.cartonPartidosEntra(dto));
+            c.EnviarMensaje(cartonBuilder.cartonPartidosEntra(dto));
         }
+
         public void cartonPartidosActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.cartonPartidosActualiza(dtoAnterior, dto));
+            c.EnviarMensaje(cartonBuilder.cartonPartidosActualiza(dtoAnterior, dto));
         }
+
         public void cartonPartidosSale()
         {
-            c.EnviarMensaje(builder.cartonPartidosSale());
+            c.EnviarMensaje(cartonBuilder.cartonPartidosSale());
         }
 
-        //ULTIMO ESCANO
+        #endregion
+
+        #region Cartón - Último Escaño
+
         public void ultimoEntra(BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.ultimoEntra(dto));
-        }
-        public void ultimoEncadena(BrainStormDTO dtoAnterior, BrainStormDTO dto)
-        {
-            c.EnviarMensaje(builder.ultimoEncadena(dtoAnterior, dto));
-        }
-        public void ultimoActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
-        {
-            c.EnviarMensaje(builder.ultimoActualiza(dtoAnterior, dto));
-        }
-        public void ultimoEntraPartido(BrainStormDTO dto, CPDataDTO partido, bool esIzquierda)
-        {
-            c.EnviarMensaje(builder.ultimoEntraPartido(dto, partido, esIzquierda));
-        }
-        public void ultimoLimpiaPartidos()
-        {
-            c.EnviarMensaje(builder.ultimoLimpiaPartidos());
-        }
-        public void ultimoSale()
-        {
-            c.EnviarMensaje(builder.ultimoSale());
+            c.EnviarMensaje(cartonBuilder.ultimoEntra(dto));
         }
 
-        //ULTIMO SUPERFALDON
+        public void ultimoEncadena(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            c.EnviarMensaje(cartonBuilder.ultimoEncadena(dtoAnterior, dto));
+        }
+
+        public void ultimoActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            c.EnviarMensaje(cartonBuilder.ultimoActualiza(dtoAnterior, dto));
+        }
+
+        public void ultimoEntraPartido(BrainStormDTO dto, CPDataDTO partido, bool esIzquierda)
+        {
+            c.EnviarMensaje(cartonBuilder.ultimoEntraPartido(dto, partido, esIzquierda));
+        }
+
+        public void ultimoLimpiaPartidos()
+        {
+            c.EnviarMensaje(cartonBuilder.ultimoLimpiaPartidos());
+        }
+
+        public void ultimoSale()
+        {
+            c.EnviarMensaje(cartonBuilder.ultimoSale());
+        }
+
+        #endregion
+
+        #region Superfaldón - Último
 
         public void ultimoSuperEntra()
         {
-            c.EnviarMensaje(builder.ultimoSuperEntra());
+            c.EnviarMensaje(superfaldonBuilder.ultimoSuperEntra());
         }
+
         public void ultimoSuperSale()
         {
-            c.EnviarMensaje(builder.ultimoSuperSale());
+            c.EnviarMensaje(superfaldonBuilder.ultimoSuperSale());
         }
 
-        //SUPERFALDON
+        #endregion
+
+        #region Superfaldón - Base
+
         public void superfaldonEntra()
         {
-            c.EnviarMensaje(builder.superfaldonEntra());
+            c.EnviarMensaje(superfaldonBuilder.superfaldonEntra());
         }
+
         public void superfaldonSale()
         {
-            c.EnviarMensaje(builder.superfaldonSale());
+            c.EnviarMensaje(superfaldonBuilder.superfaldonSale());
         }
 
-        //SEDES
+        #endregion
+
+        #region Superfaldón - Sedes
+
         public void superfaldonSedesEntra()
         {
-            c.EnviarMensaje(builder.superfaldonSedesEntra());
+            c.EnviarMensaje(superfaldonBuilder.superfaldonSedesEntra());
         }
+
         public void superfaldonSedesEncadena()
         {
-            c.EnviarMensaje(builder.superfaldonSedesEncadena());
+            c.EnviarMensaje(superfaldonBuilder.superfaldonSedesEncadena());
         }
+
         public void superfaldonSedesSale()
         {
-            c.EnviarMensaje(builder.superfaldonSedesSale());
+            c.EnviarMensaje(superfaldonBuilder.superfaldonSedesSale());
         }
 
-        //SUPERFALDON - FICHAS
+        #endregion
+
+        #region Superfaldón - Fichas
+
         public void sfFichasEntra()
         {
-            c.EnviarMensaje(builder.sfFichasEntra());
+            c.EnviarMensaje(superfaldonBuilder.sfFichasEntra());
         }
+
         public void sfFichasEncadena()
         {
-            c.EnviarMensaje(builder.sfFichasEncadena());
+            c.EnviarMensaje(superfaldonBuilder.sfFichasEncadena());
         }
+
         public void sfFichasSale()
         {
-            c.EnviarMensaje(builder.sfFichasSale());
+            c.EnviarMensaje(superfaldonBuilder.sfFichasSale());
         }
 
-        //SUPERFALDON - PACTOMETRO
+        #endregion
+
+        #region Superfaldón - Pactómetro
+
         public void sfPactometroEntra()
         {
-            c.EnviarMensaje(builder.sfPactometroEntra());
+            c.EnviarMensaje(superfaldonBuilder.sfPactometroEntra());
         }
+
         public void sfPactometroEncadena()
         {
-            c.EnviarMensaje(builder.sfPactometroEncadena());
+            c.EnviarMensaje(superfaldonBuilder.sfPactometroEncadena());
         }
+
         public void sfPactometroSale()
         {
-            c.EnviarMensaje(builder.sfPactometroSale());
+            c.EnviarMensaje(superfaldonBuilder.sfPactometroSale());
         }
 
-        //SUPERFALDON - MAYORIAS
+        #endregion
+
+        #region Superfaldón - Mayorías
+
         public void sfMayoriasEntra()
         {
-            c.EnviarMensaje(builder.sfMayoriasEntra());
+            c.EnviarMensaje(superfaldonBuilder.sfMayoriasEntra());
         }
+
         public void sfMayoriasEncadena()
         {
-            c.EnviarMensaje(builder.sfMayoriasEncadena());
+            c.EnviarMensaje(superfaldonBuilder.sfMayoriasEncadena());
         }
+
         public void sfMayoriasSale()
         {
-            c.EnviarMensaje(builder.sfMayoriasSale());
+            c.EnviarMensaje(superfaldonBuilder.sfMayoriasSale());
         }
 
-        //SUPERFALDON - BIPARTIDISMO
+        #endregion
+
+        #region Superfaldón - Bipartidismo
+
         public void sfBipartidismoEntra()
         {
-            c.EnviarMensaje(builder.sfBipartidismoEntra());
+            c.EnviarMensaje(superfaldonBuilder.sfBipartidismoEntra());
         }
+
         public void sfBipartidismoEncadena()
         {
-            c.EnviarMensaje(builder.sfBipartidismoEncadena());
+            c.EnviarMensaje(superfaldonBuilder.sfBipartidismoEncadena());
         }
+
         public void sfBipartidismoSale()
         {
-            c.EnviarMensaje(builder.sfBipartidismoSale());
+            c.EnviarMensaje(superfaldonBuilder.sfBipartidismoSale());
         }
 
-        //SUPERFALDON - GANADOR
+        #endregion
+
+        #region Superfaldón - Ganador
+
         public void sfGanadorEntra()
         {
-            c.EnviarMensaje(builder.sfGanadorEntra());
-        }
-        public void sfGanadorEncadena()
-        {
-            c.EnviarMensaje(builder.sfGanadorEncadena());
-        }
-        public void sfGanadorSale()
-        {
-            c.EnviarMensaje(builder.sfGanadorSale());
+            c.EnviarMensaje(superfaldonBuilder.sfGanadorEntra());
         }
 
+        public void sfGanadorEncadena()
+        {
+            c.EnviarMensaje(superfaldonBuilder.sfGanadorEncadena());
+        }
+
+        public void sfGanadorSale()
+        {
+            c.EnviarMensaje(superfaldonBuilder.sfGanadorSale());
+        }
+
+        #endregion
     }
 }

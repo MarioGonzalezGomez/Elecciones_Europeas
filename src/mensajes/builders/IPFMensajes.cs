@@ -282,8 +282,9 @@ namespace Elecciones.src.mensajes.builders
         //FALDON TD
         public string TickerTDEntra(BrainStormDTO dto)
         {
-            var main = Application.Current.MainWindow as MainWindow;
-            List<string> siglasPartidos = main.dtoSinFiltrar.partidos.Select(x => x.siglas).ToList();
+            // Use dto parameter directly instead of cached MainWindow.dtoSinFiltrar
+            // This ensures fresh database data is used when building signals
+            List<string> siglasPartidos = dto.partidos.Select(x => x.siglas).ToList();
             List<string> siglasActivos = dto.partidos.Select(x => x.siglas).ToList();
             string signal = "";
             //Poner camara en su sitio

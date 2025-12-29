@@ -246,7 +246,7 @@ namespace Elecciones.src.mensajes.builders
             string signal = "";
             foreach (var partido in dto.partidos)
             {
-                signal += signal += EventBuild($"TICKER/FNC_CierroVideo{partido.codigo}", "MAP_EXE") + "\n";
+                signal += EventBuild($"TICKER/FNC_CierroVideo{partido.codigo}", "MAP_EXE") + "\n";
             }
             return signal;
         }
@@ -255,7 +255,7 @@ namespace Elecciones.src.mensajes.builders
             string signal = "";
             foreach (var partido in dto.partidos)
             {
-                signal += signal += EventBuild($"TICKER/FNC_Video{partido.codigo}", "MAP_EXE") + "\n";
+                signal += EventBuild($"TICKER/FNC_Video{partido.codigo}", "MAP_EXE") + "\n";
             }
             return signal;
         }
@@ -2001,11 +2001,11 @@ namespace Elecciones.src.mensajes.builders
 
                 if (anchoAcumuladoIzq < THRESHOLD_ANCHO_PEQUENO)
                 {
-                    signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "120", 1) + "\n");
+                    signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "120", 2, 0.3, 0.1) + "\n");
                 }
                 else
                 {
-                    signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "0", 1) + "\n");
+                    signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", "0", 2, 0.3, 0.1) + "\n");
                 }
             }
             else
@@ -2014,11 +2014,11 @@ namespace Elecciones.src.mensajes.builders
 
                 if (anchoAcumuladoDch < THRESHOLD_ANCHO_PEQUENO)
                 {
-                    signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "-50", 1) + "\n");
+                    signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "-50", 2, 0.3, 0.1) + "\n");
                 }
                 else
                 {
-                    signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "46", 1) + "\n");
+                    signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", "46", 2, 0.3, 0.1) + "\n");
                 }
             }
 
@@ -2082,7 +2082,7 @@ namespace Elecciones.src.mensajes.builders
             // --- ACTUALIZACION DE BARRAS LATERALES (ultimoEscanoPartidos) ---
             // Recalcular anchos y posiciones si han cambiado los escaños de los partidos en la lista
             int escaniosTotales = dtoNuevo.circunscripcionDTO?.escaniosTotales ?? 65;
-            
+
             // Resetear acumuladores para recalcular
             anchoAcumuladoIzq = 0;
             anchoAcumuladoDch = 0;
@@ -2104,7 +2104,7 @@ namespace Elecciones.src.mensajes.builders
             {
                 bool esIzquierda = item.esIzquierda;
                 string siglas = item.siglas;
-                
+
                 // Buscar datos nuevos del partido
                 var partidoNuevo = dtoNuevo.partidos.FirstOrDefault(p => p.siglas.Replace("+", "_").Replace("-", "_") == siglas);
 
@@ -2120,7 +2120,7 @@ namespace Elecciones.src.mensajes.builders
                 // Determinar barra y grupo
                 string nombreBarra = "";
                 string nombreGrupo = esIzquierda ? "Barras_Izq" : "Barras_Dch";
-                
+
                 if (esIzquierda)
                 {
                     if (idxIzq < barrasIzq.Length) nombreBarra = barrasIzq[idxIzq];
@@ -2154,7 +2154,7 @@ namespace Elecciones.src.mensajes.builders
 
                     // Actualizar ancho (animado)
                     signal.Append(EventBuild($"Ultimo_Escano/Barras/{nombreBarra}", "PRIM_RECGLO_LEN[0]", $"{nuevoAncho}", 2, 0.5, 0) + "\n");
-                    
+
                     // Ajustar offset texto basándose en el ancho acumulado
                     if (esIzquierda)
                     {

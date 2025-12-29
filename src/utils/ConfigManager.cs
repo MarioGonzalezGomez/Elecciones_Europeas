@@ -14,6 +14,28 @@ namespace Elecciones.src.utils
         private string path;
         private readonly FileLoggerService _logger = FileLoggerService.GetInstance();
 
+        /// <summary>
+        /// Evento que se dispara cuando cambia la configuracion de conexion a la base de datos.
+        /// </summary>
+        public event EventHandler? ConnectionConfigChanged;
+
+        /// <summary>
+        /// Dispara el evento ConnectionConfigChanged.
+        /// </summary>
+        protected virtual void OnConnectionConfigChanged()
+        {
+            ConnectionConfigChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Notifica a los suscriptores que la configuracion de conexion ha cambiado.
+        /// Debe llamarse despues de guardar cambios relacionados con la conexion a BD.
+        /// </summary>
+        public void NotifyConnectionChanged()
+        {
+            OnConnectionConfigChanged();
+        }
+
         private ConfigManager(string ruta)
         {
             // If ruta is null/empty, use executable folder
@@ -140,7 +162,7 @@ namespace Elecciones.src.utils
                     defaultContent.AppendLine("bdIPF=Cartones");
                     defaultContent.AppendLine("activoIPF=1");
                     defaultContent.AppendLine();
-                    defaultContent.AppendLine("# Conexión IPF secundaria (señales puntuales a equipo con Faldones)");
+                    defaultContent.AppendLine("# Conexion IPF secundaria (senales puntuales a equipo con Faldones)");
                     defaultContent.AppendLine("ipIPF2=127.0.0.1");
                     defaultContent.AppendLine("puertoIPF2=5124");
                     defaultContent.AppendLine("bdIPF2=FALDONES2");
@@ -158,7 +180,7 @@ namespace Elecciones.src.utils
                     defaultContent.AppendLine("password=auto1041");
                     defaultContent.AppendLine("rutaArchivos=C:\\Elecciones\\Datos");
                     defaultContent.AppendLine();
-                    defaultContent.AppendLine("# 0 Para poner rutas sin crear subcarpetar JSON,CSV -> 1 Para crearlas");
+                    defaultContent.AppendLine("# 0 Para poner rutas sin crear subcarpetas JSON,CSV -> 1 Para crearlas");
                     defaultContent.AppendLine("subcarpetas=1");
                     defaultContent.AppendLine();
                     defaultContent.AppendLine("# Nivel Nacional  2-Autonomica ");
@@ -167,15 +189,15 @@ namespace Elecciones.src.utils
                     defaultContent.AppendLine("# Modifica los pares de botones de Oficial/Sondeo, para variar entre elecciones");
                     defaultContent.AppendLine("numEleccionesSimultaneas=1");
                     defaultContent.AppendLine("tablasGraficosPrincipal=2");
-                    defaultContent.AppendLine("headerTabla1=FALDÓN");
-                    defaultContent.AppendLine("headerTabla2=CARTÓN");
-                    defaultContent.AppendLine("headerTabla3=SUPERFALDÓN");
+                    defaultContent.AppendLine("headerTabla1=FALDON");
+                    defaultContent.AppendLine("headerTabla2=CARTON");
+                    defaultContent.AppendLine("headerTabla3=SUPERFALDON");
                     defaultContent.AppendLine("headerTabla4=PANTALLA");
                     defaultContent.AppendLine();
                     defaultContent.AppendLine("# Theme por defecto: 1 Light, 2 Dark, 3 Blue");
                     defaultContent.AppendLine("theme=1");
                     defaultContent.AppendLine();
-                    defaultContent.AppendLine("# Hace que la búsqueda de circunscripciones disponibles se haga filtrada (0) o completa (1)");
+                    defaultContent.AppendLine("# Hace que la busqueda de circunscripciones disponibles se haga filtrada (0) o completa (1)");
                     defaultContent.AppendLine("regional=0");
                     defaultContent.AppendLine("codigoRegionalBD1=10");
                     defaultContent.AppendLine("codigoRegionalBD2=00");
@@ -184,13 +206,13 @@ namespace Elecciones.src.utils
                     defaultContent.AppendLine("botoneraExtra=1");
                     defaultContent.AppendLine();
                     defaultContent.AppendLine("# Horas configurables para avances de participacion (editable)");
-                    defaultContent.AppendLine("# Formato libre (por ejemplo 20:15), dejar vacío si no se quiere mostrar");
+                    defaultContent.AppendLine("# Formato libre (por ejemplo 20:15), dejar vacio si no se quiere mostrar");
                     defaultContent.AppendLine("horaAvance1=");
                     defaultContent.AppendLine("horaAvance2=");
                     defaultContent.AppendLine("horaAvance3=");
                     defaultContent.AppendLine("horaParticipacion=");
                     defaultContent.AppendLine();
-                    defaultContent.AppendLine("# Horas históricas (pueden diferir de las horas actuales)");
+                    defaultContent.AppendLine("# Horas historicas (pueden diferir de las horas actuales)");
                     defaultContent.AppendLine("horaAvance1Historico=");
                     defaultContent.AppendLine("horaAvance2Historico=");
                     defaultContent.AppendLine("horaAvance3Historico=");

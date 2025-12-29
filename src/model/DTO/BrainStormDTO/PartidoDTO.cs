@@ -4,6 +4,7 @@ using Elecciones.src.model.IPF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -72,12 +73,29 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         {
             get; set;
         }
+        public int esUltimoEscano
+        {
+            get; set;
+        }
+        public int luchaUltimoEscano
+        {
+            get; set;
+        }
+        public int restoVotos
+        {
+            get; set;
+        }
 
         private PartidoDTO(string codigo, int escaniosHistoricos, int numVotantes)
         {
             this.codigo = codigo;
             this.escaniosHistoricos = escaniosHistoricos;
             this.numVotantes = numVotantes;
+        }
+
+        public PartidoDTO()
+        {
+
         }
 
         public static PartidoDTO FromCP(CircunscripcionPartido cp, bool oficiales, ConexionEntityFramework con)
@@ -97,6 +115,9 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                 dto.numVotantesHistoricos = cp.numVotantesHist;
                 dto.independentismo = partido.independentismo.ToString();
                 dto.nombre = partido.nombre;
+                dto.esUltimoEscano = cp.esUltimoEscano;
+                dto.luchaUltimoEscano = cp.luchaUltimoEscano;
+                dto.restoVotos = cp.restoVotos;
 
                 int dif = cp.escaniosHastaHist == 0 ? dto.escaniosHasta : dto.escaniosHasta - cp.escaniosHastaHist;
                 dto.diferenciaEscanios = int.Abs(dif);

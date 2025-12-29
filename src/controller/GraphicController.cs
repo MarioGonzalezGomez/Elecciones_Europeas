@@ -9,6 +9,7 @@ using Elecciones.src.logic;
 using Elecciones.src.mensajes;
 using Elecciones.src.model.DTO.BrainStormDTO;
 using Elecciones.src.model.IPF;
+using Elecciones.src.model.IPF.DTO;
 using Elecciones.src.utils;
 
 namespace Elecciones.src.controller
@@ -247,18 +248,36 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.TickerActualizaNumPartidos(); }
         }
 
-        public void TickerVotosEntra()
+        public void TickerEscanosEntra()
         {
-            if (ipfActivo.Valor == 1) { ipf.TickerVotosEntra(); }
+            if (ipfActivo.Valor == 1) { ipf.TickerEscanosEntra(); }
         }
-        public void TickerVotosSale()
+        public void TickerEscanosSale()
         {
-            if (ipfActivo.Valor == 1) { ipf.TickerVotosSale(); }
+            if (ipfActivo.Valor == 1) { ipf.TickerEscanosSale(); }
+        }
+        public void TickerVotosEntra(bool oficiales)
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerVotosEntra(oficiales); }
+            //if (ipfActivo.Valor == 1) { ipf.TickerVotosEntra(); }
+        }
+        public void TickerVotosSale(bool oficiales)
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerVotosSale(oficiales); }
+        }
+        public void TickerHistoricosEntra(bool oficiales)
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerHistoricosEntra(oficiales); }
+        }
+        public void TickerHistoricosSale(bool oficiales)
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerHistoricosSale(oficiales); }
         }
         public void TickerHistoricosEntraInd()
         {
             if (ipfActivo.Valor == 1) { ipf.TickerHistoricosEntraInd(); }
         }
+
         public void TickerHistoricosSaleInd()
         {
             if (ipfActivo.Valor == 1) { ipf.TickerHistoricosSaleInd(); }
@@ -287,6 +306,39 @@ namespace Elecciones.src.controller
         public void TickerFotosSale()
         {
             if (ipfActivo.Valor == 1) { ipf.TickerFotosSale(); }
+        }
+
+        //VIDEOS EN TICKER
+        public void VideoIn(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
+        {
+            if (ipfActivo.Valor == 1) { ipf.VideoIn(dto, partidoSeleccionado); }
+        }
+        public void VideoOut(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
+        {
+            if (ipfActivo.Valor == 1) { ipf.VideoOut(dto, partidoSeleccionado); }
+        }
+        public void VideoOutTodos(BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.VideoOutTodos(dto); }
+        }
+        public void VideoInTodos(BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.VideoInTodos(dto); }
+        }
+
+
+        //TICKER TD
+        public void TickerTDEntra(BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerTDEntra(dto); }
+        }
+        public void TickerTDActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerTDActualiza(dtoAnterior, dto); }
+        }
+        public void TickerTDSale()
+        {
+            if (ipfActivo.Valor == 1) { ipf.TickerTDSale(); }
         }
 
         //PP_PSOE
@@ -394,6 +446,12 @@ namespace Elecciones.src.controller
 
         //CARTONES
         //PARTICIPACION
+
+        internal void CartonesActualiza()
+        {
+            if (ipfActivo.Valor == 1) { ipf.CartonesActualiza(); }
+        }
+
         public void participacionEntra(BrainStormDTO dto, int avance)
         {
             if (ipfActivo.Valor == 1) { ipf.participacionEntra(dto, avance); }
@@ -430,9 +488,9 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.fichaEncadena(oficiales, dto, partido); }
         }
-        public void fichaActualiza(bool oficiales, BrainStormDTO dto, BrainStormDTO dtoAnterior)
+        public void fichaActualiza(bool oficiales, BrainStormDTO dtoAnterior, BrainStormDTO dto)
         {
-            if (ipfActivo.Valor == 1) { ipf.fichaActualiza(oficiales,dto,dtoAnterior); }
+            if (ipfActivo.Valor == 1) { ipf.fichaActualiza(oficiales, dtoAnterior, dto); }
         }
         public void fichaSale(bool oficiales)
         {
@@ -470,6 +528,57 @@ namespace Elecciones.src.controller
         public void mayoriasSale()
         {
             if (ipfActivo.Valor == 1) { ipf.mayoriasSale(); }
+        }
+
+        //CARTON PARTIDOS
+        public void cartonPartidosEntra(BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.cartonPartidosEntra(dto); }
+        }
+        public void cartonPartidosActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.cartonPartidosActualiza(dtoAnterior, dto); }
+        }
+        public void cartonPartidosSale()
+        {
+            if (ipfActivo.Valor == 1) { ipf.cartonPartidosSale(); }
+        }
+
+        //ULTIMO
+        public void ultimoEntra(BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoEntra(dto); }
+        }
+        public void ultimoEncadena(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoEncadena(dtoAnterior, dto); }
+        }
+        public void ultimoActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoActualiza(dtoAnterior, dto); }
+        }
+        public void ultimoLimpiaPartidos()
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoLimpiaPartidos(); }
+        }
+        public void ultimoEntraPartido(BrainStormDTO dto, CPDataDTO partido, bool esIzquierda)
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoEntraPartido(dto, partido, esIzquierda); }
+        }
+        public void ultimoSale()
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoSale(); }
+        }
+
+        //ULTIMO SUPERFADON
+
+        public void ultimoSuperEntra()
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoSuperEntra(); }
+        }
+        public void ultimoSuperSale()
+        {
+            if (ipfActivo.Valor == 1) { ipf.ultimoSuperSale(); }
         }
 
         //SUPERFALDON

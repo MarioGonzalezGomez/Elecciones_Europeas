@@ -28,6 +28,12 @@ namespace Elecciones
         ConfigManager configuration;
         private MainWindow main;
 
+        bool votosIn;
+        bool histIn;
+        bool millonesIn;
+
+        public bool tickerTDIn = false;
+
         public Botonera()
         {
             InitializeComponent();
@@ -90,28 +96,42 @@ namespace Elecciones
 
         private void btnEscanos_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Implementar funcionalidad Escaños
-            gController.TickerMillonesSale(); // Placeholder - usar el método existente más similar
+            main = Application.Current.MainWindow as MainWindow;
+            if (votosIn)
+            {
+                gController.TickerVotosSale(main.oficiales);
+                votosIn = false;
+            }
+            if (histIn)
+            {
+                gController.TickerHistoricosSale(main.oficiales);
+                histIn = false;
+            }
+            // gController.TickerEscanosEntra();
         }
-
         private void btnPorcentajeVoto_Click(object sender, RoutedEventArgs e)
         {
-            gController.TickerVotosEntra();
+            main = Application.Current.MainWindow as MainWindow;
+            gController.TickerVotosEntra(main.oficiales);
+            votosIn = true;
         }
-
         private void btnHistoricos_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
+            gController.TickerHistoricosEntra(main.oficiales);
             gController.TickerHistoricosEntraInd();
+            histIn = true;
         }
-
         private void btnMillones_Click(object sender, RoutedEventArgs e)
-        {
-            gController.TickerMillonesEntra();
+        {   //ENTRA FOTOS
+            //gController.TickerMillonesEntra();
+            gController.TickerFotosEntra();
         }
-
         private void btnHistoricosCom_Click(object sender, RoutedEventArgs e)
         {
-            gController.TickerHistoricosEntraCom();
+            //SALE FOTOS
+            //gController.TickerHistoricosEntraCom();
+            gController.TickerFotosSale();
         }
 
         #endregion
@@ -120,21 +140,34 @@ namespace Elecciones
 
         private void btnVideoIn_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
+            if (main.partidoSeleccionado != null)
+            {
+                gController.VideoIn(main.dto, main.partidoSeleccionado);
+            }
             // TODO: Implementar Video In
-        }
 
+        }
         private void btnVideoOut_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
+            if (main.partidoSeleccionado != null)
+            {
+                gController.VideoOut(main.dto, main.partidoSeleccionado);
+            }
             // TODO: Implementar Video Out
         }
 
         private void btnEntranTodos_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
+            gController.VideoInTodos(main.dto);
             // TODO: Implementar Entran Todos
         }
-
         private void btnSalenTodos_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
+            gController.VideoOutTodos(main.dto);
             // TODO: Implementar Salen Todos
         }
 
@@ -144,22 +177,34 @@ namespace Elecciones
 
         private void btnEntraTD_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
+            gController.TickerTDEntra(main.dto);
             gController.SubirRotulosPrimeTD();
+            tickerTDIn = true;
         }
-
         private void btnSaleTD_Click(object sender, RoutedEventArgs e)
         {
+            gController.TickerTDSale();
             gController.BajarRotulosPrimeTD();
+            tickerTDIn = false;
         }
 
         private void btnEntraEspecial_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
             gController.SubirRotulosPrimeEsp();
+            gController.TickerEntra(main.oficiales, main.dto);
         }
-
         private void btnSaleEspecial_Click(object sender, RoutedEventArgs e)
         {
+            main = Application.Current.MainWindow as MainWindow;
             gController.BajarRotulosPrimeEsp();
+            gController.TickerSale(main.oficiales);
+        }
+
+        private void btnDespliega4_Click(object sender, RoutedEventArgs e)
+        {
+            gController.Despliega4();
         }
 
         #endregion
@@ -170,7 +215,6 @@ namespace Elecciones
         {
             // TODO: Implementar - mayoriasEntra requiere BrainStormDTO
         }
-
         private void btnBajaMayoria_Click(object sender, RoutedEventArgs e)
         {
             gController.mayoriasSale();
@@ -180,7 +224,6 @@ namespace Elecciones
         {
             // TODO: Implementar Sube CCAA
         }
-
         private void btnBajaCCAA_Click(object sender, RoutedEventArgs e)
         {
             // TODO: Implementar Baja CCAA

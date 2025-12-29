@@ -311,6 +311,7 @@ namespace Elecciones
             }
             RellenarComboBox();
             configuration.SaveConfig();
+            configuration.NotifyConnectionChanged();
             main.ReiniciarParametros();
         }
 

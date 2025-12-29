@@ -7,6 +7,8 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
 using Elecciones.src.service;
+using Elecciones.src.repository;
+using Elecciones.src.controller;
 
 namespace Elecciones.src.conexion
 {
@@ -70,7 +72,7 @@ namespace Elecciones.src.conexion
 
             main = mainWindow;
         }
-        //Para elegir la DB a la que conectarnos en caso de conexión múltiple
+        //Para elegir la DB a la que conectarnos en caso de conexion multiple
         public ConexionEntityFramework(int tipoConexion, int db)
         {
             this.db = db;
@@ -95,6 +97,31 @@ namespace Elecciones.src.conexion
             _user = configuration.GetValue("user");
             _pass = configuration.GetValue("password");
             this.main = Application.Current.MainWindow as MainWindow;
+        }
+
+        /// <summary>
+        /// Invalida todos los singletons de Repositories, Services y Controllers
+        /// para forzar que se recreen con la nueva conexion.
+        /// Debe llamarse cuando cambia la configuracion de conexion a BD.
+        /// </summary>
+        public static void InvalidateAllSingletons()
+        {
+            // Invalidar Repositories
+            CircunscripcionRepository.instance = null;
+            PartidoRepository.instance = null;
+            CPRepository.instance = null;
+            LiteralRepository.instance = null;
+
+            // Invalidar Services
+            CircunscripcionService.instance = null;
+            PartidoService.instance = null;
+            CPService.instance = null;
+
+            // Invalidar Controllers
+            CircunscripcionController.instance = null;
+            PartidoController.instance = null;
+            CPController.instance = null;
+            BrainStormController.instance = null;
         }
 
         public virtual DbSet<Partido> Partidos { get; set; }
@@ -166,6 +193,9 @@ namespace Elecciones.src.conexion
                 entity.Property("escaniosDesdeSondeo").HasColumnName("escanos_desde_sondeo");
                 entity.Property("escaniosHastaSondeo").HasColumnName("escanos_hasta_sondeo");
                 entity.Property("porcentajeVotoSondeo").HasColumnName("votos_sondeo");
+                entity.Property("esUltimoEscano").HasColumnName("ult_escano");
+                entity.Property("luchaUltimoEscano").HasColumnName("sig_escano");
+                entity.Property("restoVotos").HasColumnName("restos");
             });
             modelBuilder.Entity<Literal>(entity =>
             {
@@ -251,7 +281,7 @@ namespace Elecciones.src.conexion
             if (selected == null)
             {
                 // No server reachable
-                var message = "No se ha podido conectar a la BD en ninguna de las IPs configuradas. Revise la configuración y el estado de las bases de datos.";
+                var message = "No se ha podido conectar a la BD en ninguna de las IPs configuradas. Revise la configuracion y el estado de las bases de datos.";
                 _logger.LogError(message, null);
 
                 // Show a single UI message if possible (fast, via dispatcher)
@@ -259,7 +289,7 @@ namespace Elecciones.src.conexion
                 {
                     main?.Dispatcher.Invoke(() =>
                     {
-                        MessageBox.Show(message, "Error de conexión", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(message, "Error de conexion", MessageBoxButton.OK, MessageBoxImage.Error);
                     });
                 }
                 catch
@@ -279,7 +309,7 @@ namespace Elecciones.src.conexion
             try
             {
                 configuration.SetValue("conexionDefault1", _tipoConexion.ToString());
-                main?.EscribirConexiones();
+                main?.Dispatcher.Invoke(() => main.EscribirConexiones());
             }
             catch (Exception ex)
             {

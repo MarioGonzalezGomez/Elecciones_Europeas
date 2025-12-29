@@ -1,11 +1,12 @@
-using Elecciones.src.conexion;
-using Elecciones.src.mensajes.builders;
-using Elecciones.src.model.DTO.BrainStormDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Elecciones.src.conexion;
+using Elecciones.src.mensajes.builders;
+using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.IPF.DTO;
 
 namespace Elecciones.src.mensajes
 {
@@ -52,11 +53,11 @@ namespace Elecciones.src.mensajes
         //ANIMACIONES
         public void PrimerosResultados(bool activo)
         {
-            builder.PrimerosResultados(activo);
+            c.EnviarMensaje(builder.PrimerosResultados(activo));
         }
         public void AnimacionSondeo(bool activo)
         {
-            builder.AnimacionSondeo(activo);
+            c.EnviarMensaje(builder.AnimacionSondeo(activo));
         }
 
         public string RecibirPrimerosResultados()
@@ -89,7 +90,8 @@ namespace Elecciones.src.mensajes
         //TIMER
         public void RelojEntra(int segundos)
         {
-            c.EnviarMensaje(builder.EntraReloj(segundos));
+            c.EnviarMensaje(builder.EntraReloj());
+            //  c.EnviarMensaje(builder.EntraReloj(segundos));
         }
         public void RelojSale()
         {
@@ -99,15 +101,18 @@ namespace Elecciones.src.mensajes
         //TICKER
         public void TickerEntra(bool oficial, BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.TickerEntra(oficial, dto));
+            c.EnviarMensaje(builder.TickerEntra(oficial));
+            //  c.EnviarMensaje(builder.TickerEntra(oficial, dto));
         }
         public void TickerEncadena(bool oficial, BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.TickerEncadena(oficial, dto));
+            c.EnviarMensaje(builder.TickerEncadena(oficial));
+            // c.EnviarMensaje(builder.TickerEncadena(oficial, dto));
         }
         public void TickerActualiza(BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.TickerActualiza(dto));
+            c.EnviarMensaje(builder.TickerActualiza());
+            //c.EnviarMensaje(builder.TickerActualiza(dto));
         }
         public void TickerSale(bool oficial)
         {
@@ -140,29 +145,47 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(builder.TickerActualizaNumPartidos());
         }
 
-        public void TickerVotosEntra()
+        public void TickerEscanosEntra()
         {
-            c.EnviarMensaje(builder.TickerVotosEntra());
+            // c.EnviarMensaje(builder.TickerEscanosEntra());
         }
-        public void TickerVotosSale()
+        public void TickerEscanosSale()
         {
-            c.EnviarMensaje(builder.TickerVotosSale());
+            // c.EnviarMensaje(builder.TickerEscanosSale());
+        }
+        public void TickerVotosEntra(bool oficiales)
+        {
+            c.EnviarMensaje(builder.TickerVotosEntra(oficiales));
+        }
+        public void TickerVotosSale(bool oficiales)
+        {
+            c.EnviarMensaje(builder.TickerVotosSale(oficiales));
+            // c.EnviarMensaje(builder.TickerVotosSale());
+        }
+        public void TickerHistoricosEntra(bool oficiales)
+        {
+            c.EnviarMensaje(builder.TickerHistoricosEntra(oficiales));
+            // c.EnviarMensaje(builder.TickerHistoricosEntraInd());
+        }
+        public void TickerHistoricosSale(bool oficiales)
+        {
+            c.EnviarMensaje(builder.TickerHistoricosSale(oficiales));
         }
         public void TickerHistoricosEntraInd()
         {
-            c.EnviarMensaje(builder.TickerHistoricosEntraInd());
+            // c.EnviarMensaje(builder.TickerHistoricosEntraInd());
         }
         public void TickerHistoricosSaleInd()
         {
-            c.EnviarMensaje(builder.TickerHistoricosSaleInd());
+            //c.EnviarMensaje(builder.TickerHistoricosSaleInd());
         }
         public void TickerHistoricosEntraCom()
         {
-            c.EnviarMensaje(builder.TickerHistoricosEntraCom());
+            //  c.EnviarMensaje(builder.TickerHistoricosEntraCom());
         }
         public void TickerHistoricosSaleCom()
         {
-            c.EnviarMensaje(builder.TickerHistoricosSaleCom());
+            //  c.EnviarMensaje(builder.TickerHistoricosSaleCom());
         }
         public void TickerMillonesEntra()
         {
@@ -180,6 +203,37 @@ namespace Elecciones.src.mensajes
         public void TickerFotosSale()
         {
             c.EnviarMensaje(builder.TickerFotosSale());
+        }
+
+        public void VideoIn(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
+        {
+            c.EnviarMensaje(builder.VideoIn(dto, partidoSeleccionado));
+        }
+        public void VideoOut(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
+        {
+            c.EnviarMensaje(builder.VideoOut(dto, partidoSeleccionado));
+        }
+        public void VideoOutTodos(BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.VideoOutTodos(dto));
+        }
+        public void VideoInTodos(BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.VideoInTodos(dto));
+        }
+
+        //TICKER TD
+        public void TickerTDEntra(BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.TickerTDEntra(dto));
+        }
+        public void TickerTDActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.TickerTDActualiza(dtoAnterior, dto));
+        }
+        public void TickerTDSale()
+        {
+            c.EnviarMensaje(builder.TickerTDSale());
         }
 
         //PP_PSOE
@@ -274,7 +328,8 @@ namespace Elecciones.src.mensajes
         //SEDES
         public void SedesEntra(bool tickerIn, BrainStormDTO dto, PartidoDTO seleccionado)
         {
-            c.EnviarMensaje(builder.SedesEntra(tickerIn, dto, seleccionado));
+            c.EnviarMensaje(builder.SedesEntra(tickerIn, seleccionado.codigo));
+            // c.EnviarMensaje(builder.SedesEntra(tickerIn, dto, seleccionado));
         }
         public void SedesEncadena(bool tickerIn, string codPartidoSiguiente, string codPartidoAnterior)
         {
@@ -288,6 +343,11 @@ namespace Elecciones.src.mensajes
 
         //CARTONES
         //PARTICIPACION
+        public void CartonesActualiza()
+        {
+            c.EnviarMensaje(builder.CartonesActualiza());
+        }
+
         public void participacionEntra(BrainStormDTO dto, int avance)
         {
             c.EnviarMensaje(builder.participacionEntra(dto, avance));
@@ -324,9 +384,9 @@ namespace Elecciones.src.mensajes
         {
             c.EnviarMensaje(builder.fichaEncadena(oficiales, dto, partido));
         }
-        public void fichaActualiza(bool oficiales, BrainStormDTO dto, BrainStormDTO dtoAnterior)
+        public void fichaActualiza(bool oficiales, BrainStormDTO dtoAnterior, BrainStormDTO dto)
         {
-            c.EnviarMensaje(builder.fichaActualiza(oficiales, dto, dtoAnterior));
+            c.EnviarMensaje(builder.fichaActualiza(oficiales, dtoAnterior, dto));
         }
         public void fichaSale(bool oficiales)
         {
@@ -364,6 +424,57 @@ namespace Elecciones.src.mensajes
         public void mayoriasSale()
         {
             c.EnviarMensaje(builder.mayoriasSale());
+        }
+
+        //CARTON PARTIDO
+        public void cartonPartidosEntra(BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.cartonPartidosEntra(dto));
+        }
+        public void cartonPartidosActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.cartonPartidosActualiza(dtoAnterior, dto));
+        }
+        public void cartonPartidosSale()
+        {
+            c.EnviarMensaje(builder.cartonPartidosSale());
+        }
+
+        //ULTIMO ESCANO
+        public void ultimoEntra(BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.ultimoEntra(dto));
+        }
+        public void ultimoEncadena(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.ultimoEncadena(dtoAnterior, dto));
+        }
+        public void ultimoActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        {
+            c.EnviarMensaje(builder.ultimoActualiza(dtoAnterior, dto));
+        }
+        public void ultimoEntraPartido(BrainStormDTO dto, CPDataDTO partido, bool esIzquierda)
+        {
+            c.EnviarMensaje(builder.ultimoEntraPartido(dto, partido, esIzquierda));
+        }
+        public void ultimoLimpiaPartidos()
+        {
+            c.EnviarMensaje(builder.ultimoLimpiaPartidos());
+        }
+        public void ultimoSale()
+        {
+            c.EnviarMensaje(builder.ultimoSale());
+        }
+
+        //ULTIMO SUPERFALDON
+
+        public void ultimoSuperEntra()
+        {
+            c.EnviarMensaje(builder.ultimoSuperEntra());
+        }
+        public void ultimoSuperSale()
+        {
+            c.EnviarMensaje(builder.ultimoSuperSale());
         }
 
         //SUPERFALDON
@@ -459,5 +570,6 @@ namespace Elecciones.src.mensajes
         {
             c.EnviarMensaje(builder.sfGanadorSale());
         }
+
     }
 }

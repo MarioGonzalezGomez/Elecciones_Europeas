@@ -58,5 +58,16 @@ namespace Elecciones.src.logic
             salir = false;
             await EjecutarCadaDosSegundos();
         }
+
+        /// <summary>
+        /// Actualiza la conexion del escuchador para usar la nueva base de datos.
+        /// Debe llamarse cuando cambia la configuracion de conexion.
+        /// </summary>
+        /// <param name="nuevaConexion">La nueva conexion a la base de datos</param>
+        public void ActualizarConexion(conexion.ConexionEntityFramework nuevaConexion)
+        {
+            cirController = CircunscripcionController.GetInstance(nuevaConexion);
+            circunscripciones = cirController.FindAll();
+        }
     }
 }

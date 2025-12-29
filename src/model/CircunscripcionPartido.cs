@@ -21,6 +21,9 @@ namespace Elecciones.src.model.IPF
         public int escaniosDesdeSondeo { get; set; }
         public int escaniosHastaSondeo { get; set; }
         public double porcentajeVotoSondeo { get; set; }
+        public int esUltimoEscano{ get; set; }
+        public int luchaUltimoEscano { get; set; }
+        public int restoVotos { get; set; }
 
         ConfigManager configuration;
 

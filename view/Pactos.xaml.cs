@@ -179,6 +179,7 @@ namespace Elecciones
         {
             if (partidosIzqListView.SelectedItem != null)
             {
+                var main = Application.Current.MainWindow as MainWindow;
                 CPDataDTO seleccionado = (CPDataDTO)partidosIzqListView.SelectedItem;
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
@@ -187,7 +188,11 @@ namespace Elecciones
                 preparado = false;
                 //Mandar mensaje de despliegue individualizado IZQ
                 int index = partidosTotales.IndexOf(seleccionado);
-                if (independentismo) { graficos.independentismoEntraIzquierda(index); } else { graficos.pactosEntraIzquierda(index); }
+                if (main.ultimoEscanoDentro)
+                {
+                    graficos.ultimoEntraPartido(main.dto, seleccionado, true);
+                }
+                //   if (independentismo) { graficos.independentismoEntraIzquierda(index); } else { graficos.pactosEntraIzquierda(index); }
 
             }
         }
@@ -196,6 +201,7 @@ namespace Elecciones
         {
             if (partidosIzqListView.SelectedItem != null)
             {
+                var main = Application.Current.MainWindow as MainWindow;
                 CPDataDTO seleccionado = (CPDataDTO)partidosIzqListView.SelectedItem;
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
@@ -203,13 +209,18 @@ namespace Elecciones
                 lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total escaños: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado IZQ
                 int index = partidosTotales.IndexOf(seleccionado);
-                if (independentismo) { graficos.independentismoEntraIzquierda(index); } else { graficos.pactosEntraIzquierda(index); }
+                if (main.ultimoEscanoDentro)
+                {
+                    graficos.ultimoEntraPartido(main.dto, seleccionado, true);
+                }
+                // if (independentismo) { graficos.independentismoEntraIzquierda(index); } else { graficos.pactosEntraIzquierda(index); }
             }
         }
         private void partidosDerListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (partidosDerListView.SelectedItem != null)
             {
+                var main = Application.Current.MainWindow as MainWindow;
                 CPDataDTO seleccionado = (CPDataDTO)partidosDerListView.SelectedItem;
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
@@ -217,7 +228,11 @@ namespace Elecciones
                 lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
-                if (independentismo) { graficos.independentismoEntraDerecha(index); } else { graficos.pactosEntraDerecha(index); }
+                if (main.ultimoEscanoDentro)
+                {
+                    graficos.ultimoEntraPartido(main.dto, seleccionado, false);
+                }
+                // if (independentismo) { graficos.independentismoEntraDerecha(index); } else { graficos.pactosEntraDerecha(index); }
             }
         }
 
@@ -320,6 +335,7 @@ namespace Elecciones
         {
             if (partidosDerListView.SelectedItem != null)
             {
+                var main = Application.Current.MainWindow as MainWindow;
                 CPDataDTO seleccionado = (CPDataDTO)partidosDerListView.SelectedItem;
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
@@ -327,7 +343,11 @@ namespace Elecciones
                 lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
-                if (independentismo) { graficos.independentismoEntraDerecha(index); } else { graficos.pactosEntraDerecha(index); }
+                if (main.ultimoEscanoDentro)
+                {
+                    graficos.ultimoEntraPartido(main.dto, seleccionado, false);
+                }
+                //if (independentismo) { graficos.independentismoEntraDerecha(index); } else { graficos.pactosEntraDerecha(index); }
             }
         }
 
@@ -366,7 +386,7 @@ namespace Elecciones
             lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq}%" : $"Total escaños: {totalIzq}";
             lblEscaniosDer.Content = independentismo ? $"Total: {totalDer}%" : $"Total escaños: {totalDer}";
 
-            if (independentismo) { graficos.independentismoReinicio(); } else { graficos.pactosReinicio(); }
+            // if (independentismo) { graficos.independentismoReinicio(); } else { graficos.pactosReinicio(); }
 
         }
 
@@ -388,6 +408,7 @@ namespace Elecciones
         private void btnSale_Click(object sender, RoutedEventArgs e)
         {
             graficos.pactosSale();
+            graficos.ultimoLimpiaPartidos();
             pactoDentro = false;
             var main = Application.Current.MainWindow as MainWindow;
             main.Update();

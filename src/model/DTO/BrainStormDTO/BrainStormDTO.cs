@@ -77,8 +77,8 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                 ultimo = new PartidoDTO();
                 siguiente = new PartidoDTO();
             } else {
-                ultimo = this.partidos.FirstOrDefault(p => p.esUltimoEscano != 0);
-                siguiente = this.partidos.FirstOrDefault(p => p.luchaUltimoEscano != 0);
+                ultimo = this.partidos.FirstOrDefault(p => p.esUltimoEscano != 0) ?? new PartidoDTO();
+                siguiente = this.partidos.FirstOrDefault(p => p.luchaUltimoEscano != 0) ?? new PartidoDTO();
             }
             string resultado = "Codigo;Nombre;Escrutado;Escaños;Mayoría;Avance;Participacion;Participacion Historica;Media de Participacion;Votantes;Últimas Elecciones;Numero de partidos;Ultimo;Siguiente;Resto\n";
             resultado += $"{circunscripcionDTO.codigo};{circunscripcionDTO.nombre};{circunscripcionDTO.escrutado.ToString("F2")};{circunscripcionDTO.escaniosTotales};{circunscripcionDTO.mayoria};{circunscripcionDTO.numAvance};{circunscripcionDTO.participacion.ToString("F2")};{circunscripcionDTO.participacionHistorica.ToString("F2")};{circunscripcionDTO.participacionMedia.ToString("F2")};{circunscripcionDTO.numVotantesTotales};{circunscripcionDTO.anioUltimasElecciones};{numPartidos};{ultimo.siglas};{siguiente.siglas};{siguiente.restoVotos}\n";

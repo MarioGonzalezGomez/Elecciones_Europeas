@@ -525,9 +525,9 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(cartonBuilder.cartonPartidosEntra(dto));
         }
 
-        public void cartonPartidosActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        public void cartonPartidosActualiza(BrainStormDTO dto)
         {
-            c.EnviarMensaje(cartonBuilder.cartonPartidosActualiza(dtoAnterior, dto));
+            c.EnviarMensaje(cartonBuilder.cartonPartidosActualiza(dto));
         }
 
         public void cartonPartidosSale()

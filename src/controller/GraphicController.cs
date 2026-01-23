@@ -535,9 +535,9 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.cartonPartidosEntra(dto); }
         }
-        public void cartonPartidosActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        public void cartonPartidosActualiza(BrainStormDTO dto)
         {
-            if (ipfActivo.Valor == 1) { ipf.cartonPartidosActualiza(dtoAnterior, dto); }
+            if (ipfActivo.Valor == 1) { ipf.cartonPartidosActualiza(dto); }
         }
         public void cartonPartidosSale()
         {

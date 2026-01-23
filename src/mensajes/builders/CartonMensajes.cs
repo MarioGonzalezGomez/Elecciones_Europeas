@@ -4,8 +4,10 @@ using System.Windows;
 using Elecciones.src.conexion;
 using Elecciones.src.controller;
 using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.DTO.Cartones;
 using Elecciones.src.model.IPF;
 using Elecciones.src.model.IPF.DTO;
+using Microsoft.Extensions.Primitives;
 
 namespace Elecciones.src.mensajes.builders
 {
@@ -451,8 +453,7 @@ namespace Elecciones.src.mensajes.builders
         {
             if (dto == null) return "";
             StringBuilder sb = new StringBuilder();
-            sb.Append(Prepara("CARTON_PARTIDOS") + "\n");
-            sb.Append(EventBuild("Mayorias1/LugarTxt", "TEXT_STRING", dto.circunscripcionDTO?.nombre ?? "", 1) + "\n");
+            // sb.Append(Prepara("CARTON_PARTIDOS") + "\n");
 
             var partidos = dto.partidos ?? new List<PartidoDTO>();
             var siglasLocal = partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList();
@@ -462,34 +463,25 @@ namespace Elecciones.src.mensajes.builders
                 string y = ((-0.2 * i).ToString("0.0", CultureInfo.InvariantCulture));
                 int z = i < 6 ? (-100 * i) : (-100 * (i - 6));
                 sb.Append(EventBuild($"Carton_Partidos/Fichas/{siglasLocal[i]}", "OBJ_DISPLACEMENT", $"({x},{y},{z})", 1) + "\n");
-                sb.Append(EventBuild($"Carton_Partidos/Fichas/{siglasLocal[i]}", "OBJ_CULL", "0", 2, 0, 0.5) + "\n");
             }
-
+            sb.Append(CartonesActualiza());
             sb.Append(Entra("CARTON_PARTIDOS"));
             return sb.ToString();
         }
 
-        public string cartonPartidosActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dtoNuevo)
+        public string cartonPartidosActualiza(BrainStormDTO dto)
         {
-            if (dtoNuevo == null) return "";
+            if (dto == null) return "";
             StringBuilder sb = new StringBuilder();
 
-            var anteriores = (dtoAnterior?.partidos ?? new List<PartidoDTO>()).Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList();
-            var nuevos = (dtoNuevo.partidos ?? new List<PartidoDTO>()).Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList();
+            var siglas = (dto.partidos ?? new List<PartidoDTO>()).Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList();
 
-            for (int i = 0; i < nuevos.Count; i++)
+            for (int i = 0; i < siglas.Count; i++)
             {
                 int x = i < 6 ? 0 : 918;
                 string y = ((-0.2 * i).ToString("0.0", CultureInfo.InvariantCulture));
                 int z = i < 6 ? (-100 * i) : (-100 * (i - 6));
-                sb.Append(EventBuild($"Carton_Partidos/Fichas/{nuevos[i]}", "OBJ_DISPLACEMENT", $"({x},{y},{z})", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"Carton_Partidos/Fichas/{nuevos[i]}", "OBJ_CULL", "0", 1) + "\n");
-            }
-
-            foreach (var s in anteriores.Except(nuevos))
-            {
-                sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_DISPLACEMENT", "(1920,0,0)", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_CULL", "1", 1) + "\n");
+                sb.Append(EventBuild($"Carton_Partidos/Fichas/{siglas[i]}", "OBJ_DISPLACEMENT", $"({x},{y},{z})", 2, 0.5, 0) + "\n");
             }
             sb.Append(EventBuild("Oficial_Codigo", "MAP_LLSTRING_LOAD"));
 
@@ -499,14 +491,6 @@ namespace Elecciones.src.mensajes.builders
         public string cartonPartidosSale()
         {
             StringBuilder sb = new StringBuilder();
-            try
-            {
-                var main = Application.Current.MainWindow as MainWindow;
-                var todas = main?.dtoSinFiltrar?.partidos?.Select(p => p.siglas.Replace("+", "_").Replace("-", "_")).ToList() ?? new();
-                foreach (var s in todas)
-                    sb.Append(EventBuild($"Carton_Partidos/Fichas/{s}", "OBJ_DISPLACEMENT", "(-1920,0,0)", 2, 0.5, 0) + "\n");
-            }
-            catch { }
             sb.Append(Sale("CARTON_PARTIDOS"));
             return sb.ToString();
         }
@@ -517,7 +501,46 @@ namespace Elecciones.src.mensajes.builders
 
         public string ultimoEntra(BrainStormDTO dto)
         {
-            return CartonesActualiza() + "\n" + Entra("ULTIMO_ESCANO") + "\n";
+            if (dto == null) return "";
+            var main = Application.Current.MainWindow as MainWindow;
+            var con = main?.conexionActiva;
+            StringBuilder sb = new StringBuilder();
+            sb.Append(Prepara("ULTIMO_ESCANO"));
+            var provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dto.circunscripcionDTO.nombre);
+            //HACER COLOR OK
+            if (provincias?.Count > 0)
+            {
+                foreach (var prov in provincias)
+                {
+                    // itemset("CCAA_Carton/Badajoz", "MAT_COLOR_HSV[2]", 0.196078)
+                    sb.Append(EventBuild($"CCAA_Carton/{prov.nombre}", "MAT_LIST_COLOR", "Blanco", 1));
+                }
+            }
+            else
+            {
+                sb.Append(EventBuild($"CCAA_Carton/{dto.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "Blanco", 1));
+            }
+            //TERMINA PARTE COLOR
+            //PARTE PARTIDOS DESTACADOS
+            PartidoDTO ultimo = dto.partidos.Find(p => p.esUltimoEscano == 1);
+            PartidoDTO siguiente = dto.partidos.Find(p => p.luchaUltimoEscano == 1);
+            if (ultimo != null)
+            {
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{ultimo.siglas}", "OBJ_DISPLACEMENT", "(-94, 0, 326)", 1));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{ultimo.siglas}", "OBJ_SCALE", "(1, 1, 1)", 1));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{ultimo.siglas}/Escano", "OBJ_CULL", "0", 2, 0, 0.1));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{ultimo.siglas}", "OBJ_CULL", "0", 2, 0, 0.1));
+            }
+            if (siguiente != null)
+            {
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}", "OBJ_DISPLACEMENT", "(-154, 0, 0)", 1));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}", "OBJ_SCALE", "(0.86, 0.86, 0.86)", 1));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}/Escano", "OBJ_CULL", "1", 2, 0, 0.1));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}", "OBJ_CULL", "0", 2, 0, 0.1));
+            }
+            sb.Append(CartonesActualiza());
+            sb.Append(Entra("ULTIMO_ESCANO"));
+            return sb.ToString();
         }
 
         public string ultimoEntraPartido(BrainStormDTO dto, CPDataDTO partido, bool esIzquierda)

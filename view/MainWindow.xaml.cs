@@ -393,7 +393,7 @@ namespace Elecciones
             }
             if (cartonPartidosDentro)
             {
-                graficos.cartonPartidosActualiza(dtoAnterior, dto);
+                graficos.cartonPartidosActualiza(dto);
             }
             if (ultimoEscanoDentro)
             {

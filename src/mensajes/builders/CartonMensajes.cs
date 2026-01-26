@@ -395,7 +395,7 @@ namespace Elecciones.src.mensajes.builders
             signal.Append(EventBuild("Mayorias/LugarTxt1", "TEXT_STRING", dto.circunscripcionDTO?.nombre ?? "", 1) + "\n");
 
             var partidos = dto.partidos ?? new List<PartidoDTO>();
-            string topSigla = partidos.OrderByDescending(p => p.escaniosHasta).FirstOrDefault()?.siglas.Replace("+", "_").Replace("-", "_") ?? "";
+            string topSigla = partidos.OrderByDescending(p => p.escanios).FirstOrDefault()?.siglas.Replace("+", "_").Replace("-", "_") ?? "";
 
             try
             {
@@ -507,18 +507,17 @@ namespace Elecciones.src.mensajes.builders
             StringBuilder sb = new StringBuilder();
             sb.Append(Prepara("ULTIMO_ESCANO"));
             var provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dto.circunscripcionDTO.nombre);
-            //HACER COLOR OK
-            if (provincias?.Count > 0)
+            //PARTE COLOR
+            if (dto.circunscripcionDTO.codigo.EndsWith("00000") && provincias?.Count > 0)
             {
                 foreach (var prov in provincias)
                 {
-                    // itemset("CCAA_Carton/Badajoz", "MAT_COLOR_HSV[2]", 0.196078)
-                    sb.Append(EventBuild($"CCAA_Carton/{prov.nombre}", "MAT_LIST_COLOR", "Blanco", 1));
+                    sb.Append(EventBuild($"CCAA_Carton/{prov.nombre}", "MAT_COLOR_HSV[2]", "1", 2, 0.5, 0));
                 }
             }
             else
             {
-                sb.Append(EventBuild($"CCAA_Carton/{dto.circunscripcionDTO.nombre}", "MAT_LIST_COLOR", "Blanco", 1));
+                sb.Append(EventBuild($"CCAA_Carton/{dto.circunscripcionDTO.nombre}", "MAT_COLOR_HSV[2]", "1", 2, 0.5, 0));
             }
             //TERMINA PARTE COLOR
             //PARTE PARTIDOS DESTACADOS
@@ -550,7 +549,7 @@ namespace Elecciones.src.mensajes.builders
 
             int escaniosTotales = dto.circunscripcionDTO?.escaniosTotales ?? 65;
             string siglasP = partido.siglas.Replace("+", "_").Replace("-", "_");
-            int anchoPartido = (int)Math.Round((double)TAMANO_MAXIMO_FICHA / escaniosTotales * int.Parse(partido.escaniosHasta));
+            int anchoPartido = (int)Math.Round((double)TAMANO_MAXIMO_FICHA / escaniosTotales * int.Parse(partido.escanios));
 
             string[] barrasIzq = { "Barra_Izq", "Barra_Izq1", "Barra_Izq2", "Barra_Izq3" };
             string[] barrasDch = { "Barra_Dch", "Barra_Dch1", "Barra_Dch2", "Barra_Dch3" };
@@ -562,8 +561,8 @@ namespace Elecciones.src.mensajes.builders
             string nombreGrupo = esIzquierda ? "Barras_Izq" : "Barras_Dch";
 
             int posX;
-            if (esIzquierda) { posX = POS_INICIAL_IZQ + anchoAcumuladoIzq; anchoAcumuladoIzq += anchoPartido; escaniosAcumuladosIzq += int.Parse(partido.escaniosHasta); }
-            else { posX = POS_INICIAL_DCH - anchoAcumuladoDch; anchoAcumuladoDch += anchoPartido; escaniosAcumuladosDch += int.Parse(partido.escaniosHasta); }
+            if (esIzquierda) { posX = POS_INICIAL_IZQ + anchoAcumuladoIzq; anchoAcumuladoIzq += anchoPartido; escaniosAcumuladosIzq += int.Parse(partido.escanios); }
+            else { posX = POS_INICIAL_DCH - anchoAcumuladoDch; anchoAcumuladoDch += anchoPartido; escaniosAcumuladosDch += int.Parse(partido.escanios); }
 
             ultimoEscanoPartidos.Add((esIzquierda, siglasP, anchoPartido));
 
@@ -608,7 +607,7 @@ namespace Elecciones.src.mensajes.builders
             foreach (var item in ultimoEscanoPartidos)
             {
                 var partidoNuevo = dtoNuevo.partidos.FirstOrDefault(p => p.siglas.Replace("+", "_").Replace("-", "_") == item.siglas);
-                int nuevosEscanios = partidoNuevo?.escaniosHasta ?? 0;
+                int nuevosEscanios = partidoNuevo?.escanios ?? 0;
                 int nuevoAncho = (int)Math.Round((double)TAMANO_MAXIMO_FICHA / escaniosTotales * nuevosEscanios);
 
                 string nombreBarra = item.esIzquierda ? (idxIzq < barrasIzq.Length ? barrasIzq[idxIzq++] : "") : (idxDch < barrasDch.Length ? barrasDch[idxDch++] : "");

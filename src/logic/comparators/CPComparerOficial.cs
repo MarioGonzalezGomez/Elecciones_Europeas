@@ -20,31 +20,15 @@ namespace Elecciones.src.logic.comparators
             if (o1.codPartido.Equals("99999")) return -1;
             if (o2.codPartido.Equals("99999")) return 1;
 
-            // Si o1 tiene el código 96009, siempre va antes que 99999 pero después de los otros
-            if (o1.codPartido.Equals("96009"))
-            {
-                if (o2.codPartido.Equals("99999")) return 1;
-                return -1;
-            }
-
-            if (o2.codPartido.Equals("96009"))
-            {
-                if (o1.codPartido.Equals("99999")) return 1;
-                return -1;
-            }
 
             // Comparar los demás elementos según los criterios especificados
-            int comp = Comparer<int>.Default.Compare(o1.escaniosHasta, o2.escaniosHasta);
+            int comp = Comparer<int>.Default.Compare(o1.escanios, o2.escanios);
             if (comp == 0)
             {
-                comp = Comparer<double>.Default.Compare(o1.escaniosDesde, o2.escaniosDesde);
+                comp = Comparer<double>.Default.Compare(o1.porcentajeVoto, o2.porcentajeVoto);
                 if (comp == 0)
                 {
-                    comp = Comparer<double>.Default.Compare(o1.porcentajeVoto, o2.porcentajeVoto);
-                    if (comp == 0)
-                    {
-                        comp = Comparer<int>.Default.Compare(o1.numVotantes, o2.numVotantes);
-                    }
+                    comp = Comparer<int>.Default.Compare(o1.numVotantes, o2.numVotantes);
                 }
             }
             return comp;

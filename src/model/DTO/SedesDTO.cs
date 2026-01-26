@@ -12,20 +12,58 @@ namespace Elecciones.src.model.IPF.DTO
 {
     public class SedesDTO
     {
-        public string codigo { get; set; }
-        public string padre { get; set; }
-        public string siglas { get; set; }
-        public string literalPartido { get; set; }
-        public string candidato { get; set; }
-        public int escaniosDesde { get; set; }
-        public int escaniosHasta { get; set; }
-        public int escaniosHistoricos { get; set; }
-        public double porcentajeVoto { get; set; }
-        public double porcentajeVotoHist { get; set; }
-        public int numVotantes { get; set; }
-        public int numVotantesHist { get; set; }
-        public int diferenciaEscanios { get; set; }
-        public string tendencia { get; set; }
+        public string codigo
+        {
+            get; set;
+        }
+        public string padre
+        {
+            get; set;
+        }
+        public string siglas
+        {
+            get; set;
+        }
+        public string literalPartido
+        {
+            get; set;
+        }
+        public string candidato
+        {
+            get; set;
+        }
+        public int escanios
+        {
+            get; set;
+        }
+        public int escaniosHistoricos
+        {
+            get; set;
+        }
+        public double porcentajeVoto
+        {
+            get; set;
+        }
+        public double porcentajeVotoHist
+        {
+            get; set;
+        }
+        public int numVotantes
+        {
+            get; set;
+        }
+        public int numVotantesHist
+        {
+            get; set;
+        }
+        public int diferenciaEscanios
+        {
+            get; set;
+        }
+        public string tendencia
+        {
+            get; set;
+        }
 
         ConfigManager configuration;
 
@@ -38,8 +76,7 @@ namespace Elecciones.src.model.IPF.DTO
             this.siglas = dto.siglas;
             this.literalPartido = dto.literalPartido;
             this.candidato = dto.candidato;
-            this.escaniosDesde = dto.escaniosDesde;
-            this.escaniosHasta = dto.escaniosHasta;
+            this.escanios = dto.escanios;
             this.escaniosHistoricos = dto.escaniosHistoricos;
             this.porcentajeVoto = dto.porcentajeVoto;
             this.porcentajeVotoHist = dto.porcentajeVotoHist;
@@ -63,17 +100,16 @@ namespace Elecciones.src.model.IPF.DTO
             dto.siglas = partido.siglas;
             dto.literalPartido = partido.nombre;
             dto.candidato = partido.candidato;
-            dto.escaniosDesde = oficiales ? cp.escaniosDesde : cp.escaniosDesdeSondeo;
-            dto.escaniosHasta = oficiales ? cp.escaniosHasta : cp.escaniosHastaSondeo;
-            dto.escaniosHistoricos = cp.escaniosHastaHist;
+            dto.escanios = cp.escanios;
+            dto.escaniosHistoricos = cp.escaniosHist;
             dto.porcentajeVoto = oficiales ? cp.porcentajeVoto : cp.porcentajeVotoSondeo;
             dto.porcentajeVotoHist = cp.porcentajeVotoHist;
             dto.numVotantes = cp.numVotantes;
             dto.numVotantesHist = cp.numVotantesHist;
 
-            int dif = cp.escaniosHastaHist == 0 ? 0 : dto.escaniosHasta - cp.escaniosHastaHist;
+            int dif = cp.escaniosHist == 0 ? 0 : dto.escanios - cp.escaniosHist;
             dto.diferenciaEscanios = dif;
-            string tendencia = (cp.escaniosHastaHist == 0) ? "*" :
+            string tendencia = (cp.escaniosHist == 0) ? "*" :
                    (dif > 0) ? "+" :
                    (dif == 0) ? "=" :
                    "-";
@@ -102,15 +138,14 @@ namespace Elecciones.src.model.IPF.DTO
             {
                 dto.padre = pdto.codigo;
             }
-            dto.escaniosDesde = pdto.escaniosDesde;
-            dto.escaniosHasta = pdto.escaniosHasta;
+            dto.escanios = pdto.escanios;
             dto.escaniosHistoricos = pdto.escaniosHistoricos;
             dto.porcentajeVoto = pdto.porcentajeVoto;
             dto.porcentajeVotoHist = pdto.porcentajeVotoHistorico;
             dto.numVotantes = pdto.numVotantes;
             dto.numVotantesHist = pdto.numVotantesHistoricos;
 
-            int dif = dto.escaniosHistoricos == 0 ? 0 : dto.escaniosHasta - dto.escaniosHistoricos;
+            int dif = dto.escaniosHistoricos == 0 ? 0 : dto.escanios - dto.escaniosHistoricos;
             dto.diferenciaEscanios = dif;
             string tendencia = (dto.escaniosHistoricos == 0) ? "*" :
                    (dif > 0) ? "+" :
@@ -140,8 +175,7 @@ namespace Elecciones.src.model.IPF.DTO
         {
 
             string fileName = $"{configuration.GetValue("rutaArchivos")}\\CSV\\Sedes.csv";
-            string codigo = padre;
-            string codigoPadre = padre.StartsWith("09") ? $"00{padre.Substring(2)}" : padre;
+
             int difVotos = numVotantes - numVotantesHist;
             string tendenciaVotos = numVotantesHist == 0 ? "*" :
               difVotos > 0 ? "+" :
@@ -150,8 +184,8 @@ namespace Elecciones.src.model.IPF.DTO
             difVotos = difVotos < 0 ? difVotos * (-1) : difVotos;
             double porcentajeVotoTruncado = Math.Truncate(porcentajeVoto * 10) / 10;
 
-            string csv = $"Código;Padre;Siglas;Candidato;Escaños Desde;Hasta;Históricos;% Voto;Votantes;Diferencia de escaños;Tendencia;Diferencia de votos;Tendendia\n";
-            csv += $"{codigo};{codigoPadre};{this.siglas};{this.candidato};{this.escaniosDesde};{this.escaniosHasta};{this.escaniosHistoricos};{porcentajeVotoTruncado.ToString()};{numVotantes.ToString("#,##0").Replace(",", ".")};{diferenciaEscanios};{tendencia};{difVotos.ToString("#,##0").Replace(",", ".")};{tendenciaVotos}\n";
+            string csv = $"Cï¿½digo;Padre;Siglas;Candidato;Escaï¿½os;Histï¿½ricos;% Voto;Votantes;Diferencia de escaï¿½os;Tendencia;Diferencia de votos;Tendendia\n";
+            csv += $"{codigo};{padre};{this.siglas};{this.candidato};{this.escanios};{this.escaniosHistoricos};{porcentajeVotoTruncado.ToString()};{numVotantes.ToString("#,##0").Replace(",", ".")};{diferenciaEscanios};{tendencia};{difVotos.ToString("#,##0").Replace(",", ".")};{tendenciaVotos}\n";
             await File.WriteAllTextAsync(fileName, csv);
         }
     }

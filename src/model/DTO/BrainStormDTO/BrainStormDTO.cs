@@ -20,6 +20,10 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         {
             get; set;
         }
+        public bool oficiales
+        {
+            get; set;
+        }
         public List<PartidoDTO> partidos
         {
             get; set;
@@ -31,6 +35,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
             configuration = ConfigManager.GetInstance();
             circunscripcionDTO = CircunscripcionDTO.FromCircunscripcion(c, avanceActual, tipoElecciones, con);
             partidos = new List<PartidoDTO>();
+            this.oficiales=oficiales;
             foreach (var partido in cps)
             {
                 PartidoDTO dto = PartidoDTO.FromCP(partido, oficiales, con);
@@ -38,12 +43,12 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                 if (dto != null) { partidos.Add(dto); }
 
             }
-            numPartidos = partidos.Count;
+            this.numPartidos = partidos.Where(par => (oficiales ? par.escanios : par.escaniosHastaSondeo) > 0).Count();
         }
         public BrainStormDTO(BrainStormDTO dto)
         {
             this.circunscripcionDTO = dto.circunscripcionDTO;
-            this.numPartidos = dto.partidos.Where(par => par.escaniosHasta > 0).Count();
+            this.numPartidos = dto.partidos.Where(par => (this.oficiales ? par.escanios : par.escaniosHastaSondeo) > 0).Count();
             this.partidos = dto.partidos;
             this.configuration = dto.configuration;
         }
@@ -80,13 +85,12 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                 ultimo = this.partidos.FirstOrDefault(p => p.esUltimoEscano != 0) ?? new PartidoDTO();
                 siguiente = this.partidos.FirstOrDefault(p => p.luchaUltimoEscano != 0) ?? new PartidoDTO();
             }
-            string resultado = "Codigo;Nombre;Escrutado;Escaños;Mayoría;Avance;Participacion;Participacion Historica;Media de Participacion;Votantes;Últimas Elecciones;Numero de partidos;Ultimo;Siguiente;Resto\n";
+            string resultado = "Codigo;Nombre;Escrutado;Escaï¿½os;Mayorï¿½a;Avance;Participacion;Participacion Historica;Media de Participacion;Votantes;ï¿½ltimas Elecciones;Numero de partidos;Ultimo;Siguiente;Resto\n";
             resultado += $"{circunscripcionDTO.codigo};{circunscripcionDTO.nombre};{circunscripcionDTO.escrutado.ToString("F2")};{circunscripcionDTO.escaniosTotales};{circunscripcionDTO.mayoria};{circunscripcionDTO.numAvance};{circunscripcionDTO.participacion.ToString("F2")};{circunscripcionDTO.participacionHistorica.ToString("F2")};{circunscripcionDTO.participacionMedia.ToString("F2")};{circunscripcionDTO.numVotantesTotales};{circunscripcionDTO.anioUltimasElecciones};{numPartidos};{ultimo.siglas};{siguiente.siglas};{siguiente.restoVotos}\n";
-            resultado += $"Código;Padre;Siglas;Candidato;Escaños Desde;Hasta;Históricos;% Voto;Votantes;Diferencia de escaños;Tendencia;Diferencia de votos;Tendendia;Votantes Historico;Nombre\n";
+            resultado += $"Cï¿½digo;Padre;Siglas;Candidato;Escaï¿½os;Escaï¿½os Desde Sondeo;Hasta Sondeo;Histï¿½ricos;% Voto;Votantes;Diferencia de escaï¿½os;Tendencia;Diferencia de votos;Tendendia;Votantes Historico;Nombre\n";
             foreach (var p in partidos)
             {
                 string codigo = p.padre;
-                // string codigoPadre = p.padre.StartsWith(configuration.GetValue("codigoRegionalBD1")) || p.padre.StartsWith(configuration.GetValue("codigoRegionalBD2")) ? $"00{p.padre.Substring(2)}" : p.padre;
                 string codigoPadre = codigo;
                 int difVotos = p.numVotantes - p.numVotantesHistoricos;
                 string tendenciaVotos = p.numVotantesHistoricos == 0 ? "*" :
@@ -95,7 +99,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                   "-";
                 difVotos = difVotos < 0 ? difVotos * (-1) : difVotos;
                 double porcentajeVotoTruncado = Math.Truncate(p.porcentajeVoto * 10) / 10;
-                resultado += $"{p.codigo};{codigoPadre};{p.siglas};{p.candidato};{p.escaniosDesde};{p.escaniosHasta};{p.escaniosHistoricos};{porcentajeVotoTruncado.ToString()};{p.numVotantes};{p.diferenciaEscanios};{p.tendencia};{difVotos};{tendenciaVotos};{p.numVotantesHistoricos};{p.nombre}\n";
+                resultado += $"{p.codigo};{codigoPadre};{p.siglas};{p.candidato};{p.escanios};{p.escaniosDesdeSondeo};{p.escaniosHastaSondeo};{p.escaniosHistoricos};{porcentajeVotoTruncado.ToString()};{p.numVotantes};{p.diferenciaEscanios};{p.tendencia};{difVotos};{tendenciaVotos};{p.numVotantesHistoricos};{p.nombre}\n";
             }
 
             await File.WriteAllTextAsync(fileName, resultado);

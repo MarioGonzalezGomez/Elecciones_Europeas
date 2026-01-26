@@ -149,7 +149,6 @@ namespace Elecciones.src.conexion
                 entity.Property("codigoPadre").HasColumnName("padre");
                 entity.Property("siglas").HasColumnName("sigla");
                 entity.Property("nombre").HasColumnName("descripcion");
-                entity.Property("independentismo").HasColumnName("tendencia");
 
             });
             modelBuilder.Entity<Circunscripcion>(entity =>
@@ -182,12 +181,10 @@ namespace Elecciones.src.conexion
                 entity.HasKey(cp => new { cp.codCircunscripcion, cp.codPartido });
                 entity.Property(cp => cp.codCircunscripcion).HasColumnName("COD_CIRCUNSCRIPCION");
                 entity.Property(cp => cp.codPartido).HasColumnName("COD_PARTIDO");
-                entity.Property("escaniosDesde").HasColumnName("escanos_desde");
-                entity.Property("escaniosHasta").HasColumnName("escanos_hasta");
+                entity.Property("escanios").HasColumnName("escanos_hasta");
                 entity.Property("porcentajeVoto").HasColumnName("votos");
                 entity.Property("numVotantes").HasColumnName("votantes");
-                entity.Property("escaniosDesdeHist").HasColumnName("escanos_desde_hist");
-                entity.Property("escaniosHastaHist").HasColumnName("escanos_hasta_hist");
+                entity.Property("escaniosHist").HasColumnName("escanos_hasta_hist");
                 entity.Property("porcentajeVotoHist").HasColumnName("votos_hist");
                 entity.Property("numVotantesHist").HasColumnName("votantes_hist");
                 entity.Property("escaniosDesdeSondeo").HasColumnName("escanos_desde_sondeo");

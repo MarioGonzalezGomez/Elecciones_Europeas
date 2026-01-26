@@ -29,11 +29,15 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         {
             get; set;
         }
-        public int escaniosDesde
+        public int escanios
         {
             get; set;
         }
-        public int escaniosHasta
+        public int escaniosDesdeSondeo
+        {
+            get; set;
+        }
+        public int escaniosHastaSondeo
         {
             get; set;
         }
@@ -62,10 +66,6 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
             get; set;
         }
         public string tendencia
-        {
-            get; set;
-        }
-        public string independentismo
         {
             get; set;
         }
@@ -100,28 +100,28 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
 
         public static PartidoDTO FromCP(CircunscripcionPartido cp, bool oficiales, ConexionEntityFramework con)
         {
-            PartidoDTO dto = new PartidoDTO(cp.codPartido, cp.escaniosHastaHist, cp.numVotantes);
+            PartidoDTO dto = new PartidoDTO(cp.codPartido, cp.escaniosHist, cp.numVotantes);
             Partido partido = PartidoController.GetInstance(con).FindById(cp.codPartido);
             if (partido != null)
             {
                 dto.padre = partido.codigoPadre;
                 dto.siglas = partido.siglas;
                 dto.candidato = partido.candidato;
-                dto.escaniosDesde = oficiales ? cp.escaniosDesde : cp.escaniosDesdeSondeo;
-                dto.escaniosHasta = oficiales ? cp.escaniosHasta : cp.escaniosHastaSondeo;
+                dto.escanios = oficiales ? cp.escanios : 0;
+                dto.escaniosDesdeSondeo = cp.escaniosDesdeSondeo;
+                dto.escaniosHastaSondeo = cp.escaniosHastaSondeo;
                 dto.porcentajeVoto = oficiales ? cp.porcentajeVoto : cp.porcentajeVotoSondeo;
                 dto.porcentajeVotoHistorico = cp.porcentajeVotoHist;
                 dto.numVotantes = cp.numVotantes;
                 dto.numVotantesHistoricos = cp.numVotantesHist;
-                dto.independentismo = partido.independentismo.ToString();
                 dto.nombre = partido.nombre;
                 dto.esUltimoEscano = cp.esUltimoEscano;
                 dto.luchaUltimoEscano = cp.luchaUltimoEscano;
                 dto.restoVotos = cp.restoVotos;
 
-                int dif = cp.escaniosHastaHist == 0 ? dto.escaniosHasta : dto.escaniosHasta - cp.escaniosHastaHist;
+                int dif = cp.escaniosHist == 0 ? (oficiales ? dto.escanios : dto.escaniosHastaSondeo) : (oficiales ? dto.escanios : dto.escaniosHastaSondeo) - cp.escaniosHist;
                 dto.diferenciaEscanios = int.Abs(dif);
-                string tendencia = cp.escaniosHastaHist == 0 ? "*" :
+                string tendencia = cp.escaniosHist == 0 ? "*" :
                        dif > 0 ? "+" :
                        dif == 0 ? "=" :
                        "-";

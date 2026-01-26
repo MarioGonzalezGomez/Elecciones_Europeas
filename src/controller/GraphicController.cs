@@ -397,38 +397,6 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.pactosSaleIzquierda(posicionPartido); }
         }
 
-        //INDEPENDENTISMO
-        public void independentismoEntra()
-        {
-            if (ipfActivo.Valor == 1) { ipf.independentismoEntra(); }
-        }
-        public void independentismoReinicio()
-        {
-            if (ipfActivo.Valor == 1) { ipf.independentismoReinicio(); }
-        }
-        public void independentismoSale()
-        {
-            if (ipfActivo.Valor == 1) { ipf.independentismoSale(); }
-        }
-
-        public void independentismoEntraDerecha(int posicionPartido)
-        {
-            if (ipfActivo.Valor == 1) { ipf.independentismoEntraDerecha(posicionPartido); }
-        }
-        public void independentismoEntraIzquierda(int posicionPartido)
-        {
-            if (ipfActivo.Valor == 1) { ipf.independentismoEntraIzquierda(posicionPartido); }
-        }
-
-        public void independentismoSaleDerecha(int posicionPartido)
-        {
-            if (ipfActivo.Valor == 1) { ipf.independentismoSaleDerecha(posicionPartido); }
-        }
-        public void independentismoSaleIzquierda(int posicionPartido)
-        {
-            if (ipfActivo.Valor == 1) { ipf.independentismoSaleIzquierda(posicionPartido); }
-        }
-
         //SEDES
         public void SedesEntra(bool tickerIn, BrainStormDTO dto, PartidoDTO seleccionado)
         {

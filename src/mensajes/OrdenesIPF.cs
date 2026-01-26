@@ -133,7 +133,7 @@ namespace Elecciones.src.mensajes
 
         public void TickerEntra(bool oficial, BrainStormDTO dto)
         {
-            c.EnviarMensaje(faldonBuilder.TickerEntra(oficial));
+            c.EnviarMensaje(faldonBuilder.TickerEntra(oficial, dto));
         }
 
         public void TickerEncadena(bool oficial, BrainStormDTO dto)
@@ -342,45 +342,6 @@ namespace Elecciones.src.mensajes
         public void pactosSaleIzquierda(int posicionPartido)
         {
             c.EnviarMensaje(faldonBuilder.pactosSaleIzquierda(posicionPartido));
-        }
-
-        #endregion
-
-        #region Faldón - Independentismo
-
-        public void independentismoEntra()
-        {
-            c.EnviarMensaje(faldonBuilder.independentismoEntra());
-        }
-
-        public void independentismoReinicio()
-        {
-            c.EnviarMensaje(faldonBuilder.independentismoReinicio());
-        }
-
-        public void independentismoSale()
-        {
-            c.EnviarMensaje(faldonBuilder.independentismoSale());
-        }
-
-        public void independentismoEntraDerecha(int posicionPartido)
-        {
-            c.EnviarMensaje(faldonBuilder.independentismoEntraDerecha(posicionPartido));
-        }
-
-        public void independentismoEntraIzquierda(int posicionPartido)
-        {
-            c.EnviarMensaje(faldonBuilder.independentismoEntraIzquierda(posicionPartido));
-        }
-
-        public void independentismoSaleDerecha(int posicionPartido)
-        {
-            c.EnviarMensaje(faldonBuilder.independentismoSaleDerecha(posicionPartido));
-        }
-
-        public void independentismoSaleIzquierda(int posicionPartido)
-        {
-            c.EnviarMensaje(faldonBuilder.independentismoSaleIzquierda(posicionPartido));
         }
 
         #endregion

@@ -68,8 +68,8 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                 recuento.SIGLA_OFICIAL = partido.siglas;
                 recuento.CODIGO = partido.codigo;
                 recuento.ORDEN = dto.partidos.IndexOf(partido) + 1;
-                recuento.ESCANOS_DESDE = partido.escaniosDesde;
-                recuento.ESCANOS_HASTA = partido.escaniosHasta;
+                recuento.ESCANOS_DESDE = partido.escaniosDesdeSondeo;
+                recuento.ESCANOS_HASTA = partido.escanios > 0 ? partido.escanios : partido.escaniosHastaSondeo;
                 recuento.DIF_ESCANOS = partido.diferenciaEscanios;
                 recuento.FLECHA_ESCANOS = GetTendencia(partido.tendencia);
                 recuento.VOTOS = partido.porcentajeVoto;

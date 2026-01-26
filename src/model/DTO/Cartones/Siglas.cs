@@ -23,8 +23,8 @@ namespace Elecciones.src.model.DTO.Cartones
             configuration = ConfigManager.GetInstance();
             this.circunscripcion = circunscripcion;
             partido = dto.codigo;
-            escanosDesde = dto.escaniosDesde;
-            escanosHasta = dto.escaniosHasta;
+            escanosDesde = dto.escaniosDesdeSondeo;
+            escanosHasta = dto.escanios;
             diferencia = dto.diferenciaEscanios;
             tendencia = dto.tendencia;
             escanosHistoricos = dto.escaniosHistoricos;
@@ -45,7 +45,7 @@ namespace Elecciones.src.model.DTO.Cartones
         public async Task ToCsv()
         {
             string fileName = $"{configuration.GetValue("rutaArchivos")}\\CSV\\{partido}.csv";
-            string csv = $"Circunscripción;Partido;Escaños Desde;Hasta;Diferencia;Tendencia;Históricos\n";
+            string csv = $"Circunscripciï¿½n;Partido;Escaï¿½os Desde;Hasta;Diferencia;Tendencia;Histï¿½ricos\n";
             csv += $"{this.circunscripcion};{this.partido};{this.escanosDesde};{this.escanosHasta};{this.diferencia};{this.tendencia};{this.escanosHistoricos}\n";
             await File.WriteAllTextAsync(fileName, csv);
         }

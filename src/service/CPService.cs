@@ -97,7 +97,7 @@ namespace Elecciones.src.service
         public List<CircunscripcionPartido> FindByIdCircunscripcionOficial(string cod)
         {
             return FindByIdCircunscripcion(cod)
-                 .Where(cp => cp.escaniosHasta > 0)
+                 .Where(cp => cp.escanios > 0)
                  .OrderByDescending(cp => cp, new CPComparerOficial())
                  .ToList();
         }

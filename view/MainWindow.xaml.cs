@@ -1,4 +1,4 @@
-﻿using Elecciones.src.conexion;
+using Elecciones.src.conexion;
 using Elecciones.src.controller;
 using Elecciones.src.logic;
 using Elecciones.src.mensajes;
@@ -39,8 +39,6 @@ namespace Elecciones
         public ConexionEntityFramework conexionActiva;
         private int avance;
         public BrainStormDTO dto;
-        public BrainStormDTO dtoSinFiltrar;
-        BrainStormDTO dtoDesdeSedes;
         bool preparado;
         public bool oficiales;
         bool regional;
@@ -332,19 +330,11 @@ namespace Elecciones
 
                 if (actualizacionActiva && (pactos == null || pactos.pactoDentro == false))
                 {
-                    if (desdeSede) { dtoAnterior = new BrainStormDTO(dtoDesdeSedes); }
-                    else { dtoAnterior = new BrainStormDTO(dto); }
                     dtoAnterior = new BrainStormDTO(dto);
                     seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
 
-                    // Determine whether we should request the filtered DTO for UI (true) or the unfiltered one (false).
-                    // Preserve previous behavior: when the current grafico is "SEDES" use unfiltered for UI; otherwise use filtered.
-                    // NEW: If sedeDentro is true, ALWAYS use unfiltered (filtroSedes = false).
-                    // If tickerDentro is true, ALWAYS use filtered (filtroSedes = true), unless sedeDentro overrides.
-                    bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || (!string.Equals(graficosListView.SelectedValue, "SEDES") && !string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO")) || tickerDentro);
-
-                    // Use ObtenerDTO which now updates both dto and dtoSinFiltrar.
-                    dto = ObtenerDTO(filtroSedes, elementoSeleccionado);
+                    // Always fetch the unfiltered DTO containing all parties ordered by codigo
+                    dto = ObtenerDTO(elementoSeleccionado);
 
                     if (string.Equals(graficosHeader.Header, "FALDÓN")) { UpdateFaldones(dtoAnterior); }
                     //Add cambios por actualizacion en vivo en cartones
@@ -407,7 +397,7 @@ namespace Elecciones
 
         private bool CompararOrden(BrainStormDTO anterior, BrainStormDTO actual)
         {
-            List<PartidoDTO> filtrado = anterior.partidos.Where(par => par.escaniosHasta > 0).ToList();
+            List<PartidoDTO> filtrado = anterior.partidos.Where(par => (oficiales ? par.escanios : par.escaniosHastaSondeo) > 0).ToList();
             for (int i = 0; i < filtrado.Count; i++)
             {
                 if (filtrado[i].codigo != actual.partidos[i].codigo) { return false; }
@@ -702,14 +692,7 @@ namespace Elecciones
             {
                 string elementoSeleccionado = circunscripcionesListView.SelectedItem != null ? circunscripcionesListView.SelectedItem.ToString() : autonomiasListView.SelectedItem.ToString();
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                if (sedeDentro || (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES")))
-                {
-                    ObtenerDTO(false, elementoSeleccionado);
-                }
-                else
-                {
-                    ObtenerDTO(true, elementoSeleccionado);
-                }
+                ObtenerDTO(elementoSeleccionado);
                 ActualizarInfoInterfaz(seleccionada, dto);
                 preparado = false;
 
@@ -729,7 +712,7 @@ namespace Elecciones
             if (oficiales)
             {
                 columna3.Header = "ESCAÑOS";
-                bindingCol3 = new Binding("escaniosHasta");
+                bindingCol3 = new Binding(oficiales ? "escanios" : "escaniosHastaSondeo");
                 columna3.DisplayMemberBinding = bindingCol3;
 
                 columna4.Header = "DIF ESC";
@@ -742,11 +725,11 @@ namespace Elecciones
             else
             {
                 columna3.Header = "ESC. DESDE";
-                bindingCol3 = new Binding("escaniosDesde");
+                bindingCol3 = new Binding("escaniosDesdeSondeo");
                 columna3.DisplayMemberBinding = bindingCol3;
 
                 columna4.Header = "ESC. HASTA";
-                bindingCol4 = new Binding("escaniosHasta");
+                bindingCol4 = new Binding(oficiales ? "escanios" : "escaniosHastaSondeo");
                 columna4.DisplayMemberBinding = bindingCol4;
 
                 if (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"))
@@ -824,7 +807,7 @@ namespace Elecciones
                 elementoSeleccionado = circunscripcionesListView.SelectedItem.ToString();
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"));
-                dto = ObtenerDTO(filtroSedes, seleccionada.nombre);
+                dto = ObtenerDTO(seleccionada.nombre);
                 ActualizarInfoInterfaz(seleccionada, dto);
                 preparado = false;
             }
@@ -833,7 +816,7 @@ namespace Elecciones
                 elementoSeleccionado = autonomiasListView.SelectedItem.ToString();
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"));
-                dto = ObtenerDTO(filtroSedes, seleccionada.nombre);
+                dto = ObtenerDTO(seleccionada.nombre);
                 ActualizarInfoInterfaz(seleccionada, dto);
                 preparado = false;
             }
@@ -878,14 +861,7 @@ namespace Elecciones
 
                 //PONER LA INFORMACIÓN EN LA INTERFAZ
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                if (sedeDentro || (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES")))
-                {
-                    ObtenerDTO(false, elementoSeleccionado);
-                }
-                else
-                {
-                    ObtenerDTO(true, elementoSeleccionado);
-                }
+                ObtenerDTO(elementoSeleccionado);
                 ActualizarInfoInterfaz(seleccionada, dto);
             }
         }
@@ -904,14 +880,7 @@ namespace Elecciones
 
                 //PONER LA INFORMACIÓN EN LA INTERFAZ
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                if (sedeDentro || (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES")))
-                {
-                    ObtenerDTO(false, elementoSeleccionado);
-                }
-                else
-                {
-                    ObtenerDTO(true, elementoSeleccionado);
-                }
+                dto = ObtenerDTO(elementoSeleccionado);
                 ActualizarInfoInterfaz(seleccionada, dto);
             }
         }
@@ -936,37 +905,100 @@ namespace Elecciones
                 4 => seleccionada.participacionHist.ToString(),
                 _ => seleccionada.participacionHist.ToString()
             };
+            
+            // Usar la misma lógica de filtrado que en ActualizarInfoInterfaz(BrainStormDTO dto)
             listaDeDatos.Clear();
-            List<CPDataDTO> cpdatas;
-            if (graficosListView.SelectedItem != null && (string.Equals(graficosListView.SelectedValue, "SEDES") || string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO")))
+
+            // Obtener el gráfico seleccionado
+            string graficoSeleccionado = graficosListView.SelectedItem?.ToString() ?? "";
+
+            // Obtener los datos filtrados según el gráfico y el estado (oficiales/sondeo)
+            List<CPDataDTO> cpdatas = ObtenerDatosParaTabla(graficoSeleccionado, dto);
+
+            if (partidoSeleccionado != null)
             {
-                dtoSinFiltrar = oficiales ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(seleccionada.nombre, avance, tipoElecciones) : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(seleccionada.nombre, avance, tipoElecciones);
-                cpdatas = CPDataDTO.FromBSDto(dtoSinFiltrar);
-                if (partidoSeleccionado != null)
-                {
-                    partidoSeleccionado = dtoSinFiltrar.partidos.Find(par => par.siglas.Equals(partidoSeleccionado.siglas));
-                }
+                partidoSeleccionado = dto.partidos.Find(par => par.siglas.Equals(partidoSeleccionado.siglas));
             }
-            else { cpdatas = CPDataDTO.FromBSDto(dto); }
             cpdatas.ForEach(listaDeDatos.Add);
         }
         private void ActualizarInfoInterfaz(BrainStormDTO dto)
         {
             listaDeDatos.Clear();
-            List<CPDataDTO> cpdatas;
-            if (graficosListView.SelectedItem != null && (string.Equals(graficosListView.SelectedValue, "SEDES") || string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO")))
+
+            // Obtener el gráfico seleccionado
+            string graficoSeleccionado = graficosListView.SelectedItem?.ToString() ?? "";
+
+            // Obtener los datos filtrados según el gráfico y el estado (oficiales/sondeo)
+            List<CPDataDTO> cpdatas = ObtenerDatosParaTabla(graficoSeleccionado, dto);
+
+            if (partidoSeleccionado != null)
             {
-                dtoSinFiltrar = oficiales ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones) : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones);
-                EscribirFichero();
-                cpdatas = CPDataDTO.FromBSDto(dtoSinFiltrar);
-                if (partidoSeleccionado != null)
-                {
-                    partidoSeleccionado = dtoSinFiltrar.partidos.Find(par => par.siglas.Equals(partidoSeleccionado.siglas));
-                }
+                partidoSeleccionado = dto.partidos.Find(par => par.siglas.Equals(partidoSeleccionado.siglas));
             }
-            else { cpdatas = CPDataDTO.FromBSDto(dto); }
             cpdatas.ForEach(listaDeDatos.Add);
         }
+
+        /// <summary>
+        /// Obtiene los datos a mostrar en la tabla según el gráfico seleccionado y el estado (oficiales/sondeo)
+        /// </summary>
+        private List<CPDataDTO> ObtenerDatosParaTabla(string graficoSeleccionado, BrainStormDTO dto)
+        {
+            List<CPDataDTO> allCPDatas = CPDataDTO.FromBSDto(dto);
+
+            return graficoSeleccionado switch
+            {
+                "CUENTA ATRÁS" => new List<CPDataDTO>(), // No mostrar datos
+                "FICHAS" => FiltrarDatosParaFichas(allCPDatas),
+                "SEDES" => FiltrarDatosParaSedes(allCPDatas),
+                _ => allCPDatas // Por defecto, mostrar todos los datos
+            };
+        }
+
+        /// <summary>
+        /// Filtra datos para el gráfico "FICHAS"
+        /// - Sondeo: Siglas, Escaños desde Sondeo, Escaños hasta sondeo, Escaños históricos (solo con al menos 1 escaño en Sondeo)
+        /// - Oficial: Siglas, Escaños, %voto, Escaños hist, Diferencia de escaños (solo con al menos 1 escaño Oficial)
+        /// </summary>
+        private List<CPDataDTO> FiltrarDatosParaFichas(List<CPDataDTO> allCPDatas)
+        {
+            List<CPDataDTO> filtrados;
+
+            if (oficiales)
+            {
+                // Filtrar solo partidos con al menos 1 escaño en datos oficiales
+                filtrados = allCPDatas.Where(p => int.TryParse(p.escanios, out int esc) && esc > 0).ToList();
+                // Ordenar usando CPDataComparer (orden descendente por escaños, voto, votantes)
+                filtrados.Sort((a, b) => -new CPDataComparer().Compare(a, b));
+            }
+            else
+            {
+                // Filtrar solo partidos con al menos 1 escaño en sondeo
+                filtrados = allCPDatas.Where(p => int.TryParse(p.escaniosHastaSondeo, out int esc) && esc > 0).ToList();
+                // Ordenar usando CPDataComparer
+                filtrados.Sort((a, b) => -new CPDataComparer().Compare(a, b));
+            }
+
+            return filtrados;
+        }
+
+        /// <summary>
+        /// Filtra datos para el gráfico "SEDES"
+        /// - Muestra todos los partidos ordenados por id
+        /// - Si no es oficial (oficiales==false), devuelve lista vacía
+        /// - Datos mostrados: Siglas, Escaños, %voto, número de Votantes, diferencia de votantes
+        /// </summary>
+        private List<CPDataDTO> FiltrarDatosParaSedes(List<CPDataDTO> allCPDatas)
+        {
+            // SEDES solo existe para datos oficiales
+            if (!oficiales)
+            {
+                return new List<CPDataDTO>();
+            }
+
+            // Ya están ordenados por id, simplemente devolver todos
+            return allCPDatas;
+        }
+
 
 
         //ADAPTACION DE DATOS DEPENDIENDO DE ELEMENTO SELECCIONADO
@@ -986,33 +1018,100 @@ namespace Elecciones
                     // Ocultar la lista de datos al mostrar la cuenta atrás
                     datosListView.Visibility = Visibility.Collapsed;
                     break;
+
+                case "FICHAS":
+                    // Restaurar visibilidad
+                    datosListView.Visibility = Visibility.Visible;
+
+                    // Ocultar columna Código
+                    columna1.Width = 0;
+
+                    if (oficiales)
+                    {
+                        // Oficial: Siglas, Escaños, %voto, Escaños hist, Diferencia de escaños
+                        columna3.Header = "ESCAÑOS";
+                        columna3.DisplayMemberBinding = new Binding("escanios");
+
+                        columna4.Header = "% VOTO";
+                        columna4.DisplayMemberBinding = new Binding("porcentajeVoto");
+
+                        columna5.Header = "ESC. HIST";
+                        columna5.DisplayMemberBinding = new Binding("escaniosHistoricos");
+
+                        columna6.Header = "DIF ESC";
+                        columna6.DisplayMemberBinding = new Binding("diferenciaEscanios");
+                        columna6.Width = datosListView.ActualWidth / 7;
+
+                        columna7.Width = 0; // Ocultar columna 7
+                    }
+                    else
+                    {
+                        // Sondeo: Siglas, Escaños desde Sondeo, Escaños hasta sondeo, Escaños históricos
+                        columna3.Header = "ESC. DESDE";
+                        columna3.DisplayMemberBinding = new Binding("escaniosDesdeSondeo");
+
+                        columna4.Header = "ESC. HASTA";
+                        columna4.DisplayMemberBinding = new Binding("escaniosHastaSondeo");
+
+                        columna5.Header = "ESC. HIST";
+                        columna5.DisplayMemberBinding = new Binding("escaniosHistoricos");
+
+                        columna6.Width = 0; // Ocultar columna 6
+                        columna7.Width = 0; // Ocultar columna 7
+                    }
+
+                    if (dto != null)
+                    {
+                        ObtenerDTO(dto.circunscripcionDTO.nombre);
+                        ActualizarInfoInterfaz(dto);
+                    }
+                    break;
+
                 case "SEDES":
                     // Restaurar visibilidad al volver de "CUENTA ATRÁS"
                     datosListView.Visibility = Visibility.Visible;
 
-                    columna3.Header = "ESCAÑOS";
-                    Binding binding3 = new Binding("escaniosHasta");
-                    columna3.DisplayMemberBinding = binding3;
-                    columna4.Header = "DIF ESC";
-                    Binding binding4 = new Binding("diferenciaEscanios");
-                    columna4.DisplayMemberBinding = binding4;
-                    columna5.Header = "% VOTO";
-                    Binding binding5 = new Binding("porcentajeVoto");
-                    columna5.DisplayMemberBinding = binding5;
+                    // Ocultar columna Código
+                    columna1.Width = 0;
+
+                    if (oficiales)
+                    {
+                        // Mostrar: Siglas, Escaños, %voto, número de Votantes, diferencia de votantes
+                        columna3.Header = "ESCAÑOS";
+                        columna3.DisplayMemberBinding = new Binding("escanios");
+
+                        columna4.Header = "% VOTO";
+                        columna4.DisplayMemberBinding = new Binding("porcentajeVoto");
+
+                        columna5.Header = "VOTANTES";
+                        columna5.DisplayMemberBinding = new Binding("votantes");
+
+                        columna6.Header = "DIF VOT";
+                        columna6.DisplayMemberBinding = new Binding("diferenciaVotantes");
+                        columna6.Width = datosListView.ActualWidth / 7;
+
+                        columna7.Width = 0; // Ocultar columna 7
+                    }
+                    else
+                    {
+                        // No mostrar datos en sondeo
+                        datosListView.Visibility = Visibility.Collapsed;
+                    }
+
                     if (dto != null)
                     {
-                        ObtenerDTO(false, dto.circunscripcionDTO.nombre);
+                        ObtenerDTO(dto.circunscripcionDTO.nombre);
                         ActualizarInfoInterfaz(dto);
                     }
                     break;
+
                 case "INDEPENDENTISMO":
                     // Restaurar visibilidad al volver de "CUENTA ATRÁS"
                     datosListView.Visibility = Visibility.Visible;
-
                     ActualizarDatosEnTabla();
                     if (dto != null)
                     {
-                        ObtenerDTO(false, dto.circunscripcionDTO.nombre);
+                        ObtenerDTO(dto.circunscripcionDTO.nombre);
                         ActualizarInfoInterfaz(dto);
                     }
                     break;
@@ -1020,11 +1119,10 @@ namespace Elecciones
                 default:
                     // Restaurar visibilidad al volver de "CUENTA ATRÁS"
                     datosListView.Visibility = Visibility.Visible;
-
                     ActualizarDatosEnTabla();
                     if (dto != null)
                     {
-                        ObtenerDTO(!sedeDentro, dto.circunscripcionDTO.nombre);
+                        ObtenerDTO(dto.circunscripcionDTO.nombre);
                         ActualizarInfoInterfaz(dto);
                     }
                     break;
@@ -1061,53 +1159,23 @@ namespace Elecciones
                 CPDataDTO? dataActual = datosListView.SelectedItem != null ? datosListView.SelectedItem as CPDataDTO : null;
                 if (dataActual != null)
                 {
-                    if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES") && dtoSinFiltrar != null)
+                    partidoSeleccionado = dto.partidos.Find(par => string.Equals(par.codigo, dataActual.codigo));
+                    if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES") && partidoSeleccionado != null)
                     {
-                        partidoSeleccionado = dtoSinFiltrar.partidos.Find(par => par.codigo.Equals(dataActual.codigo));
-                    }
-                    else
-                    {
-                        partidoSeleccionado = dto.partidos.Find(par => string.Equals(par.codigo, dataActual.codigo));
+                        graficos.SedesEncadena(false, partidoSeleccionado.codigo);
                     }
                 }
-                preparado = false;
             }
         }
 
         //LOGICA DE FICHEROS
-        private BrainStormDTO ObtenerDTO(bool filtrado, string circunscripcion)
+        private BrainStormDTO ObtenerDTO(string circunscripcion)
         {
-            // Always update both dto (used by UI when 'filtrado' requested or not) and dtoSinFiltrar (complete list).
-            // This ensures dtoSinFiltrar reflects the latest data whenever dto is refreshed.
-            if (filtrado)
-            {
-                // dto is filtered (UI-friendly), dtoSinFiltrar keeps the full unfiltered dataset
-                dto = oficiales
-                    ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficial(circunscripcion, avance, tipoElecciones)
-                    : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeo(circunscripcion, avance, tipoElecciones);
-
-                try
-                {
-                    dtoSinFiltrar = oficiales
-                        ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(circunscripcion, avance, tipoElecciones)
-                        : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(circunscripcion, avance, tipoElecciones);
-                }
-                catch
-                {
-                    // If unfiltered fetch fails, keep dtoSinFiltrar as a defensive copy of dto to avoid null usage elsewhere.
-                    dtoSinFiltrar = new BrainStormDTO(dto);
-                }
-            }
-            else
-            {
-                // dto is the unfiltered dataset; make dtoSinFiltrar a copy of it so both reflect the same full data.
-                dto = oficiales
-                    ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(circunscripcion, avance, tipoElecciones)
-                    : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(circunscripcion, avance, tipoElecciones);
-
-                // Keep dtoSinFiltrar consistent with dto (full)
-                dtoSinFiltrar = new BrainStormDTO(dto);
-            }
+            // Always fetch unfiltered DTO (SinFiltrar) which contains all parties
+            // ordered by the comparers but without filtering by escaños > 0
+            dto = oficiales
+                ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(circunscripcion, avance, tipoElecciones)
+                : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(circunscripcion, avance, tipoElecciones);
 
             return dto;
         }
@@ -1116,81 +1184,56 @@ namespace Elecciones
         {
             if (dto != null)
             {
-                preparado = true;
-
-                // Read ordering mode from config (non-boolean so it can be extended later)
-                string ordenSetting = configuration.GetValue("ordenPartidos") ?? "0";
-
-                // Local helper: create a new BrainStormDTO copy ordered by partido.codigo.
-                // Uses the provided source (so we can pass an unfiltered DTO when needed).
-                BrainStormDTO CreateOrderedDtoCopyFrom(BrainStormDTO source)
+                try
                 {
-                    var ordered = new BrainStormDTO(source);
-                    ordered.partidos = source.partidos.OrderBy(p => p.codigo).ToList();
-                    // For the code-ordered files we want the full list count (they contain all parties).
-                    ordered.numPartidos = ordered.partidos.Count;
-                    return ordered;
-                }
+                    preparado = true;
 
-                // If config requests code ordering we must obtain the full (unfiltered) DTO from controller
-                // so the _Codigo files contain the complete list of parties. Do this without mutating the UI dto.
-                BrainStormDTO dtoToWriteMain = dto; // which dto will be used for the main filenames
+                    // Read ordering mode from config (non-boolean so it can be extended later)
+                    string ordenSetting = configuration.GetValue("ordenPartidos") ?? "0";
 
-                if (ordenSetting == "1")
-                {
-                    // Fetch unfiltered DTO directly from controller (do not call ObtenerDTO to avoid changing UI state).
-                    dtoSinFiltrar = oficiales
-                        ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones)
-                        : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones);
-
-                    // If the configuration indicates that the main CSVs should use code-ordering,
-                    // use the ordered full DTO for the main files as well.
-                    dtoToWriteMain = CreateOrderedDtoCopyFrom(dtoSinFiltrar);
-                }
-
-                // Write the main CSV (behaviour preserved; main file will use code-ordered DTO if ordenSetting == "1")
-                if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
-                {
-                    if (desdeSedes)
+                    // Local helper: create a new BrainStormDTO copy ordered by partido.codigo.
+                    // Uses the provided source (so we can pass an unfiltered DTO when needed).
+                    BrainStormDTO CreateOrderedDtoCopyFrom(BrainStormDTO source)
                     {
-                        if (oficiales)
-                        {
-                            if (ordenSetting == "1") { await dtoToWriteMain.ToCsv(); }
-                            else { await dto.ToCsv(); }
-                        }
-                        else
-                        {
-                            if (ordenSetting == "1") { await dtoToWriteMain.ToCsv("Brainstorm_Sondeo"); }
-                            else { await dto.ToCsv("Brainstorm_Sondeo"); }
-                        }
+                        var ordered = new BrainStormDTO(source);
+                        ordered.partidos = source.partidos.OrderBy(p => p.codigo).ToList();
+                        // For the code-ordered files we want the full list count (they contain all parties).
+                        ordered.numPartidos = ordered.partidos.Count;
+                        return ordered;
                     }
-                }
-                else
-                {
-                    if (oficiales)
+
+                    // Always use the unfiltered DTO (which is now the only type we maintain)
+                    var dtoToWrite = CreateOrderedDtoCopyFrom(dto);
+
+                    // Write the main CSV with all parties ordered by codigo
+                    if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
                     {
-                        if (ordenSetting == "1") { await dtoToWriteMain.ToCsv(); }
-                        else { await dto.ToCsv(); }
+                        if (desdeSedes)
+                        {
+                            if (oficiales)
+                            {
+                                await dtoToWrite.ToCsv();
+                            }
+                            else
+                            {
+                                await dtoToWrite.ToCsv("Brainstorm_Sondeo");
+                            }
+                        }
                     }
                     else
                     {
-                        if (ordenSetting == "1") { await dtoToWriteMain.ToCsv("Brainstorm_Sondeo"); }
-                        else { await dto.ToCsv("Brainstorm_Sondeo"); }
-                    }
-                }
-
-                // Always also write the new code-ordered files that must contain the complete list.
-                // Ensure we have a full DTO to build them from (fetch if not already fetched).
-                try
-                {
-                    if (dtoSinFiltrar == null)
-                    {
-                        dtoSinFiltrar = oficiales
-                            ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones)
-                            : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones);
+                        if (oficiales)
+                        {
+                            await dtoToWrite.ToCsv();
+                        }
+                        else
+                        {
+                            await dtoToWrite.ToCsv("Brainstorm_Sondeo");
+                        }
                     }
 
-                    var dtoCodigoOrdered = CreateOrderedDtoCopyFrom(dtoSinFiltrar);
+                    // Always also write the code-ordered files
+                    var dtoCodigoOrdered = CreateOrderedDtoCopyFrom(dto);
 
                     if (oficiales)
                     {
@@ -1203,7 +1246,7 @@ namespace Elecciones
                 }
                 catch
                 {
-                    // Keep behaviour non-intrusive on filesystem errors (existing code uses minimal handling).
+                    // Keep behaviour non-intrusive on filesystem errors
                 }
 
                 if (partidoSeleccionado != null)
@@ -1220,7 +1263,6 @@ namespace Elecciones
                 }
                 // await EscribirJsonPrimeAsync();
             }
-
         }
         private async Task EscribirJsonPrimeAsync()
         {
@@ -1278,14 +1320,7 @@ namespace Elecciones
             {
                 if (pactos == null)
                 {
-                    if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO"))
-                    {
-                        pactos = new Pactos(dtoSinFiltrar, oficiales);
-                    }
-                    else
-                    {
-                        pactos = new Pactos(dto, oficiales);
-                    }
+                    pactos = new Pactos(dto, oficiales);
                     pactos.Show();
                 }
                 else { pactos.Activate(); }
@@ -1324,20 +1359,12 @@ namespace Elecciones
                         }
                         tickerDentro = true;
                         break;
-                    case "INDEPENDENTISMO":
-                        if (tickerDentro)
-                        {
-                            graficos.independentismoEntra();
-                            dtoDesdeSedes = new BrainStormDTO(dto);
-                        }
-                        break;
                     case "SEDES":
                         if (partidoSeleccionado != null)
                         {
                             if (!sedeDentro)
                             {
                                 graficos.SedesEntra(false, dto, partidoSeleccionado);
-                                dtoDesdeSedes = new BrainStormDTO(dto);
                             }
                             else { graficos.SedesEncadena(false, partidoSeleccionado.codigo); }
                             sedeDentro = true;
@@ -1354,18 +1381,18 @@ namespace Elecciones
                 switch (graficosListView.SelectedValue.ToString())
                 {
                     case "PARTICIPACIÓN":
-                        if (participacionDentro) { graficos.participacionEncadena(dtoSinFiltrar, avance); }
+                        if (participacionDentro) { graficos.participacionEncadena(dto, avance); }
                         else
                         {
-                            graficos.participacionEntra(dtoSinFiltrar, avance);
+                            graficos.participacionEntra(dto, avance);
                             participacionDentro = true;
                         }
                         break;
                     case "FICHAS":
-                        if (fichaDentro) { graficos.fichaEncadena(oficiales, dtoSinFiltrar, partidoSeleccionado); }
+                        if (fichaDentro) { graficos.fichaEncadena(oficiales, dto, partidoSeleccionado); }
                         else
                         {
-                            graficos.fichaEntra(oficiales, dtoSinFiltrar, partidoSeleccionado);
+                            graficos.fichaEntra(oficiales, dto, partidoSeleccionado);
                             fichaDentro = true;
                         }
                         break;
@@ -1389,7 +1416,7 @@ namespace Elecciones
                         //graficos.superfaldonEntra();
                         break;
                     case "CARTÓN PARTIDOS":
-                        graficos.cartonPartidosEntra(dtoSinFiltrar);
+                        graficos.cartonPartidosEntra(dto);
                         cartonPartidosDentro = true;
                         break;
                     case "ÚLTIMO ESCAÑO":
@@ -1478,17 +1505,10 @@ namespace Elecciones
                         //}
                         if (dto != null)
                         {
-                            ObtenerDTO(true, dto.circunscripcionDTO.nombre);
+                            ObtenerDTO(dto.circunscripcionDTO.nombre);
                             ActualizarInfoInterfaz(dto);
                         }
                         EscribirFichero();
-                        break;
-                    case "INDEPENDENTISMO":
-                        graficos.independentismoSale();
-                        if (tickerDentro)
-                        {
-                            Update(true);
-                        }
                         break;
                     default: break;
                 }

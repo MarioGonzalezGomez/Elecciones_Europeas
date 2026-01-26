@@ -10,27 +10,67 @@ namespace Elecciones.src.model.IPF.DTO
 {
     public class CPDataDTO
     {
-        public string codigo { get; set; }
-        public string siglas { get; set; }
-        public string escaniosDesde { get; set; }
-        public string escaniosHasta { get; set; }
-        public string escaniosHistoricos { get; set; }
-        public string diferenciaEscanios { get; set; }
-        public string votantes { get; set; }
-        public string votantesHistoricos { get; set; }
-        public string diferenciaVotantes { get; set; }
-        public string porcentajeVoto { get; set; }
-        public string porcentajeVotoHist { get; set; }
+        public string codigo
+        {
+            get; set;
+        }
+        public string siglas
+        {
+            get; set;
+        }
+        public string escanios
+        {
+            get; set;
+        }
+        public string escaniosDesdeSondeo
+        {
+            get; set;
+        }
+        public string escaniosHastaSondeo
+        {
+            get; set;
+        }
+        public string escaniosHistoricos
+        {
+            get; set;
+        }
+        public string diferenciaEscanios
+        {
+            get; set;
+        }
+        public string votantes
+        {
+            get; set;
+        }
+        public string votantesHistoricos
+        {
+            get; set;
+        }
+        public string diferenciaVotantes
+        {
+            get; set;
+        }
+        public string porcentajeVoto
+        {
+            get; set;
+        }
+        public string porcentajeVotoHist
+        {
+            get; set;
+        }
 
 
-        public CPDataDTO() { }
+        public CPDataDTO()
+        {
+        }
 
-        public CPDataDTO(string codigo, string siglas, string escaniosDesde, string escaniosHasta, string escaniosHistoricos, string diferenciaEscanios, string votantes, string votantesHistoricos, string diferenciaVotantes, string porcentajeVoto, string porcentajeVotoHist)
+        public CPDataDTO(string codigo, string siglas, string escanios, string escaniosDesdeSondeo, string escaniosHastaSondeo, string escaniosHistoricos, string diferenciaEscanios, string votantes, string votantesHistoricos, string diferenciaVotantes, string porcentajeVoto, string porcentajeVotoHist)
         {
             this.codigo = codigo;
             this.siglas = siglas;
-            this.escaniosDesde = escaniosDesde;
-            this.escaniosHasta = escaniosHasta;
+            this.escanios = escanios;
+            this.escaniosDesdeSondeo = escaniosDesdeSondeo;
+            this.escaniosHastaSondeo = escaniosHastaSondeo;
             this.escaniosHistoricos = escaniosHistoricos;
             this.diferenciaEscanios = diferenciaEscanios;
             this.votantes = votantes;
@@ -45,9 +85,9 @@ namespace Elecciones.src.model.IPF.DTO
             List<CPDataDTO> lista = new List<CPDataDTO>();
             foreach (PartidoDTO p in dto.partidos)
             {
-                int difesc = p.escaniosHasta - p.escaniosHistoricos;
+                int difesc = p.escanios - p.escaniosHistoricos;
                 int difVotos = p.numVotantes - p.numVotantesHistoricos;
-                lista.Add(new CPDataDTO(p.codigo, p.siglas, p.escaniosDesde.ToString(), p.escaniosHasta.ToString(), p.escaniosHistoricos.ToString(), difesc.ToString(), p.numVotantes.ToString(), p.numVotantesHistoricos.ToString(), difVotos.ToString(), p.porcentajeVoto.ToString(), p.porcentajeVotoHistorico.ToString()));
+                lista.Add(new CPDataDTO(p.codigo, p.siglas, p.escanios.ToString(), p.escaniosDesdeSondeo.ToString(), p.escaniosHastaSondeo.ToString(), p.escaniosHistoricos.ToString(), difesc.ToString(), p.numVotantes.ToString(), p.numVotantesHistoricos.ToString(), difVotos.ToString(), p.porcentajeVoto.ToString(), p.porcentajeVotoHistorico.ToString()));
             }
             return lista;
         }

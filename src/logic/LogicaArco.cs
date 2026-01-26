@@ -73,7 +73,7 @@ namespace Elecciones.src.logic
         //TRUE en caso de Hasta, FALSE en caso de Desde
         private double GetAncho(CPDataDTO data, bool hasta)
         {
-            return hasta ? double.Parse(data.escaniosHasta) * gradosTotales / escaniosTotales : double.Parse(data.escaniosDesde) * gradosTotales / escaniosTotales;
+            return hasta ? double.Parse(data.escaniosHastaSondeo) * gradosTotales / escaniosTotales : double.Parse(data.escaniosDesdeSondeo) * gradosTotales / escaniosTotales;
         }
 
         public async Task ToJson(List<PactoArco> pactos)

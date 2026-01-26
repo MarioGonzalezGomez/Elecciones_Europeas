@@ -109,9 +109,48 @@ namespace Elecciones.src.mensajes.builders
 
         #region Ticker
 
-        public string TickerEntra(bool oficial)
+        double pxTotales = 1748;
+        int margin = 10;
+        int posicionInicial = 0;
+        public string TickerEntra(bool oficiales, BrainStormDTO dto)
         {
-            return oficial ? EventRunBuild("TICKER/ENTRA") : EventRunBuild("TICKER_SONDEO/ENTRA");
+            if (dto == null) return "";
+            StringBuilder sb = new StringBuilder();
+
+            //TAMANO
+            double tamanoFicha = (pxTotales - (margin * (dto.numPartidos - 1))) / dto.numPartidos;
+            sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 1));
+
+            //POSICION
+            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
+            for (int i = 0; i < dto.partidos.Count; i++)
+            {
+                string partidoId = (i + 1).ToString("D2");
+                partidoIdMap[dto.partidos[i].codigo] = partidoId;
+            }
+
+            // Ordenar partidos según PartidoDTOComparer (por escaños descendente)
+            List<PartidoDTO> partidosOrdenados = dto.partidos.OrderByDescending(p => oficiales ? p.escanios : p.escaniosHastaSondeo).ToList();
+
+            // Calcular posición acumulativa para cada partido según el orden del comparador
+            double posicionAcumulada = posicionInicial;
+            for (int i = 0; i < partidosOrdenados.Count; i++)
+            {
+                PartidoDTO partido = partidosOrdenados[i];
+                string partidoId = partidoIdMap[partido.codigo];
+
+                // Asignar posición al partido
+                sb.Append(EventBuild($"partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 1));
+
+                // Acumular para el siguiente: posición actual + tamaño ficha + margen
+                if (i < partidosOrdenados.Count - 1)
+                {
+                    posicionAcumulada += tamanoFicha + margin;
+                }
+            }
+
+            return sb.ToString();
+            //return oficial ? EventRunBuild("TICKER/ENTRA") : EventRunBuild("TICKER_SONDEO/ENTRA");
         }
 
         public string TickerEncadena(bool oficial)
@@ -309,7 +348,7 @@ namespace Elecciones.src.mensajes.builders
                 {
                     PartidoDTO temp = dto.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "0", 2, 0.2, 0) + "\n";
-                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escaniosHasta}'", 2, 0.5, 0) + "\n";
+                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escanios}'", 2, 0.5, 0) + "\n";
                 }
                 else
                 {
@@ -325,7 +364,7 @@ namespace Elecciones.src.mensajes.builders
         public string TickerTDActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dtoNuevo)
         {
             var main = Application.Current.MainWindow as MainWindow;
-            List<string> siglasPartidos = main.dtoSinFiltrar.partidos.Select(x => x.siglas).ToList();
+            List<string> siglasPartidos = main.dto.partidos.Select(x => x.siglas).ToList();
             List<string> siglasNuevas = dtoNuevo.partidos.Select(x => x.siglas).ToList();
             List<string> siglasAnteriores = dtoAnterior.partidos.Select(x => x.siglas).ToList();
 
@@ -392,7 +431,7 @@ namespace Elecciones.src.mensajes.builders
                         signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.EscanosPos}", 1) + "\n";
 
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
-                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escaniosHasta}'", 2, 0.5, 0) + "\n";
+                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escanios}'", 2, 0.5, 0) + "\n";
                     }
                     else
                     {
@@ -442,7 +481,7 @@ namespace Elecciones.src.mensajes.builders
                         }
 
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
-                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escaniosHasta}'", 2, 0.5, 0) + "\n";
+                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escanios}'", 2, 0.5, 0) + "\n";
                     }
                 }
 
@@ -466,7 +505,7 @@ namespace Elecciones.src.mensajes.builders
                         signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
 
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
-                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escaniosHasta}'", 2, 0.5, 0) + "\n";
+                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escanios}'", 2, 0.5, 0) + "\n";
                     }
                 }
             }
@@ -560,57 +599,6 @@ namespace Elecciones.src.mensajes.builders
             string signal = EventBuild("PACTOMETRO/CualIzda", "MAP_INT_PAR", $"{posicionPartido + 1}", 1);
             signal += EventBuild("PACTOMETRO/PongoQuitoIzda", "MAP_INT_PAR", "0", 1);
             signal += EventRunBuild("PACTOMETRO/SumaPorIzda");
-            return signal;
-        }
-
-        #endregion
-
-        #region Independentismo
-
-        public string independentismoEntra()
-        {
-            return Entra("PACTOMETRO_IND");
-        }
-
-        public string independentismoReinicio()
-        {
-            return EventRunBuild("PACTOMETRO_IND/INICIO");
-        }
-
-        public string independentismoSale()
-        {
-            return Sale("PACTOMETRO_IND");
-        }
-
-        public string independentismoEntraDerecha(int posicionPartido)
-        {
-            string signal = EventBuild("PACTOMETRO_IND/CualDcha", "MAP_INT_PAR", $"{posicionPartido + 1}", 1);
-            signal += EventBuild("PACTOMETRO_IND/PongoQuitoDcha", "MAP_INT_PAR", "1", 1);
-            signal += EventRunBuild("PACTOMETRO_IND/SumaPorDcha");
-            return signal;
-        }
-
-        public string independentismoEntraIzquierda(int posicionPartido)
-        {
-            string signal = EventBuild("PACTOMETRO_IND/CualIzda", "MAP_INT_PAR", $"{posicionPartido + 1}", 1);
-            signal += EventBuild("PACTOMETRO_IND/PongoQuitoIzda", "MAP_INT_PAR", "1", 1);
-            signal += EventRunBuild("PACTOMETRO_IND/SumaPorIzda");
-            return signal;
-        }
-
-        public string independentismoSaleDerecha(int posicionPartido)
-        {
-            string signal = EventBuild("PACTOMETRO_IND/CualDcha", "MAP_INT_PAR", $"{posicionPartido + 1}", 1);
-            signal += EventBuild("PACTOMETRO_IND/PongoQuitoDcha", "MAP_INT_PAR", "0", 1);
-            signal += EventRunBuild("PACTOMETRO_IND/SumaPorDcha");
-            return signal;
-        }
-
-        public string independentismoSaleIzquierda(int posicionPartido)
-        {
-            string signal = EventBuild("PACTOMETRO_IND/CualIzda", "MAP_INT_PAR", $"{posicionPartido + 1}", 1);
-            signal += EventBuild("PACTOMETRO_IND/PongoQuitoIzda", "MAP_INT_PAR", "0", 1);
-            signal += EventRunBuild("PACTOMETRO_IND/SumaPorIzda");
             return signal;
         }
 

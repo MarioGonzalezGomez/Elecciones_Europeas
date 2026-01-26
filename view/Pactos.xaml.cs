@@ -45,7 +45,6 @@ namespace Elecciones
         private bool preparado;
 
         public bool pactoDentro;
-        public bool independentismo;
 
         ConfigManager config;
 
@@ -64,10 +63,9 @@ namespace Elecciones
         private void InitializeVariables()
         {
             var main = Application.Current.MainWindow as MainWindow;
-            independentismo = main.graficosListView.SelectedItem != null && string.Equals(main.graficosListView.SelectedValue, "INDEPENDENTISMO");
             totalIzq = 0;
             totalDer = 0;
-            mayoriaAbsoluta = independentismo ? 50 : dto.circunscripcionDTO.mayoria;
+            mayoriaAbsoluta = dto.circunscripcionDTO.mayoria;
             partidosDisponibles = new ObservableCollection<CPDataDTO>();
             partidosDentroIzq = new ObservableCollection<CPDataDTO>();
             partidosDentroDer = new ObservableCollection<CPDataDTO>();
@@ -81,9 +79,9 @@ namespace Elecciones
         private void InitializeInfo()
         {
             lblCircunscripcion.Content = dto.circunscripcionDTO.nombre;
-            lblMayoria.Content = $"Mayoría absoluta: {mayoriaAbsoluta}";
-            lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq}%" : $"Total escaños: {totalIzq}";
-            lblEscaniosDer.Content = independentismo ? $"Total: {totalDer}%" : $"Total escaños: {totalDer}";
+            lblMayoria.Content = $"Mayorï¿½a absoluta: {mayoriaAbsoluta}";
+            lblEscaniosIzq.Content = $"Total escaï¿½os: {totalIzq}";
+            lblEscaniosDer.Content = $"Total escaï¿½os: {totalDer}";
             CargarPartidos();
             partidosIzqListView.ItemsSource = partidosDisponibles;
             partidosDerListView.ItemsSource = partidosDisponibles;
@@ -95,24 +93,24 @@ namespace Elecciones
         {
             if (oficiales)
             {
-                escDesdeIzq.Header = "ESCAÑOS";
-                Binding binding1 = new Binding("escaniosHasta");
+                escDesdeIzq.Header = "ESCAï¿½OS";
+                Binding binding1 = new Binding("escaniosDesde");
                 escDesdeIzq.DisplayMemberBinding = binding1;
                 escHastaIzq.Header = "% VOTO";
                 Binding binding2 = new Binding("porcentajeVoto");
                 escHastaIzq.DisplayMemberBinding = binding2;
 
-                escDesdeDentroIzq.Header = "ESCAÑOS";
+                escDesdeDentroIzq.Header = "ESCAï¿½OS";
                 escDesdeDentroIzq.DisplayMemberBinding = binding1;
                 escHastaDentroIzq.Header = "% VOTO";
                 escHastaDentroIzq.DisplayMemberBinding = binding2;
 
-                escDesdeDentroDer.Header = "ESCAÑOS";
+                escDesdeDentroDer.Header = "ESCAï¿½OS";
                 escDesdeDentroDer.DisplayMemberBinding = binding1;
                 escHastaDentroDer.Header = "% VOTO";
                 escHastaDentroDer.DisplayMemberBinding = binding2;
 
-                escDesdeDer.Header = "ESCAÑOS";
+                escDesdeDer.Header = "ESCAï¿½OS";
                 escDesdeDer.DisplayMemberBinding = binding1;
                 escHastaDer.Header = "% VOTO";
                 escHastaDer.DisplayMemberBinding = binding2;
@@ -120,10 +118,10 @@ namespace Elecciones
             else
             {
                 escDesdeIzq.Header = "DESDE";
-                Binding binding1 = new Binding("escaniosDesde");
+                Binding binding1 = new Binding("escaniosDesdeSondeo");
                 escDesdeIzq.DisplayMemberBinding = binding1;
                 escHastaIzq.Header = "HASTA";
-                Binding binding2 = new Binding("escaniosHasta");
+                Binding binding2 = new Binding("escanios");
                 escHastaIzq.DisplayMemberBinding = binding2;
 
                 escDesdeDentroIzq.Header = "DESDE";
@@ -183,8 +181,8 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosIzqListView.SelectedItem;
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
-                totalIzq += independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total escaños: {totalIzq}";
+                totalIzq += int.Parse(seleccionado.escanios);
+                lblEscaniosIzq.Content = $"Total escaï¿½os: {totalIzq}";
                 preparado = false;
                 //Mandar mensaje de despliegue individualizado IZQ
                 int index = partidosTotales.IndexOf(seleccionado);
@@ -192,7 +190,7 @@ namespace Elecciones
                 {
                     graficos.ultimoEntraPartido(main.dto, seleccionado, true);
                 }
-                //   if (independentismo) { graficos.independentismoEntraIzquierda(index); } else { graficos.pactosEntraIzquierda(index); }
+                //  graficos.pactosEntraIzquierda(index); }
 
             }
         }
@@ -205,8 +203,8 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosIzqListView.SelectedItem;
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
-                totalIzq += independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total escaños: {totalIzq}";
+                totalIzq += int.Parse(seleccionado.escanios);
+                lblEscaniosIzq.Content = $"Total escaï¿½os: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado IZQ
                 int index = partidosTotales.IndexOf(seleccionado);
                 if (main.ultimoEscanoDentro)
@@ -224,8 +222,8 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDerListView.SelectedItem;
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
-                totalDer += independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total escaños: {totalDer}";
+                totalDer += int.Parse(seleccionado.escanios);
+                lblEscaniosDer.Content = $"Total escaï¿½os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 if (main.ultimoEscanoDentro)
@@ -243,11 +241,11 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDentroIzqListView.SelectedItem;
                 partidosDentroIzq.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
-                totalIzq -= independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total escaños: {totalIzq}";
+                totalIzq -= int.Parse(seleccionado.escanios);
+                lblEscaniosIzq.Content = $"Total escaï¿½os: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
-                if (independentismo) { graficos.independentismoSaleIzquierda(index); } else { graficos.pactosSaleIzquierda(index); }
+                graficos.pactosSaleIzquierda(index);
                 ReordenarListas();
             }
         }
@@ -258,11 +256,11 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDentroDerListView.SelectedItem;
                 partidosDentroDer.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
-                totalDer -= independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total escaños: {totalDer}";
+                totalDer -= int.Parse(seleccionado.escanios);
+                lblEscaniosDer.Content = $"Total escaï¿½os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
-                if (independentismo) { graficos.independentismoSaleDerecha(index); } else { graficos.pactosSaleDerecha(index); }
+                graficos.pactosSaleDerecha(index);
                 ReordenarListas();
             }
         }
@@ -289,11 +287,11 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDentroIzqListView.SelectedItem;
                 partidosDentroIzq.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
-                totalIzq -= independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq.ToString("F2")}%" : $"Total escaños: {totalIzq}";
+                totalIzq -= int.Parse(seleccionado.escanios);
+                lblEscaniosIzq.Content = $"Total escaï¿½os: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
-                if (independentismo) { graficos.independentismoSaleIzquierda(index); } else { graficos.pactosSaleIzquierda(index); }
+                graficos.pactosSaleIzquierda(index);
                 ReordenarListas();
             }
         }
@@ -339,8 +337,8 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDerListView.SelectedItem;
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
-                totalDer += independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total escaños: {totalDer}";
+                totalDer += int.Parse(seleccionado.escanios);
+                lblEscaniosDer.Content = $"Total escaï¿½os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 if (main.ultimoEscanoDentro)
@@ -366,11 +364,11 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDentroDerListView.SelectedItem;
                 partidosDentroDer.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
-                totalDer -= independentismo ? double.Parse(seleccionado.porcentajeVoto) : int.Parse(seleccionado.escaniosHasta);
-                lblEscaniosDer.Content = independentismo ? $"Total: {totalDer.ToString("F2")}%" : $"Total escaños: {totalDer}";
+                totalDer -= int.Parse(seleccionado.escanios);
+                lblEscaniosDer.Content = $"Total escaï¿½os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
-                if (independentismo) { graficos.independentismoSaleDerecha(index); } else { graficos.pactosSaleDerecha(index); }
+                graficos.pactosSaleDerecha(index);
                 ReordenarListas();
             }
         }
@@ -383,8 +381,8 @@ namespace Elecciones
             CargarPartidos();
             totalIzq = 0;
             totalDer = 0;
-            lblEscaniosIzq.Content = independentismo ? $"Total: {totalIzq}%" : $"Total escaños: {totalIzq}";
-            lblEscaniosDer.Content = independentismo ? $"Total: {totalDer}%" : $"Total escaños: {totalDer}";
+            lblEscaniosIzq.Content = $"Total escaï¿½os: {totalIzq}";
+            lblEscaniosDer.Content = $"Total escaï¿½os: {totalDer}";
 
             // if (independentismo) { graficos.independentismoReinicio(); } else { graficos.pactosReinicio(); }
 
@@ -401,7 +399,7 @@ namespace Elecciones
             {
                 EscribirPacto();
             }
-            if (independentismo) { graficos.independentismoEntra(); } else { graficos.pactosEntra(); }
+            graficos.pactosEntra();
             pactoDentro = true;
 
         }

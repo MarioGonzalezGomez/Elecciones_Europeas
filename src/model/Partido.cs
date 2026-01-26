@@ -28,10 +28,6 @@ namespace Elecciones.src.model.IPF
         {
             get; set;
         }
-        public int independentismo
-        {
-            get; set;
-        }
 
 
         ConfigManager configuration;
@@ -40,7 +36,7 @@ namespace Elecciones.src.model.IPF
         {
             configuration = ConfigManager.GetInstance();
         }
-        public Partido(string codigo, string codigoPadre, string siglas, string nombre, string candidato, int independentismo)
+        public Partido(string codigo, string codigoPadre, string siglas, string nombre, string candidato)
         {
             configuration = ConfigManager.GetInstance();
             this.codigo = codigo;
@@ -48,11 +44,10 @@ namespace Elecciones.src.model.IPF
             this.siglas = siglas;
             this.nombre = nombre;
             this.candidato = candidato;
-            this.independentismo = independentismo;
         }
         public override string ToString()
         {
-            return $"{codigo};{codigoPadre};{siglas};{nombre};{candidato};{independentismo};";
+            return $"{codigo};{codigoPadre};{siglas};{nombre};{candidato};";
         }
         public async Task ToJson()
         {

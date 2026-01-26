@@ -13,7 +13,7 @@ namespace Elecciones.src.logic.comparators
     {
         public bool Equals(PartidoDTO? x, PartidoDTO? y)
         {
-            return x.escaniosHasta == y.escaniosHasta;
+            return x.escanios == y.escanios;
         }
 
         public int GetHashCode([DisallowNull] PartidoDTO obj)

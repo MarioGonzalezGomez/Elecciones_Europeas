@@ -73,7 +73,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
             recuentos.PARTICIPACION = bsDto.circunscripcionDTO.participacion;
             recuentos.PARTICIPACION_HISTORICO = bsDto.circunscripcionDTO.participacionHistorica;
             recuentos.PARTIDOS_TOTALES = bsDto.partidos.Count;
-            recuentos.PARTIDOS_CON_ESCANO = bsDto.partidos.Where(par => par.escaniosHasta > 0).ToList().Count();
+            recuentos.PARTIDOS_CON_ESCANO = bsDto.partidos.Where(par => (bsDto.oficiales ? par.escanios : par.escaniosHastaSondeo) > 0).ToList().Count();
             recuentos.RECUENTOS = recuentolist;
             return recuentos;
         }

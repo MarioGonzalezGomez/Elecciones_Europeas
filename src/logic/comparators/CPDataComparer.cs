@@ -8,24 +8,22 @@ using System.Threading.Tasks;
 
 namespace Elecciones.src.logic.comparators
 {
-    internal class CPDataComparer: IComparer<CPDataDTO>
+    internal class CPDataComparer : IComparer<CPDataDTO>
     {
         public int Compare(CPDataDTO? o1, CPDataDTO? o2)
         {
             if (o1.codigo.Equals("99999")) return -1;
 
-            int comp = Comparer<int>.Default.Compare(int.Parse(o1.escaniosHasta), int.Parse(o2.escaniosHasta));
+            int comp = Comparer<int>.Default.Compare(int.Parse(o1.escanios), int.Parse(o2.escanios));
             if (comp == 0)
             {
-                comp = Comparer<double>.Default.Compare(int.Parse(o1.escaniosDesde), int.Parse(o2.escaniosDesde));
+
+                comp = Comparer<double>.Default.Compare(double.Parse(o1.porcentajeVoto), double.Parse(o2.porcentajeVoto));
                 if (comp == 0)
                 {
-                    comp = Comparer<double>.Default.Compare(double.Parse(o1.porcentajeVoto), double.Parse(o2.porcentajeVoto));
-                    if (comp == 0)
-                    {
-                        comp = Comparer<int>.Default.Compare(int.Parse(o1.votantes), int.Parse(o2.votantes));
-                    }
+                    comp = Comparer<int>.Default.Compare(int.Parse(o1.votantes), int.Parse(o2.votantes));
                 }
+
             }
             return comp;
         }

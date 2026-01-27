@@ -58,13 +58,16 @@ namespace Elecciones.src.model.IPF.DTO
         {
             get; set;
         }
-
+        public string restos
+        {
+            get; set;
+        }
 
         public CPDataDTO()
         {
         }
 
-        public CPDataDTO(string codigo, string siglas, string escanios, string escaniosDesdeSondeo, string escaniosHastaSondeo, string escaniosHistoricos, string diferenciaEscanios, string votantes, string votantesHistoricos, string diferenciaVotantes, string porcentajeVoto, string porcentajeVotoHist)
+        public CPDataDTO(string codigo, string siglas, string escanios, string escaniosDesdeSondeo, string escaniosHastaSondeo, string escaniosHistoricos, string diferenciaEscanios, string votantes, string votantesHistoricos, string diferenciaVotantes, string porcentajeVoto, string porcentajeVotoHist, string restos)
         {
             this.codigo = codigo;
             this.siglas = siglas;
@@ -78,6 +81,7 @@ namespace Elecciones.src.model.IPF.DTO
             this.diferenciaVotantes = diferenciaVotantes;
             this.porcentajeVoto = porcentajeVoto;
             this.porcentajeVotoHist = porcentajeVotoHist;
+            this.restos = restos;
         }
 
         public static List<CPDataDTO> FromBSDto(BrainStormDTO dto)
@@ -87,7 +91,7 @@ namespace Elecciones.src.model.IPF.DTO
             {
                 int difesc = p.escanios - p.escaniosHistoricos;
                 int difVotos = p.numVotantes - p.numVotantesHistoricos;
-                lista.Add(new CPDataDTO(p.codigo, p.siglas, p.escanios.ToString(), p.escaniosDesdeSondeo.ToString(), p.escaniosHastaSondeo.ToString(), p.escaniosHistoricos.ToString(), difesc.ToString(), p.numVotantes.ToString(), p.numVotantesHistoricos.ToString(), difVotos.ToString(), p.porcentajeVoto.ToString(), p.porcentajeVotoHistorico.ToString()));
+                lista.Add(new CPDataDTO(p.codigo, p.siglas, p.escanios.ToString(), p.escaniosDesdeSondeo.ToString(), p.escaniosHastaSondeo.ToString(), p.escaniosHistoricos.ToString(), difesc.ToString(), p.numVotantes.ToString(), p.numVotantesHistoricos.ToString(), difVotos.ToString(), p.porcentajeVoto.ToString(), p.porcentajeVotoHistorico.ToString(), p.restoVotos.ToString()));
             }
             return lista;
         }

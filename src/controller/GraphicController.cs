@@ -521,9 +521,9 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.ultimoEncadena(dtoAnterior, dto); }
         }
-        public void ultimoActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        public void ultimoActualiza(BrainStormDTO dtoNuevo)
         {
-            if (ipfActivo.Valor == 1) { ipf.ultimoActualiza(dtoAnterior, dto); }
+            if (ipfActivo.Valor == 1) { ipf.ultimoActualiza(dtoNuevo); }
         }
         public void ultimoLimpiaPartidos()
         {
@@ -645,6 +645,23 @@ namespace Elecciones.src.controller
         public void sfGanadorSale()
         {
             if (ipfActivo.Valor == 1) { ipf.sfGanadorSale(); }
+        }
+
+        public void pactometroActualiza(BrainStormDTO dtoActualizado, string tipoGrafico)
+        {
+            switch (tipoGrafico)
+            {
+                case "FICHAS":
+                    if (ipfActivo.Valor == 1) { ipf.ActualizaPactometroFichas(dtoActualizado); }
+                    break;
+
+                case "ÚLTIMO ESCAÑO":
+                    if (ipfActivo.Valor == 1) { ipf.ActualizaPactometroUltimoEscano(dtoActualizado); }
+                    break;
+                default:
+                    // Si no es ningún tipo específico de pacto gráfico, no hacer nada
+                    break;
+            }
         }
     }
 }

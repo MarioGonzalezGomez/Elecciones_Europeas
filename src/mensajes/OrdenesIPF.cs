@@ -510,9 +510,9 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(cartonBuilder.ultimoEncadena(dtoAnterior, dto));
         }
 
-        public void ultimoActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dto)
+        public void ultimoActualiza(BrainStormDTO dtoNuevo)
         {
-            c.EnviarMensaje(cartonBuilder.ultimoActualiza(dtoAnterior, dto));
+            c.EnviarMensaje(cartonBuilder.ultimoActualiza(dtoNuevo));
         }
 
         public void ultimoEntraPartido(BrainStormDTO dto, CPDataDTO partido, bool esIzquierda)
@@ -670,6 +670,15 @@ namespace Elecciones.src.mensajes
         public void sfGanadorSale()
         {
             c.EnviarMensaje(superfaldonBuilder.sfGanadorSale());
+        }
+
+        //ACTUALIZAS DE PACTOS
+        public void ActualizaPactometroFichas(BrainStormDTO dtoActualizado) {
+            c.EnviarMensaje(faldonBuilder.ActualizaPactometroFichas(dtoActualizado));
+        }
+        public void ActualizaPactometroUltimoEscano(BrainStormDTO dtoActualizado)
+        {
+            c.EnviarMensaje(cartonBuilder.ActualizaPactometroUltimoEscano(dtoActualizado));
         }
 
         #endregion

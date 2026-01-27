@@ -94,7 +94,7 @@ namespace Elecciones
             if (oficiales)
             {
                 escDesdeIzq.Header = "ESCA�OS";
-                Binding binding1 = new Binding("escaniosDesde");
+                Binding binding1 = new Binding("escanios");
                 escDesdeIzq.DisplayMemberBinding = binding1;
                 escHastaIzq.Header = "% VOTO";
                 Binding binding2 = new Binding("porcentajeVoto");
@@ -121,7 +121,7 @@ namespace Elecciones
                 Binding binding1 = new Binding("escaniosDesdeSondeo");
                 escDesdeIzq.DisplayMemberBinding = binding1;
                 escHastaIzq.Header = "HASTA";
-                Binding binding2 = new Binding("escanios");
+                Binding binding2 = new Binding("escaniosHastaSondeo");
                 escHastaIzq.DisplayMemberBinding = binding2;
 
                 escDesdeDentroIzq.Header = "DESDE";
@@ -152,8 +152,25 @@ namespace Elecciones
         private void CargarPartidos()
         {
             List<CPDataDTO> cpdatas = CPDataDTO.FromBSDto(dto);
-            cpdatas.ForEach(partidosDisponibles.Add);
+            // Filtrar solo los partidos que tienen al menos 1 escaño
+            List<CPDataDTO> partidosFiltrados = FiltrarPartidosConEscanios(cpdatas);
+            partidosFiltrados.ForEach(partidosDisponibles.Add);
             partidosTotales = partidosDisponibles.ToList();
+        }
+
+        /// <summary>
+        /// Filtra los partidos para mostrar solo aquellos que tienen al menos 1 escaño
+        /// </summary>
+        private List<CPDataDTO> FiltrarPartidosConEscanios(List<CPDataDTO> partidos)
+        {
+            return partidos.Where(p => 
+            {
+                if (int.TryParse(p.escanios, out int escanios))
+                {
+                    return escanios > 0;
+                }
+                return false;
+            }).ToList();
         }
 
         public void RecargarDatos(BrainStormDTO dto, bool oficiales)
@@ -163,6 +180,94 @@ namespace Elecciones
             InitializeVariables();
             InitializeInfo();
             AdaptarTablas();
+        }
+
+        /// <summary>
+        /// Actualiza los datos del pacto en vivo manteniendo los partidos en sus listas correspondientes.
+        /// Este método preserva la posición de los partidos en las listas (partidosDentroIzq, partidosDentroDer)
+        /// mientras actualiza sus datos numéricos (escaños, votantes, porcentajes, etc.)
+        /// </summary>
+        /// <param name="dtoActualizado">DTO con los datos actualizados de la circunscripción</param>
+        /// <param name="oficiales">Indica si los datos son oficiales o sondeo</param>
+        /// <param name="tipoGrafico">Tipo de gráfico que está actualmente en emisión (PACTÓMETRO, MAYORÍAS, CARTÓN PARTIDOS, ÚLTIMO ESCAÑO, etc.)</param>
+        public void ActualizaPacto(BrainStormDTO dtoActualizado, bool oficiales, string tipoGrafico)
+        {
+            // Preservar referencias a los partidos en sus listas actuales
+            List<CPDataDTO> partidosEnIzq = partidosDentroIzq.ToList();
+            List<CPDataDTO> partidosEnDer = partidosDentroDer.ToList();
+            
+            // Actualizar el dto con los nuevos datos
+            this.dto = dtoActualizado;
+            this.oficiales = oficiales;
+            this.mayoriaAbsoluta = dto.circunscripcionDTO.mayoria;
+            
+            // Recargar la lista de partidos disponibles con los nuevos datos filtrados
+            List<CPDataDTO> cpdatasNuevas = CPDataDTO.FromBSDto(dto);
+            List<CPDataDTO> cpdatasNuevasFiltradas = FiltrarPartidosConEscanios(cpdatasNuevas);
+            
+            // Actualizar los datos de los partidos preservando su posición en las listas
+            ActualizarPartidosEnLista(partidosDentroIzq, cpdatasNuevasFiltradas);
+            ActualizarPartidosEnLista(partidosDentroDer, cpdatasNuevasFiltradas);
+            ActualizarPartidosEnLista(partidosDisponibles, cpdatasNuevasFiltradas);
+            
+            // Recalcular totales
+            totalIzq = 0;
+            totalDer = 0;
+            foreach (var partido in partidosDentroIzq)
+            {
+                if (int.TryParse(partido.escanios, out int esc))
+                    totalIzq += esc;
+            }
+            foreach (var partido in partidosDentroDer)
+            {
+                if (int.TryParse(partido.escanios, out int esc))
+                    totalDer += esc;
+            }
+            
+            lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
+            lblEscaniosDer.Content = $"Total escaños: {totalDer}";
+            lblMayoria.Content = $"Mayoría absoluta: {mayoriaAbsoluta}";
+            
+            // Disparar el método para actualizar señales gráficas
+            ActualizarSenalesGraficas(dtoActualizado, tipoGrafico);
+        }
+
+        /// <summary>
+        /// Actualiza los datos de los partidos en una lista observable, preservando su posición
+        /// </summary>
+        private void ActualizarPartidosEnLista(ObservableCollection<CPDataDTO> lista, List<CPDataDTO> datosNuevos)
+        {
+            for (int i = 0; i < lista.Count; i++)
+            {
+                CPDataDTO partidoActual = lista[i];
+                CPDataDTO datosActualizados = datosNuevos.FirstOrDefault(p => p.codigo == partidoActual.codigo);
+                
+                if (datosActualizados != null)
+                {
+                    // Actualizar los datos del partido sin cambiar su posición en la lista
+                    lista[i] = datosActualizados;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Método que dispara señales gráficas según el tipo de pacto en emisión.
+        /// Se ejecuta automáticamente cuando hay una actualización de datos en vivo.
+        /// Mantiene los datos sincronizados con la pantalla gráfica según el tipo de pacto.
+        /// </summary>
+        /// <param name="dtoActualizado">DTO con la información actualizada de la circunscripción</param>
+        /// <param name="tipoGrafico">Tipo de gráfico que está actualmente en emisión (ej: "PACTÓMETRO", "MAYORÍAS", etc.)</param>
+        private void ActualizarSenalesGraficas(BrainStormDTO dtoActualizado, string tipoGrafico)
+        {
+            graficos.pactometroActualiza(dtoActualizado, tipoGrafico);
+        }
+
+        /// <summary>
+        /// Obtiene el nombre de la circunscripción actual del pacto
+        /// </summary>
+        public string GetCircunscripcionActual()
+        {
+            return dto?.circunscripcionDTO?.nombre ?? "";
         }
 
         private void imgFlechaEntraIzq_MouseEnter(object sender, MouseEventArgs e)
@@ -211,7 +316,7 @@ namespace Elecciones
                 {
                     graficos.ultimoEntraPartido(main.dto, seleccionado, true);
                 }
-                // if (independentismo) { graficos.independentismoEntraIzquierda(index); } else { graficos.pactosEntraIzquierda(index); }
+                graficos.pactosEntraIzquierda(index);
             }
         }
         private void partidosDerListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -230,7 +335,7 @@ namespace Elecciones
                 {
                     graficos.ultimoEntraPartido(main.dto, seleccionado, false);
                 }
-                // if (independentismo) { graficos.independentismoEntraDerecha(index); } else { graficos.pactosEntraDerecha(index); }
+               graficos.pactosEntraDerecha(index);
             }
         }
 

@@ -163,6 +163,12 @@ namespace Elecciones.src.mensajes.builders
             return EventRunBuild("TICKER/ACTUALIZO");
         }
 
+        public string ActualizaPactometroFichas(BrainStormDTO dtoActualizado)
+        {
+            //TODO
+            return EventRunBuild("PACTOMETRO/ACTUALIZA_FICHAS");
+        }
+
         public string TickerSale(bool oficial)
         {
             return oficial ? EventRunBuild("TICKER/SALE") : EventRunBuild("TICKER_SONDEO/SALE");
@@ -644,6 +650,8 @@ namespace Elecciones.src.mensajes.builders
         {
             return Sale("SEDES");
         }
+
+     
 
         #endregion
     }

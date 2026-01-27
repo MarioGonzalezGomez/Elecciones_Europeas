@@ -573,12 +573,12 @@ namespace Elecciones.src.mensajes.builders
             if (esIzquierda)
             {
                 signal.Append(EventBuild("Num_Izq", "MAP_FLOAT_PAR", $"{escaniosAcumuladosIzq}", 2, 0.5, 0) + "\n");
-                signal.Append(EventBuild("Txt_Izq", "BIND_VOFFSET[0]", anchoAcumuladoIzq < THRESHOLD_ANCHO_PEQUENO ? "120" : "0", 2, 0.3, 0.1) + "\n");
+                signal.Append(EventBuild("OBJ_DISPLACEMENT3", "BIND_VOFFSET[0]", anchoAcumuladoIzq < THRESHOLD_ANCHO_PEQUENO ? "120" : "0", 2, 0.3, 0.1) + "\n");
             }
             else
             {
                 signal.Append(EventBuild("Num_Dch", "MAP_FLOAT_PAR", $"{escaniosAcumuladosDch}", 2, 0.5, 0) + "\n");
-                signal.Append(EventBuild("Txt_Dch", "BIND_VOFFSET[0]", anchoAcumuladoDch < THRESHOLD_ANCHO_PEQUENO ? "-50" : "46", 2, 0.3, 0.1) + "\n");
+                signal.Append(EventBuild("OBJ_DISPLACEMENT4", "BIND_VOFFSET[0]", anchoAcumuladoDch < THRESHOLD_ANCHO_PEQUENO ? "-50" : "46", 2, 0.3, 0.1) + "\n");
             }
 
             return signal.ToString();
@@ -591,7 +591,34 @@ namespace Elecciones.src.mensajes.builders
             return EventBuild("ULTIMO_ESCANO/SALE_BARRAS", "EVENT_RUN");
         }
 
-        public string ultimoActualiza(BrainStormDTO dtoAnterior, BrainStormDTO dtoNuevo)
+        public string ultimoActualiza(BrainStormDTO dto)
+        {
+            if (dto == null) return "";
+            var main = Application.Current.MainWindow as MainWindow;
+            var con = main?.conexionActiva;
+            StringBuilder sb = new StringBuilder();
+            //PARTE PARTIDOS DESTACADOS
+            PartidoDTO ultimo = dto.partidos.Find(p => p.esUltimoEscano == 1);
+            PartidoDTO siguiente = dto.partidos.Find(p => p.luchaUltimoEscano == 1);
+            if (ultimo != null)
+            {
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{ultimo.siglas}", "OBJ_DISPLACEMENT", "(-94, 0, 326)", 2, 0.5, 0));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{ultimo.siglas}", "OBJ_SCALE", "(1, 1, 1)", 2, 0.5, 0));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{ultimo.siglas}/Escano", "OBJ_CULL", "0", 2, 0.5, 0));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{ultimo.siglas}", "OBJ_CULL", "0", 2, 0.5, 0));
+            }
+            if (siguiente != null)
+            {
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}", "OBJ_DISPLACEMENT", "(-154, 0, 0)", 2, 0.5, 0));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}", "OBJ_SCALE", "(0.86, 0.86, 0.86)", 2, 0.5, 0));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}/Escano", "OBJ_CULL", "1", 2, 0.5, 0));
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}", "OBJ_CULL", "0", 2, 0.5, 0));
+            }
+            sb.Append(CartonesActualiza());
+            return sb.ToString();
+        }
+
+        public string ActualizaPactometroUltimoEscano(BrainStormDTO dtoNuevo)
         {
             if (dtoNuevo == null) return "";
             StringBuilder signal = new StringBuilder();
@@ -657,6 +684,8 @@ namespace Elecciones.src.mensajes.builders
             siglasUltimoEscano = siglasLuchaEscano = "";
             return Sale("ULTIMO_ESCANO");
         }
+
+
 
         #endregion
     }

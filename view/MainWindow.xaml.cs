@@ -241,22 +241,22 @@ namespace Elecciones
                     //  graficosListView.Items.Add("INDEPENDENTISMO");
                     break;
                 case 2:
-                    graficosListView.Items.Add("PARTICIPACIÓN");
+                    //graficosListView.Items.Add("PARTICIPACIÓN");
                     //graficosListView.Items.Add("CCAA");
-                    graficosListView.Items.Add("FICHAS");
+                    //graficosListView.Items.Add("FICHAS");
                     //graficosListView.Items.Add("PACTÓMETRO");
-                    graficosListView.Items.Add("MAYORÍAS");
+                    //graficosListView.Items.Add("MAYORÍAS");
                     //graficosListView.Items.Add("VS");
                     graficosListView.Items.Add("CARTÓN PARTIDOS");
                     graficosListView.Items.Add("ÚLTIMO ESCAÑO");
-                    graficosListView.Items.Add("ÚLTIMO SUPERFALDÓN");
+                    //graficosListView.Items.Add("ÚLTIMO SUPERFALDÓN");
                     break;
                 case 3:
-                    graficosListView.Items.Add("FICHAS");
+                    graficosListView.Items.Add("ESCRUTADO");
+                    graficosListView.Items.Add("CARRUSEL");
+                    graficosListView.Items.Add("CCAA");
                     graficosListView.Items.Add("PACTÓMETRO");
-                    graficosListView.Items.Add("MAYORÍAS");
-                    graficosListView.Items.Add("BIPARTIDISMO");
-                    graficosListView.Items.Add("GANADOR");
+                    //graficosListView.Items.Add("GANADOR");
                     break;
                 case 4:
                     graficosListView.Items.Add("PANTALLA 1");
@@ -328,7 +328,7 @@ namespace Elecciones
                 conexionActiva.ChangeTracker.Clear();
                 conexionActiva.SaveChangesAsync();
 
-                if (actualizacionActiva && (pactos == null || pactos.pactoDentro == false))
+                if (actualizacionActiva)
                 {
                     dtoAnterior = new BrainStormDTO(dto);
                     seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
@@ -340,7 +340,32 @@ namespace Elecciones
                     //Add cambios por actualizacion en vivo en cartones
                     if (string.Equals(graficosHeader.Header, "CARTÓN")) { UpdateCartones(dtoAnterior); }
                     if (string.Equals(graficosHeader.Header, "SUPERFADÓN")) { UpdateSuperfaldones(); }
-                    if (pactos != null && pactos.pactoDentro == false) { pactos.RecargarDatos(dto, oficiales); }
+                    
+                    // Actualizar datos en la ventana de Pactos si está abierta
+                    if (pactos != null && pactos.pactoDentro)
+                    {
+                        // Obtener el tipo de gráfico actual
+                        string tipoGrafico = graficosListView.SelectedItem?.ToString() ?? "";
+                        
+                        // Si la ventana de Pactos tiene una circunscripción diferente, obtener su dto actualizado
+                        string pactoCircunscripcion = pactos.GetCircunscripcionActual();
+                        if (!string.Equals(pactoCircunscripcion, elementoSeleccionado))
+                        {
+                            BrainStormDTO dtoPactos = ObtenerDTO(pactoCircunscripcion);
+                            pactos.ActualizaPacto(dtoPactos, oficiales, tipoGrafico);
+                        }
+                        else
+                        {
+                            // Si es la misma circunscripción, usar el dto actualizado de MainWindow
+                            pactos.ActualizaPacto(dto, oficiales, tipoGrafico);
+                        }
+                    }
+                    else if (pactos != null && !pactos.pactoDentro)
+                    {
+                        // Si el pacto no está en emisión, simplemente recargar los datos
+                        pactos.RecargarDatos(dto, oficiales);
+                    }
+                    
                     ActualizarInfoInterfaz(seleccionada, dto);
                     EscribirFichero(desdeSede);
                 }
@@ -387,7 +412,7 @@ namespace Elecciones
             }
             if (ultimoEscanoDentro)
             {
-                graficos.ultimoActualiza(dtoAnterior, dto);
+                graficos.ultimoActualiza(dto);
             }
             graficos.CartonesActualiza();
         }
@@ -696,12 +721,9 @@ namespace Elecciones
                 ActualizarInfoInterfaz(seleccionada, dto);
                 preparado = false;
 
-                if (dto != null)
+                if (dto != null && pactos != null)
                 {
-                    if (pactos != null)
-                    {
-                        pactos.RecargarDatos(dto, oficiales);
-                    }
+                    pactos.RecargarDatos(dto, oficiales);
                 }
             }
         }
@@ -905,7 +927,7 @@ namespace Elecciones
                 4 => seleccionada.participacionHist.ToString(),
                 _ => seleccionada.participacionHist.ToString()
             };
-            
+
             // Usar la misma lógica de filtrado que en ActualizarInfoInterfaz(BrainStormDTO dto)
             listaDeDatos.Clear();
 
@@ -950,6 +972,8 @@ namespace Elecciones
                 "CUENTA ATRÁS" => new List<CPDataDTO>(), // No mostrar datos
                 "FICHAS" => FiltrarDatosParaFichas(allCPDatas),
                 "SEDES" => FiltrarDatosParaSedes(allCPDatas),
+                "CARTÓN PARTIDOS" => FiltrarDatosParaCartonPartidos(allCPDatas),
+                "ÚLTIMO ESCAÑO" => FiltrarDatosParaUltimoEscano(allCPDatas, dto),
                 _ => allCPDatas // Por defecto, mostrar todos los datos
             };
         }
@@ -997,6 +1021,72 @@ namespace Elecciones
 
             // Ya están ordenados por id, simplemente devolver todos
             return allCPDatas;
+        }
+
+        /// <summary>
+        /// Filtra datos para el gráfico "CARTÓN PARTIDOS"
+        /// - Solo existe para datos oficiales (devuelve lista vacía en sondeo)
+        /// - Muestra todos los partidos (incluso los sin representación)
+        /// - Datos mostrados: Siglas, Escaños, %voto, Votantes
+        /// - Ordenado por CPDataComparer (más escaños > más %voto > más votantes)
+        /// </summary>
+        private List<CPDataDTO> FiltrarDatosParaCartonPartidos(List<CPDataDTO> allCPDatas)
+        {
+            // CARTÓN PARTIDOS solo existe para datos oficiales
+            if (!oficiales)
+            {
+                return new List<CPDataDTO>();
+            }
+
+            // Devolver todos los partidos ordenados por comparer
+            List<CPDataDTO> filtrados = new List<CPDataDTO>(allCPDatas);
+            filtrados.Sort((a, b) => -new CPDataComparer().Compare(a, b));
+            return filtrados;
+        }
+
+        /// <summary>
+        /// Filtra datos para el gráfico "ÚLTIMO ESCAÑO"
+        /// - Solo existe para datos oficiales (devuelve lista vacía en sondeo)
+        /// - Muestra solo los dos partidos que disputan el último escaño
+        /// - Datos mostrados: Siglas, Restos
+        /// - Orden: primero el partido con esUltimoEscano=1, luego el de luchaUltimoEscano=1
+        /// </summary>
+        private List<CPDataDTO> FiltrarDatosParaUltimoEscano(List<CPDataDTO> allCPDatas, BrainStormDTO dto)
+        {
+            // ÚLTIMO ESCAÑO solo existe para datos oficiales
+            if (!oficiales || dto == null)
+            {
+                return new List<CPDataDTO>();
+            }
+
+            List<CPDataDTO> ultimoEscano = new List<CPDataDTO>();
+
+            // Buscar el partido que tiene el último escaño
+            PartidoDTO partidoUltimo = dto.partidos.Find(p => p.esUltimoEscano == 1);
+            // Buscar el partido que lucha por el último escaño
+            PartidoDTO partidoLucha = dto.partidos.Find(p => p.luchaUltimoEscano == 1);
+
+            // Agregar el partido con el último escaño primero
+            if (partidoUltimo != null)
+            {
+                CPDataDTO cpDataUltimo = allCPDatas.FirstOrDefault(c => c.codigo == partidoUltimo.codigo);
+                if (cpDataUltimo != null)
+                {
+                    ultimoEscano.Add(cpDataUltimo);
+                }
+            }
+
+            // Agregar el partido que lucha por el último escaño
+            if (partidoLucha != null)
+            {
+                CPDataDTO cpDataLucha = allCPDatas.FirstOrDefault(c => c.codigo == partidoLucha.codigo);
+                if (cpDataLucha != null)
+                {
+                    ultimoEscano.Add(cpDataLucha);
+                }
+            }
+
+            return ultimoEscano;
         }
 
 
@@ -1105,6 +1195,74 @@ namespace Elecciones
                     }
                     break;
 
+                case "CARTÓN PARTIDOS":
+                    // Restaurar visibilidad
+                    datosListView.Visibility = Visibility.Visible;
+
+                    // Ocultar columna Código
+                    columna1.Width = 0;
+
+                    if (oficiales)
+                    {
+                        // Oficial: Siglas, Escaños, %voto, Votantes
+                        columna3.Header = "ESCAÑOS";
+                        columna3.DisplayMemberBinding = new Binding("escanios");
+
+                        columna4.Header = "% VOTO";
+                        columna4.DisplayMemberBinding = new Binding("porcentajeVoto");
+                        columna4.Width = datosListView.ActualWidth / 5; // Restaurar visibilidad
+
+                        columna5.Header = "VOTANTES";
+                        columna5.DisplayMemberBinding = new Binding("votantes");
+                        columna5.Width = datosListView.ActualWidth / 5; // Restaurar visibilidad
+
+                        columna6.Width = 0; // Ocultar columna 6
+                        columna7.Width = 0; // Ocultar columna 7
+                    }
+                    else
+                    {
+                        // No mostrar datos en sondeo
+                        datosListView.Visibility = Visibility.Collapsed;
+                    }
+
+                    if (dto != null)
+                    {
+                        dto = ObtenerDTO(dto.circunscripcionDTO.nombre);
+                        ActualizarInfoInterfaz(dto);
+                    }
+                    break;
+
+                case "ÚLTIMO ESCAÑO":
+                    // Restaurar visibilidad
+                    datosListView.Visibility = Visibility.Visible;
+
+                    // Ocultar columna Código
+                    columna1.Width = 0;
+
+                    if (oficiales)
+                    {
+                        // Oficial: Siglas, Restos
+                        columna3.Header = "RESTOS";
+                        columna3.DisplayMemberBinding = new Binding("restos");
+
+                        columna4.Width = 0; // Ocultar columna 4
+                        columna5.Width = 0; // Ocultar columna 5
+                        columna6.Width = 0; // Ocultar columna 6
+                        columna7.Width = 0; // Ocultar columna 7
+                    }
+                    else
+                    {
+                        // No mostrar datos en sondeo
+                        datosListView.Visibility = Visibility.Collapsed;
+                    }
+
+                    if (dto != null)
+                    {
+                        dto = ObtenerDTO(dto.circunscripcionDTO.nombre);
+                        ActualizarInfoInterfaz(dto);
+                    }
+                    break;
+
                 case "INDEPENDENTISMO":
                     // Restaurar visibilidad al volver de "CUENTA ATRÁS"
                     datosListView.Visibility = Visibility.Visible;
@@ -1127,28 +1285,35 @@ namespace Elecciones
                     }
                     break;
             }
+
+            // Ajustar tamaño de columnas al final de AdaptarTablaDatos
+            ReajustarSizeTabla();
         }
         private void ReajustarSizeTabla()
         {
-            if (oficiales)
+            // Contar las columnas visibles (ancho > 0)
+            List<GridViewColumn> columnasVisibles = new List<GridViewColumn>();
+            if (columna1.Width > 0) columnasVisibles.Add(columna1);
+            if (columna2.Width > 0) columnasVisibles.Add(columna2);
+            if (columna3.Width > 0) columnasVisibles.Add(columna3);
+            if (columna4.Width > 0) columnasVisibles.Add(columna4);
+            if (columna5.Width > 0) columnasVisibles.Add(columna5);
+            if (columna6.Width > 0) columnasVisibles.Add(columna6);
+            if (columna7.Width > 0) columnasVisibles.Add(columna7);
+
+            // Si no hay columnas visibles o el ancho es 0, no hacer nada
+            if (columnasVisibles.Count == 0 || datosListView.ActualWidth <= 0)
+                return;
+
+            // Obtener el ancho total disponible considerando márgenes
+            double anchoTotal = datosListView.ActualWidth;
+
+            // Dividir el ancho total entre las columnas visibles para ocupar todo el espacio
+            double anchoColumnaa = anchoTotal / columnasVisibles.Count;
+
+            foreach (var columna in columnasVisibles)
             {
-                columna1.Width = datosListView.ActualWidth / 7;
-                columna2.Width = datosListView.ActualWidth / 7;
-                columna3.Width = datosListView.ActualWidth / 7;
-                columna4.Width = datosListView.ActualWidth / 7;
-                columna5.Width = datosListView.ActualWidth / 7;
-                columna6.Width = datosListView.ActualWidth / 7;
-                columna7.Width = datosListView.ActualWidth / 7;
-            }
-            else
-            {
-                columna1.Width = datosListView.ActualWidth / 5;
-                columna2.Width = datosListView.ActualWidth / 5;
-                columna3.Width = datosListView.ActualWidth / 5;
-                columna4.Width = datosListView.ActualWidth / 5;
-                columna5.Width = datosListView.ActualWidth / 5;
-                columna6.Width = 0;
-                columna7.Width = 0;
+                columna.Width = anchoColumnaa;
             }
         }
 

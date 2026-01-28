@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Win32; // <- Added for OpenFileDialog
+using Microsoft.Win32;
 
 namespace Elecciones
 {
@@ -89,6 +89,9 @@ namespace Elecciones
 
         //Manejar datos del fichero de configuracion
         ConfigManager configuration;
+
+        //Diccionario para guardar los valores originales de escaños de sondeo
+        private Dictionary<string, (int desde, int hasta)> valoresOriginalesSondeo = new Dictionary<string, (int, int)>();
 
         public MainWindow()
         {
@@ -232,6 +235,9 @@ namespace Elecciones
             try
             {
                 cmbSondeo.Items.Clear();
+                // Agregar opción RTVE como primera opción (valores originales)
+                cmbSondeo.Items.Add("RTVE");
+                
                 MedioController medioController = new MedioController(conexionActiva);
                 List<src.model.DTO.MedioDTO> medios = medioController.ObtenerMediosConDescripcion();
                 
@@ -264,7 +270,6 @@ namespace Elecciones
                     graficosListView.Items.Add("CUENTA ATRÁS");
                     graficosListView.Items.Add("FICHAS");
                     graficosListView.Items.Add("SEDES");
-                    //  graficosListView.Items.Add("INDEPENDENTISMO");
                     break;
                 case 2:
                     //graficosListView.Items.Add("PARTICIPACIÓN");
@@ -275,7 +280,6 @@ namespace Elecciones
                     //graficosListView.Items.Add("VS");
                     graficosListView.Items.Add("CARTÓN PARTIDOS");
                     graficosListView.Items.Add("ÚLTIMO ESCAÑO");
-                    //graficosListView.Items.Add("ÚLTIMO SUPERFALDÓN");
                     break;
                 case 3:
                     graficosListView.Items.Add("ESCRUTADO");
@@ -930,6 +934,28 @@ namespace Elecciones
                 //PONER LA INFORMACIÓN EN LA INTERFAZ
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 dto = ObtenerDTO(elementoSeleccionado);
+                
+                // Aplicar el medio actualmente seleccionado al nuevo DTO
+                if (cmbSondeo.SelectedItem != null && !oficiales)
+                {
+                    string medioSeleccionado = cmbSondeo.SelectedItem.ToString();
+                    if (medioSeleccionado == "RTVE")
+                    {
+                        RestaurarValoresOriginalesSondeo();
+                    }
+                    else
+                    {
+                        // Obtener el código del medio y actualizar los datos
+                        MedioController medioController = new MedioController(conexionActiva);
+                        List<src.model.DTO.MedioDTO> medios = medioController.ObtenerMediosConDescripcion();
+                        src.model.DTO.MedioDTO medio = medios.FirstOrDefault(m => m.descripcion == medioSeleccionado);
+                        if (medio != null)
+                        {
+                            ActualizarDatosConMedio(medio.codigo);
+                        }
+                    }
+                }
+                
                 ActualizarInfoInterfaz(seleccionada, dto);
             }
         }
@@ -1369,7 +1395,23 @@ namespace Elecciones
                 ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(circunscripcion, avance, tipoElecciones)
                 : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(circunscripcion, avance, tipoElecciones);
 
+            // Guardar los valores originales de escaños de sondeo
+            GuardarValoresOriginalesSondeo(dto);
+
             return dto;
+        }
+
+        private void GuardarValoresOriginalesSondeo(BrainStormDTO dtoActual)
+        {
+            if (dtoActual != null)
+            {
+                foreach (var partido in dtoActual.partidos)
+                {
+                    // Guardar los valores originales con una clave única por partido en esta circunscripción
+                    string clave = $"{dtoActual.circunscripcionDTO.codigo}_{partido.codigo}";
+                    valoresOriginalesSondeo[clave] = (partido.escaniosDesdeSondeo, partido.escaniosHastaSondeo);
+                }
+            }
         }
 
         private async void EscribirFichero(bool desdeSedes = false)
@@ -1870,38 +1912,46 @@ namespace Elecciones
                     string descripcionSondeo = cmbSondeo.SelectedItem?.ToString();
                     if (!string.IsNullOrEmpty(descripcionSondeo))
                     {
-                        // Obtener el código del medio a partir de la descripción
-                        MedioController medioController = new MedioController(conexionActiva);
-                        List<src.model.DTO.MedioDTO> medios = medioController.ObtenerMediosConDescripcion();
-                        src.model.DTO.MedioDTO medioSeleccionado = medios.FirstOrDefault(m => m.descripcion == descripcionSondeo);
-
-                        if (medioSeleccionado != null)
+                        if (descripcionSondeo == "RTVE")
                         {
-                            // Obtener los datos de MedioPartido para actualizar el DTO
-                            ActualizarDatosConMedio(medioSeleccionado.codigo);
+                            // Restaurar los valores originales de escaños de sondeo
+                            RestaurarValoresOriginalesSondeo();
+                        }
+                        else
+                        {
+                            // Obtener el código del medio a partir de la descripción
+                            MedioController medioController = new MedioController(conexionActiva);
+                            List<src.model.DTO.MedioDTO> medios = medioController.ObtenerMediosConDescripcion();
+                            src.model.DTO.MedioDTO medioSeleccionado = medios.FirstOrDefault(m => m.descripcion == descripcionSondeo);
 
-                            // Si estamos en modo sondeo, actualizar la interfaz
-                            if (!oficiales)
+                            if (medioSeleccionado != null)
                             {
-                                // Determinar si estamos en una circunscripción o autonomía
-                                if (circunscripcionesListView.SelectedItem != null)
-                                {
-                                    // Estamos en una circunscripción específica
-                                    string circunscripcionSeleccionada = circunscripcionesListView.SelectedItem.ToString();
-                                    Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(circunscripcionSeleccionada);
-                                    ActualizarInfoInterfaz(seleccionada, dto);
-                                }
-                                else if (autonomiasListView.SelectedItem != null)
-                                {
-                                    // Estamos en una autonomía
-                                    ActualizarInfoInterfaz(dto);
-                                }
+                                // Obtener los datos de MedioPartido para actualizar el DTO
+                                ActualizarDatosConMedio(medioSeleccionado.codigo);
+                            }
+                        }
 
-                                // Si hay un gráfico y circunscripción seleccionados, exportar el CSV
-                                if (graficosListView.SelectedItem != null && circunscripcionesListView.SelectedItem != null)
-                                {
-                                    EscribirFichero();
-                                }
+                        // Si estamos en modo sondeo, actualizar la interfaz
+                        if (!oficiales)
+                        {
+                            // Determinar si estamos en una circunscripción o autonomía
+                            if (circunscripcionesListView.SelectedItem != null)
+                            {
+                                // Estamos en una circunscripción específica
+                                string circunscripcionSeleccionada = circunscripcionesListView.SelectedItem.ToString();
+                                Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(circunscripcionSeleccionada);
+                                ActualizarInfoInterfaz(seleccionada, dto);
+                            }
+                            else if (autonomiasListView.SelectedItem != null)
+                            {
+                                // Estamos en una autonomía
+                                ActualizarInfoInterfaz(dto);
+                            }
+
+                            // Si hay un gráfico y circunscripción seleccionados, exportar el CSV
+                            if (graficosListView.SelectedItem != null && circunscripcionesListView.SelectedItem != null)
+                            {
+                                EscribirFichero();
                             }
                         }
                     }
@@ -1910,6 +1960,24 @@ namespace Elecciones
             catch (Exception ex)
             {
                 MessageBox.Show($"Error seleccionando sondeo: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void RestaurarValoresOriginalesSondeo()
+        {
+            if (dto != null)
+            {
+                foreach (var partido in dto.partidos)
+                {
+                    // Buscar los valores originales con la clave única
+                    string clave = $"{dto.circunscripcionDTO.codigo}_{partido.codigo}";
+                    if (valoresOriginalesSondeo.TryGetValue(clave, out var valores))
+                    {
+                        // Restaurar los valores originales
+                        partido.escaniosDesdeSondeo = valores.desde;
+                        partido.escaniosHastaSondeo = valores.hasta;
+                    }
+                }
             }
         }
 

@@ -96,6 +96,7 @@ namespace Elecciones
             InitializeVariables();
             AdaptarConexiones();
             CargarCircunscripciones();
+            CargarMedios();
             InitializeListView();
             AdaptarColores();
             EscribirConexiones();
@@ -225,6 +226,31 @@ namespace Elecciones
                 gridView.Columns[0].Header = autonomiasHeader;
             }
         }
+
+        private void CargarMedios()
+        {
+            try
+            {
+                cmbSondeo.Items.Clear();
+                MedioController medioController = new MedioController(conexionActiva);
+                List<src.model.DTO.MedioDTO> medios = medioController.ObtenerMediosConDescripcion();
+                
+                foreach (var medio in medios)
+                {
+                    cmbSondeo.Items.Add(medio.descripcion);
+                }
+
+                if (cmbSondeo.Items.Count > 0)
+                {
+                    cmbSondeo.SelectedIndex = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error cargando medios: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         //Por ahora, se modifican manualmente, pero se podría implementar un modo de introducir
         //los tipos de gráficos en la ventana de configuración Avanzada
         public void InitializeListView()
@@ -775,6 +801,7 @@ namespace Elecciones
             conexionActiva = new ConexionEntityFramework(int.Parse(configuration.GetValue($"conexionDefault{eleccionSeleccionada.Valor + 1}")), eleccionSeleccionada.Valor + 1);
             CCAA.Clear();
             CargarCircunscripciones();
+            CargarMedios();
             autonomiasListView.ItemsSource = CCAA.Select(cir => cir.nombre).ToList();
             ActualizarHeaderAutonomias();
             circunscripcionNames.Clear();
@@ -1831,6 +1858,93 @@ namespace Elecciones
             if (config != null)
             {
                 config.Close();
+            }
+        }
+
+        private void cmbSondeo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (cmbSondeo.SelectedIndex >= 0 && dto != null)
+                {
+                    string descripcionSondeo = cmbSondeo.SelectedItem?.ToString();
+                    if (!string.IsNullOrEmpty(descripcionSondeo))
+                    {
+                        // Obtener el código del medio a partir de la descripción
+                        MedioController medioController = new MedioController(conexionActiva);
+                        List<src.model.DTO.MedioDTO> medios = medioController.ObtenerMediosConDescripcion();
+                        src.model.DTO.MedioDTO medioSeleccionado = medios.FirstOrDefault(m => m.descripcion == descripcionSondeo);
+
+                        if (medioSeleccionado != null)
+                        {
+                            // Obtener los datos de MedioPartido para actualizar el DTO
+                            ActualizarDatosConMedio(medioSeleccionado.codigo);
+
+                            // Si estamos en modo sondeo, actualizar la interfaz
+                            if (!oficiales)
+                            {
+                                // Determinar si estamos en una circunscripción o autonomía
+                                if (circunscripcionesListView.SelectedItem != null)
+                                {
+                                    // Estamos en una circunscripción específica
+                                    string circunscripcionSeleccionada = circunscripcionesListView.SelectedItem.ToString();
+                                    Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(circunscripcionSeleccionada);
+                                    ActualizarInfoInterfaz(seleccionada, dto);
+                                }
+                                else if (autonomiasListView.SelectedItem != null)
+                                {
+                                    // Estamos en una autonomía
+                                    ActualizarInfoInterfaz(dto);
+                                }
+
+                                // Si hay un gráfico y circunscripción seleccionados, exportar el CSV
+                                if (graficosListView.SelectedItem != null && circunscripcionesListView.SelectedItem != null)
+                                {
+                                    EscribirFichero();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error seleccionando sondeo: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ActualizarDatosConMedio(string codMedio)
+        {
+            try
+            {
+                MedioPartidoController medioPartidoController = new MedioPartidoController(conexionActiva);
+                
+                // Para cada partido en el DTO, actualizar los escaños de sondeo
+                foreach (var partido in dto.partidos)
+                {
+                    // Obtener el código de circunscripción del DTO
+                    string codCircunscripcion = dto.circunscripcionDTO.codigo;
+
+                    // Obtener los datos del MedioPartido
+                    var medioPartido = medioPartidoController.ObtenerPorClave(codCircunscripcion, codMedio, partido.codigo);
+
+                    if (medioPartido != null)
+                    {
+                        // Actualizar los valores de escaños de sondeo
+                        partido.escaniosDesdeSondeo = medioPartido.escaniosDesde;
+                        partido.escaniosHastaSondeo = medioPartido.escaniosHasta;
+                    }
+                    else
+                    {
+                        // Si no hay datos para este partido, establecer valores por defecto
+                        partido.escaniosDesdeSondeo = 0;
+                        partido.escaniosHastaSondeo = 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error actualizando datos del medio: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

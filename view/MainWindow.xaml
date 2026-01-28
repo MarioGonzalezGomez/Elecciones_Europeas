@@ -166,9 +166,10 @@
         </Grid>
         <Grid Grid.Row="1" Grid.Column="2" Margin="10">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="158*"/>
-                <ColumnDefinition Width="47*"/>
-                <ColumnDefinition Width="125*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0.3*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -187,10 +188,15 @@
             <Label Name="lblParticipacion" Grid.Row="2" Grid.Column="1" Content="---" FontSize="15"  Margin="1"/>
             <Label Name="lblParticipacionHist" Grid.Row="3" Grid.Column="1" Content="---" FontSize="15"  Margin="1"/>
 
-            <Button Content="AVANCE 1" x:Name="btnAvance1" Click="btnAvance1_Click" Grid.Row="0" Grid.Column="2"  Margin="10,3,10,3"/>
-            <Button Content="AVANCE 2" x:Name="btnAvance2" Click="btnAvance2_Click" Grid.Row="1" Grid.Column="2" Margin="10,3,10,3"/>
-            <Button Content="AVANCE 3" x:Name="btnAvance3" Click="btnAvance3_Click" Grid.Row="2" Grid.Column="2" Margin="10,3,10,3"/>
-            <Button Content="FINAL" x:Name="btnAvance4" Click="btnAvance4_Click" Grid.Row="3" Grid.Column="2"  Margin="10,3,10,3"/>
+            <!-- Botones de Avance en 2x2 -->
+            <Button Content="AVANCE 1" x:Name="btnAvance1" Click="btnAvance1_Click" Grid.Row="0" Grid.Column="2"  Margin="5,3,3,3"/>
+            <Button Content="AVANCE 2" x:Name="btnAvance2" Click="btnAvance2_Click" Grid.Row="0" Grid.Column="3" Margin="3,3,5,3"/>
+            <Button Content="AVANCE 3" x:Name="btnAvance3" Click="btnAvance3_Click" Grid.Row="1" Grid.Column="2" Margin="5,3,3,3"/>
+            <Button Content="FINAL" x:Name="btnAvance4" Click="btnAvance4_Click" Grid.Row="1" Grid.Column="3" Margin="3,3,5,3"/>
+            
+            <!-- ComboBox para seleccionar Sondeo -->
+            <TextBlock Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2" Text="Sondeo:" VerticalAlignment="Center" Margin="5,3,0,3" FontSize="13" FontWeight="SemiBold"/>
+            <ComboBox x:Name="cmbSondeo" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,3,5,3" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" SelectionChanged="cmbSondeo_SelectionChanged"/>
         </Grid>
         <Grid Name="gridTablas" Grid.Row="2" Grid.Column="0" Margin="5,0,5,0">
             <ListView Name="graficosListView" Margin="0,0,0,5" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden" SelectionChanged="graficosListView_SelectionChanged">

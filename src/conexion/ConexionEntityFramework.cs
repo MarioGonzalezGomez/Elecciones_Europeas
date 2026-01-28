@@ -1,4 +1,5 @@
 using Elecciones.src.model.IPF;
+using Elecciones.src.model;
 using Elecciones.src.utils;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
@@ -128,6 +129,8 @@ namespace Elecciones.src.conexion
         public virtual DbSet<Circunscripcion> Circunscripciones { get; set; }
         public virtual DbSet<CircunscripcionPartido> Cps { get; set; }
         public virtual DbSet<Literal> Literales { get; set; }
+        public virtual DbSet<Medio> Medios { get; set; }
+        public virtual DbSet<MedioPartido> MedioPartidos { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -206,6 +209,29 @@ namespace Elecciones.src.conexion
                 entity.Property("gallego").HasColumnName("gallego");
                 entity.Property("valenciano").HasColumnName("valenciano");
                 entity.Property("mallorquin").HasColumnName("mallorquin");
+
+            });
+            modelBuilder.Entity<Medio>(entity =>
+            {
+                entity.ToTable("medios");
+
+                entity.HasKey(m => m.codigo);
+                entity.Property(m => m.codigo).HasColumnName("MEDIO");
+                entity.Property("descripcion").HasColumnName("descripcion");
+                entity.Property("comparar").HasColumnName("comparar");
+
+            });
+            modelBuilder.Entity<MedioPartido>(entity =>
+            {
+                entity.ToTable("medio_partido");
+
+                entity.HasKey(mp => new { mp.codCircunscripcion, mp.codMedio, mp.codPartido });
+                entity.Property(mp => mp.codCircunscripcion).HasColumnName("COD_CIRCUNSCRIPCION");
+                entity.Property(mp => mp.codMedio).HasColumnName("COD_MEDIO");
+                entity.Property(mp => mp.codPartido).HasColumnName("COD_PARTIDO");
+                entity.Property("escaniosDesde").HasColumnName("escanos_desde");
+                entity.Property("escaniosHasta").HasColumnName("escanos_hasta");
+                entity.Property("votos").HasColumnName("votos");
 
             });
         }

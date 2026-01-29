@@ -597,9 +597,11 @@ namespace Elecciones.src.mensajes.builders
             var main = Application.Current.MainWindow as MainWindow;
             var con = main?.conexionActiva;
             StringBuilder sb = new StringBuilder();
-            //PARTE PARTIDOS DESTACADOS
+
+            // PARTE PARTIDOS DESTACADOS
             PartidoDTO ultimo = dto.partidos.Find(p => p.esUltimoEscano == 1);
             PartidoDTO siguiente = dto.partidos.Find(p => p.luchaUltimoEscano == 1);
+
             if (ultimo != null)
             {
                 sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{ultimo.siglas}", "OBJ_DISPLACEMENT", "(-94, 0, 326)", 2, 0.5, 0));
@@ -607,6 +609,7 @@ namespace Elecciones.src.mensajes.builders
                 sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{ultimo.siglas}/Escano", "OBJ_CULL", "0", 2, 0.5, 0));
                 sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{ultimo.siglas}", "OBJ_CULL", "0", 2, 0.5, 0));
             }
+
             if (siguiente != null)
             {
                 sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}", "OBJ_DISPLACEMENT", "(-154, 0, 0)", 2, 0.5, 0));
@@ -614,6 +617,22 @@ namespace Elecciones.src.mensajes.builders
                 sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}/Escano", "OBJ_CULL", "1", 2, 0.5, 0));
                 sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}", "OBJ_CULL", "0", 2, 0.5, 0));
             }
+
+            // Ocultar todos los partidos que no sean último ni siguiente
+            foreach (var partido in dto.partidos)
+            {
+                // Saltar si es el partido último o el siguiente
+                if ((ultimo != null && partido.codigo == ultimo.codigo) || 
+                    (siguiente != null && partido.codigo == siguiente.codigo))
+                {
+                    continue;
+                }
+
+                // Ocultar el partido
+                string siglasOcultar = partido.siglas.Replace("+", "_").Replace("-", "_");
+                sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasOcultar}", "OBJ_CULL", "1", 2, 0.25, 0) + "\n");
+            }
+
             sb.Append(CartonesActualiza());
             return sb.ToString();
         }

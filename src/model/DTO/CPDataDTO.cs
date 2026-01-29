@@ -101,5 +101,27 @@ namespace Elecciones.src.model.IPF.DTO
             ConfigManager cm = ConfigManager.GetInstance();
             return obj is CPDataDTO dto && (codigo == dto.codigo || codigo == cm.GetValue("codigoRegional") + dto.codigo.Substring(2));
         }
+
+        /// <summary>
+        /// Actualiza los datos de este partido con los valores de otro CPDataDTO
+        /// Útil para refrescar la UI sin reemplazar el objeto en las listas
+        /// </summary>
+        public void ActualizarDatos(CPDataDTO datosNuevos)
+        {
+            if (datosNuevos == null) return;
+            
+            this.siglas = datosNuevos.siglas;
+            this.escanios = datosNuevos.escanios;
+            this.escaniosDesdeSondeo = datosNuevos.escaniosDesdeSondeo;
+            this.escaniosHastaSondeo = datosNuevos.escaniosHastaSondeo;
+            this.escaniosHistoricos = datosNuevos.escaniosHistoricos;
+            this.diferenciaEscanios = datosNuevos.diferenciaEscanios;
+            this.votantes = datosNuevos.votantes;
+            this.votantesHistoricos = datosNuevos.votantesHistoricos;
+            this.diferenciaVotantes = datosNuevos.diferenciaVotantes;
+            this.porcentajeVoto = datosNuevos.porcentajeVoto;
+            this.porcentajeVotoHist = datosNuevos.porcentajeVotoHist;
+            this.restos = datosNuevos.restos;
+        }
     }
 }

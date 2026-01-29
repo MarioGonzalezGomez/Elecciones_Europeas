@@ -377,18 +377,12 @@ namespace Elecciones
                         // Obtener el tipo de gráfico actual
                         string tipoGrafico = graficosListView.SelectedItem?.ToString() ?? "";
                         
-                        // Si la ventana de Pactos tiene una circunscripción diferente, obtener su dto actualizado
+                        // Obtener el DTO de la circunscripción del pacto (que puede ser diferente a la actual)
                         string pactoCircunscripcion = pactos.GetCircunscripcionActual();
-                        if (!string.Equals(pactoCircunscripcion, elementoSeleccionado))
-                        {
-                            BrainStormDTO dtoPactos = ObtenerDTO(pactoCircunscripcion);
-                            pactos.ActualizaPacto(dtoPactos, oficiales, tipoGrafico);
-                        }
-                        else
-                        {
-                            // Si es la misma circunscripción, usar el dto actualizado de MainWindow
-                            pactos.ActualizaPacto(dto, oficiales, tipoGrafico);
-                        }
+                        BrainStormDTO dtoPactos = ObtenerDTO(pactoCircunscripcion);
+                        
+                        // ActualizaPacto validará que los datos correspondan a su circunscripción original
+                        pactos.ActualizaPacto(dtoPactos, oficiales, tipoGrafico);
                     }
                     else if (pactos != null && !pactos.pactoDentro)
                     {
@@ -1554,7 +1548,9 @@ namespace Elecciones
             {
                 if (pactos == null)
                 {
-                    pactos = new Pactos(dto, oficiales);
+                    // Obtener el tipo de gráfico actual
+                    string tipoGrafico = graficosListView.SelectedItem?.ToString() ?? "";
+                    pactos = new Pactos(dto, oficiales, tipoGrafico);
                     pactos.Show();
                 }
                 else { pactos.Activate(); }

@@ -43,6 +43,10 @@ namespace Elecciones
         private ObservableCollection<CPDataDTO> partidosDentroDer;
         private GraphicController graficos;
         private bool preparado;
+        /// <summary>
+        /// Circunscripción original del pacto - se mantiene fija durante toda la sesión
+        /// </summary>
+        private string circunscripcionOriginal;
 
         public bool pactoDentro;
 
@@ -52,6 +56,8 @@ namespace Elecciones
         {
             this.dto = dto;
             this.oficiales = oficiales;
+            // Guardar la circunscripción original del pacto ANTES de InitializeVariables
+            this.circunscripcionOriginal = dto.circunscripcionDTO.nombre;
             InitializeComponent();
             InitializeVariables();
             InitializeInfo();
@@ -60,12 +66,35 @@ namespace Elecciones
             this.Closing += WindowClosing;
         }
 
+        public Pactos(BrainStormDTO dto, bool oficiales, string tipoGraficoActual) : this(dto, oficiales)
+        {
+            // Si el tipo de gráfico es "ÚLTIMO ESCAÑO", automatizar la entrada
+            if (string.Equals(tipoGraficoActual, "ÚLTIMO ESCAÑO", StringComparison.OrdinalIgnoreCase))
+            {
+                this.Loaded += (s, e) => AutoEntrarEnPacto();
+            }
+        }
+
+        /// <summary>
+        /// Automatiza la entrada en el pacto simulando el click en el botón "ENTRA"
+        /// </summary>
+        private void AutoEntrarEnPacto()
+        {
+            if (!preparado)
+            {
+                EscribirPacto();
+            }
+            graficos.pactosEntra();
+            pactoDentro = true;
+        }
+
         private void InitializeVariables()
         {
             var main = Application.Current.MainWindow as MainWindow;
             totalIzq = 0;
             totalDer = 0;
             mayoriaAbsoluta = dto.circunscripcionDTO.mayoria;
+            // circunscripcionOriginal ya se inicializa en el constructor y NO se debe cambiar
             partidosDisponibles = new ObservableCollection<CPDataDTO>();
             partidosDentroIzq = new ObservableCollection<CPDataDTO>();
             partidosDentroDer = new ObservableCollection<CPDataDTO>();
@@ -175,6 +204,14 @@ namespace Elecciones
 
         public void RecargarDatos(BrainStormDTO dto, bool oficiales)
         {
+            // Validar que los datos correspondan a la circunscripción original del pacto
+            string circunscripcionNueva = dto?.circunscripcionDTO?.nombre ?? "";
+            if (!string.Equals(circunscripcionNueva, circunscripcionOriginal, StringComparison.OrdinalIgnoreCase))
+            {
+                // Los datos no corresponden a la circunscripción del pacto, no recargar
+                return;
+            }
+
             this.dto = dto;
             this.oficiales = oficiales;
             InitializeVariables();
@@ -186,12 +223,21 @@ namespace Elecciones
         /// Actualiza los datos del pacto en vivo manteniendo los partidos en sus listas correspondientes.
         /// Este método preserva la posición de los partidos en las listas (partidosDentroIzq, partidosDentroDer)
         /// mientras actualiza sus datos numéricos (escaños, votantes, porcentajes, etc.)
+        /// IMPORTANTE: Solo actualiza si los datos corresponden a la circunscripción original del pacto
         /// </summary>
         /// <param name="dtoActualizado">DTO con los datos actualizados de la circunscripción</param>
         /// <param name="oficiales">Indica si los datos son oficiales o sondeo</param>
         /// <param name="tipoGrafico">Tipo de gráfico que está actualmente en emisión (PACTÓMETRO, MAYORÍAS, CARTÓN PARTIDOS, ÚLTIMO ESCAÑO, etc.)</param>
         public void ActualizaPacto(BrainStormDTO dtoActualizado, bool oficiales, string tipoGrafico)
         {
+            // Validar que los datos actualizados correspondan a la circunscripción original del pacto
+            string circunscripcionActualizada = dtoActualizado?.circunscripcionDTO?.nombre ?? "";
+            if (!string.Equals(circunscripcionActualizada, circunscripcionOriginal, StringComparison.OrdinalIgnoreCase))
+            {
+                // Los datos no corresponden a la circunscripción del pacto, no actualizar
+                return;
+            }
+
             // Preservar referencias a los partidos en sus listas actuales
             List<CPDataDTO> partidosEnIzq = partidosDentroIzq.ToList();
             List<CPDataDTO> partidosEnDer = partidosDentroDer.ToList();
@@ -234,6 +280,7 @@ namespace Elecciones
 
         /// <summary>
         /// Actualiza los datos de los partidos en una lista observable, preservando su posición
+        /// Actualiza las propiedades del objeto en lugar de reemplazarlo, para que la UI se refresque correctamente
         /// </summary>
         private void ActualizarPartidosEnLista(ObservableCollection<CPDataDTO> lista, List<CPDataDTO> datosNuevos)
         {
@@ -244,8 +291,8 @@ namespace Elecciones
                 
                 if (datosActualizados != null)
                 {
-                    // Actualizar los datos del partido sin cambiar su posición en la lista
-                    lista[i] = datosActualizados;
+                    // Actualizar los datos del partido SIN reemplazar el objeto, para que la UI se refresque
+                    partidoActual.ActualizarDatos(datosActualizados);
                 }
             }
         }

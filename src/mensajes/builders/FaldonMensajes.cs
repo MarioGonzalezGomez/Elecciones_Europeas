@@ -1,5 +1,6 @@
 using System.Text;
 using System.Windows;
+using Elecciones.src.logic.comparators;
 using Elecciones.src.model.DTO.BrainStormDTO;
 using Elecciones.src.model.IPF.DTO;
 
@@ -121,36 +122,38 @@ namespace Elecciones.src.mensajes.builders
             double tamanoFicha = (pxTotales - (margin * (dto.numPartidos - 1))) / dto.numPartidos;
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 1));
 
-            //POSICION
+            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
             Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            for (int i = 0; i < dto.partidos.Count; i++)
+            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
+            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
             {
                 string partidoId = (i + 1).ToString("D2");
-                partidoIdMap[dto.partidos[i].codigo] = partidoId;
+                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
             }
 
-            // Ordenar partidos según PartidoDTOComparer (por escaños descendente)
-            List<PartidoDTO> partidosOrdenados = dto.partidos.OrderByDescending(p => oficiales ? p.escanios : p.escaniosHastaSondeo).ToList();
+            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
+            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
+            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(oficiales));
+            partidosOrdenadosPorComparer.Reverse(); // Descendente
 
             // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
-            for (int i = 0; i < partidosOrdenados.Count; i++)
+            for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
             {
-                PartidoDTO partido = partidosOrdenados[i];
+                PartidoDTO partido = partidosOrdenadosPorComparer[i];
                 string partidoId = partidoIdMap[partido.codigo];
 
-                // Asignar posición al partido
-                sb.Append(EventBuild($"partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 1));
+                // Asignar posición al partido (usando su ID basado en código)
+                sb.Append(EventBuild($"Escrutinio/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 1));
 
                 // Acumular para el siguiente: posición actual + tamaño ficha + margen
-                if (i < partidosOrdenados.Count - 1)
+                if (i < partidosOrdenadosPorComparer.Count - 1)
                 {
                     posicionAcumulada += tamanoFicha + margin;
                 }
             }
 
             return sb.ToString();
-            //return oficial ? EventRunBuild("TICKER/ENTRA") : EventRunBuild("TICKER_SONDEO/ENTRA");
         }
 
         public string TickerEncadena(bool oficial)
@@ -300,12 +303,16 @@ namespace Elecciones.src.mensajes.builders
 
         public string TickerTDEntra(BrainStormDTO dto)
         {
+            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
+            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
+            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(true));
+            partidosOrdenadosPorComparer.Reverse(); // Descendente
             List<string> siglasPartidos = dto.partidos.Select(x => x.siglas).ToList();
-            List<string> siglasActivos = dto.partidos.Select(x => x.siglas).ToList();
+            List<string> siglasActivos = partidosOrdenadosPorComparer.Select(x => x.siglas).ToList();
             string signal = "";
             signal += EventBuild("NumeroEscrutado", "TEXT_STRING", $"'{dto.circunscripcionDTO.escrutado}%'", 2, 0.5, 0) + "\n";
 
-            int n = dto.partidos?.Count ?? 0;
+            int n = partidosOrdenadosPorComparer?.Count ?? 0;
 
             var layoutByCount = new Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)>()
             {
@@ -315,6 +322,9 @@ namespace Elecciones.src.mensajes.builders
                 {4, (320, new[] {0,341,683,1024}, -621, -441)},
                 {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
                 {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
+                {7, (170, new[] {-35,150,335,520,705,890,1075}, -554, -474)},
+                {8, (157, new[] {-73,95,263,431,599,767,935,1103}, -554, -475)},
+                {9, (131, new[] {-63,82,227,372,517,662,807,952,1097}, -545, -464)},
             };
 
             var layout = layoutByCount.ContainsKey(n) ? layoutByCount[n] : layoutByCount[1];
@@ -331,18 +341,23 @@ namespace Elecciones.src.mensajes.builders
                 var siglaRaw = siglasPartidos[idx];
                 var siglaObj = Esc(siglaRaw);
 
+                // Determinar escala según número de partidos
+                string escala = n <= 7 ? "(1,1,1)" : (n == 8 ? "(0.9,0.9,0.9)" : "(0.75,0.75,0.75)");
+
                 if (activeIndex.TryGetValue(siglaRaw, out int posIndex) && posIndex >= 0 && posIndex < layout.Positions.Length)
                 {
                     int pos = layout.Positions[posIndex];
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{pos}", 2, 0.5, 0) + "\n";
                     signal += EventBuild($"Partidos/{siglaObj}/Logo", "OBJ_DISPLACEMENT[0]", $"{layout.LogoPos}", 1) + "\n";
                     signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layout.EscanosPos}", 1) + "\n";
+                    signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_SCALE", escala, 1) + "\n";
                 }
                 else
                 {
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
                     signal += EventBuild($"Partidos/{siglaObj}/Logo", "OBJ_DISPLACEMENT[0]", $"{layout.LogoPos}", 1) + "\n";
                     signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layout.EscanosPos}", 1) + "\n";
+                    signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_SCALE", escala, 1) + "\n";
                 }
             }
 
@@ -395,6 +410,9 @@ namespace Elecciones.src.mensajes.builders
                     {4, (320, new[] {0,341,683,1024}, -621, -441)},
                     {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
                     {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
+                    {7, (170, new[] {-35,150,335,520,705,890,1075}, -554, -474)},
+                    {8, (157, new[] {-73,95,263,431,599,767,935,1103}, -554, -475)},
+                    {9, (131, new[] {-63,82,227,372,517,662,807,952,1097}, -545, -464)},
                 };
 
                 var layoutNuevo = layoutByCount.ContainsKey(nNuevo) ? layoutByCount[nNuevo] : layoutByCount[1];
@@ -436,6 +454,10 @@ namespace Elecciones.src.mensajes.builders
                         signal += EventBuild($"Partidos/{siglaObj}/Logo", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.LogoPos}", 1) + "\n";
                         signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.EscanosPos}", 1) + "\n";
 
+                        // Determinar escala según número de partidos
+                        string escalaNuevo = nNuevo <= 7 ? "(1,1,1)" : (nNuevo == 8 ? "(0.9,0.9,0.9)" : "(0.75,0.75,0.75)");
+                        signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_SCALE", escalaNuevo, 2, 0.5, 0) + "\n";
+
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
                         signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escanios}'", 2, 0.5, 0) + "\n";
                     }
@@ -457,6 +479,9 @@ namespace Elecciones.src.mensajes.builders
                     {4, (320, new[] {0,341,683,1024}, -621, -441)},
                     {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
                     {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
+                    {7, (170, new[] {-35,150,335,520,705,890,1075}, -554, -474)},
+                    {8, (157, new[] {-73,95,263,431,599,767,935,1103}, -554, -475)},
+                    {9, (131, new[] {-63,82,227,372,517,662,807,952,1097}, -545, -464)},
                 };
 
                 (int Size, int[] Positions, int LogoPos, int EscanosPos) layout = layoutByCount[nNuevo];

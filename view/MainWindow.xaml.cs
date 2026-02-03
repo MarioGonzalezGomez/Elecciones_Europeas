@@ -1430,46 +1430,20 @@ namespace Elecciones
                         return ordered;
                     }
 
-                    // Always use the unfiltered DTO (which is now the only type we maintain)
+                    // Always use the unfiltered DTO ordered by codigo
                     var dtoToWrite = CreateOrderedDtoCopyFrom(dto);
 
-                    // Write the main CSV with all parties ordered by codigo
+                    // Write the single CSV file (all data is the same, no need for duplicates)
                     if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
                     {
                         if (desdeSedes)
                         {
-                            if (oficiales)
-                            {
-                                await dtoToWrite.ToCsv();
-                            }
-                            else
-                            {
-                                await dtoToWrite.ToCsv("Brainstorm_Sondeo");
-                            }
+                            await dtoToWrite.ToCsv("BrainStorm", cmbSondeo.SelectedItem?.ToString() ?? "");
                         }
                     }
                     else
                     {
-                        if (oficiales)
-                        {
-                            await dtoToWrite.ToCsv();
-                        }
-                        else
-                        {
-                            await dtoToWrite.ToCsv("Brainstorm_Sondeo");
-                        }
-                    }
-
-                    // Always also write the code-ordered files
-                    var dtoCodigoOrdered = CreateOrderedDtoCopyFrom(dto);
-
-                    if (oficiales)
-                    {
-                        await dtoCodigoOrdered.ToCsv("Brainstorm_Codigo");
-                    }
-                    else
-                    {
-                        await dtoCodigoOrdered.ToCsv("Brainstorm_Sondeo_Codigo");
+                        await dtoToWrite.ToCsv("BrainStorm", cmbSondeo.SelectedItem?.ToString() ?? "");
                     }
                 }
                 catch

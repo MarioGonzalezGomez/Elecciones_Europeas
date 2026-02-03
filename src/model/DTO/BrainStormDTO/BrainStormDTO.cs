@@ -65,7 +65,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
             string json = JsonSerializer.Serialize(this, options);
             await File.WriteAllTextAsync(fileName, json);
         }
-        public async Task ToCsv(string ruta = "BrainStorm")
+        public async Task ToCsv(string ruta = "BrainStorm", string nombreSondeo = "")
         {
             string fileName = $"{configuration.GetValue("rutaArchivos")}\\CSV\\{ruta}.csv";
             if (configuration.GetValue("subcarpetas").Equals("1"))
@@ -85,8 +85,8 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                 ultimo = this.partidos.FirstOrDefault(p => p.esUltimoEscano != 0) ?? new PartidoDTO();
                 siguiente = this.partidos.FirstOrDefault(p => p.luchaUltimoEscano != 0) ?? new PartidoDTO();
             }
-            string resultado = "Codigo;Nombre;Escrutado;Esca�os;Mayor�a;Avance;Participacion;Participacion Historica;Media de Participacion;Votantes;�ltimas Elecciones;Numero de partidos;Ultimo;Siguiente;Resto\n";
-            resultado += $"{circunscripcionDTO.codigo};{circunscripcionDTO.nombre};{circunscripcionDTO.escrutado.ToString("F2")};{circunscripcionDTO.escaniosTotales};{circunscripcionDTO.mayoria};{circunscripcionDTO.numAvance};{circunscripcionDTO.participacion.ToString("F2")};{circunscripcionDTO.participacionHistorica.ToString("F2")};{circunscripcionDTO.participacionMedia.ToString("F2")};{circunscripcionDTO.numVotantesTotales};{circunscripcionDTO.anioUltimasElecciones};{numPartidos};{ultimo.siglas};{siguiente.siglas};{siguiente.restoVotos}\n";
+            string resultado = "Codigo;Nombre;Escrutado;Esca�os;Mayor�a;Avance;Participacion;Participacion Historica;Media de Participacion;Votantes;�ltimas Elecciones;Numero de partidos;Ultimo;Siguiente;Resto;NombreSondeo\n";
+            resultado += $"{circunscripcionDTO.codigo};{circunscripcionDTO.nombre};{circunscripcionDTO.escrutado.ToString("F2")};{circunscripcionDTO.escaniosTotales};{circunscripcionDTO.mayoria};{circunscripcionDTO.numAvance};{circunscripcionDTO.participacion.ToString("F2")};{circunscripcionDTO.participacionHistorica.ToString("F2")};{circunscripcionDTO.participacionMedia.ToString("F2")};{circunscripcionDTO.numVotantesTotales};{circunscripcionDTO.anioUltimasElecciones};{numPartidos};{ultimo.codigo};{siguiente.codigo};{siguiente.restoVotos};{nombreSondeo}\n";
             resultado += $"C�digo;Padre;Siglas;Candidato;Esca�os;Esca�os Desde Sondeo;Hasta Sondeo;Hist�ricos;% Voto;Votantes;Diferencia de esca�os;Tendencia;Diferencia de votos;Tendendia;Votantes Historico;Nombre\n";
             foreach (var p in partidos)
             {

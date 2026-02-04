@@ -17,13 +17,13 @@ namespace Elecciones.src.mensajes
     internal class OrdenesIPF
     {
         public static OrdenesIPF? instance;
-        
+
         // Builders especializados por tipo de rótulo
         private readonly FaldonMensajes faldonBuilder;
         private readonly CartonMensajes cartonBuilder;
         private readonly SuperfaldonMensajes superfaldonBuilder;
         private readonly DronMensajes dronBuilder;
-        
+
         public ConexionGraficos c;
 
         private OrdenesIPF()
@@ -143,7 +143,7 @@ namespace Elecciones.src.mensajes
 
         public void TickerActualiza(BrainStormDTO dto)
         {
-            c.EnviarMensaje(faldonBuilder.TickerActualiza());
+            c.EnviarMensaje(faldonBuilder.TickerActualiza(dto));
         }
 
         public void TickerSale(bool oficial)
@@ -151,38 +151,12 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(faldonBuilder.TickerSale(oficial));
         }
 
-        public void TickerActualizaEscrutado()
+        public void TickerEscanosEntra()
         {
-            c.EnviarMensaje(faldonBuilder.TickerActualizaEscrutado());
         }
-
-        public void TickerActualizaDatos()
+        public void TickerEscanosSale()
         {
-            c.EnviarMensaje(faldonBuilder.TickerActualizaDatos());
         }
-
-        public void TickerActualizaDatosIndividualizado(List<PartidoDTO> partidos)
-        {
-            c.EnviarMensaje(faldonBuilder.TickerActualizaDatosIndividualizado(partidos));
-        }
-
-        public void TickerYaNoEstaIndividualizado(List<PartidoDTO> partidos)
-        {
-            c.EnviarMensaje(faldonBuilder.TickerYaNoEstaIndividualizado(partidos));
-        }
-
-        public void TickerActualizaPosiciones()
-        {
-            c.EnviarMensaje(faldonBuilder.TickerActualizaPosiciones());
-        }
-
-        public void TickerActualizaNumPartidos()
-        {
-            c.EnviarMensaje(faldonBuilder.TickerActualizaNumPartidos());
-        }
-
-        public void TickerEscanosEntra() { }
-        public void TickerEscanosSale() { }
 
         public void TickerVotosEntra(bool oficiales)
         {
@@ -204,10 +178,18 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(faldonBuilder.TickerHistoricosSale(oficiales));
         }
 
-        public void TickerHistoricosEntraInd() { }
-        public void TickerHistoricosSaleInd() { }
-        public void TickerHistoricosEntraCom() { }
-        public void TickerHistoricosSaleCom() { }
+        public void TickerHistoricosEntraInd()
+        {
+        }
+        public void TickerHistoricosSaleInd()
+        {
+        }
+        public void TickerHistoricosEntraCom()
+        {
+        }
+        public void TickerHistoricosSaleCom()
+        {
+        }
 
         public void TickerMillonesEntra()
         {
@@ -274,39 +256,6 @@ namespace Elecciones.src.mensajes
 
         #endregion
 
-        #region Faldón - PP_PSOE
-
-        public void PP_PSOEEntra()
-        {
-            c.EnviarMensaje(faldonBuilder.PP_PSOEEntra());
-        }
-
-        public void PP_PSOESale()
-        {
-            c.EnviarMensaje(faldonBuilder.PP_PSOESale());
-        }
-
-        #endregion
-
-        #region Faldón - Despliegas
-
-        public void Despliega4()
-        {
-            c.EnviarMensaje(faldonBuilder.Despliega4());
-        }
-
-        public void Despliega5()
-        {
-            c.EnviarMensaje(faldonBuilder.Despliega5());
-        }
-
-        public void RecuperaTodos()
-        {
-            c.EnviarMensaje(faldonBuilder.RecuperaTodos());
-        }
-
-        #endregion
-
         #region Faldón - Pactos
 
         public void pactosEntra()
@@ -324,14 +273,14 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(faldonBuilder.pactosSale());
         }
 
-        public void pactosEntraDerecha(int posicionPartido)
+        public void pactosEntraDerecha(BrainStormDTO dto, PartidoDTO pSeleccionado)
         {
-            c.EnviarMensaje(faldonBuilder.pactosEntraDerecha(posicionPartido));
+            c.EnviarMensaje(faldonBuilder.pactosEntraDerecha(dto, pSeleccionado));
         }
 
-        public void pactosEntraIzquierda(int posicionPartido)
+        public void pactosEntraIzquierda(BrainStormDTO dto, PartidoDTO pSeleccionado)
         {
-            c.EnviarMensaje(faldonBuilder.pactosEntraIzquierda(posicionPartido));
+            c.EnviarMensaje(faldonBuilder.pactosEntraIzquierda(dto, pSeleccionado));
         }
 
         public void pactosSaleDerecha(int posicionPartido)
@@ -673,7 +622,8 @@ namespace Elecciones.src.mensajes
         }
 
         //ACTUALIZAS DE PACTOS
-        public void ActualizaPactometroFichas(BrainStormDTO dtoActualizado) {
+        public void ActualizaPactometroFichas(BrainStormDTO dtoActualizado)
+        {
             c.EnviarMensaje(faldonBuilder.ActualizaPactometroFichas(dtoActualizado));
         }
         public void ActualizaPactometroUltimoEscano(BrainStormDTO dtoActualizado)

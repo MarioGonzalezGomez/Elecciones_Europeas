@@ -129,9 +129,6 @@
                             <Button x:Name="btnSaleEspecial" Content="Sale Especial" Grid.Column="1" Grid.Row="1" 
                                     Margin="2" Padding="8,6" Background="#ff7979"
                                     Click="btnSaleEspecial_Click"/>
-                            <Button x:Name="btnDespliega4" Content="Despliega 4" Grid.ColumnSpan="2" Grid.Row="2" 
-                            Margin="2" Padding="8,6" Background="BlanchedAlmond" Foreground="Black"
-                             Click="btnDespliega4_Click"/>
                         </Grid>
                     </GroupBox>
                     <!--#endregion-->

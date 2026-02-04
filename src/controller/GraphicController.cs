@@ -176,12 +176,6 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { return ipf.RecibirPrimerosResultados(); } else { return null; }
         }
 
-        //PROYECCION
-        public void Proyeccion(bool activa)
-        {
-            if (ipfActivo.Valor == 1) { ipf.Proyeccion(activa); }
-        }
-
         //GIROS
         public void DeSondeoAOficiales()
         {
@@ -220,32 +214,6 @@ namespace Elecciones.src.controller
         public void TickerSale(bool oficial)
         {
             if (ipfActivo.Valor == 1) { ipf.TickerSale(oficial); }
-        }
-
-        public void TickerActualizaEscrutado()
-        {
-            if (ipfActivo.Valor == 1) { ipf.TickerActualizaEscrutado(); }
-        }
-        public void TickerActualizaDatos()
-        {
-            if (ipfActivo.Valor == 1) { ipf.TickerActualizaDatos(); }
-        }
-        public void TickerActualizaDatosIndividualizado(List<PartidoDTO> partidos)
-        {
-            if (ipfActivo.Valor == 1) { ipf.TickerActualizaDatosIndividualizado(partidos); }
-        }
-
-        public void TickerYaNoEstaIndividualizado(List<PartidoDTO> partidos)
-        {
-            if (ipfActivo.Valor == 1) { ipf.TickerYaNoEstaIndividualizado(partidos); }
-        }
-        public void TickerActualizaPosiciones()
-        {
-            if (ipfActivo.Valor == 1) { ipf.TickerActualizaPosiciones(); }
-        }
-        public void TickerActualizaNumPartidos()
-        {
-            if (ipfActivo.Valor == 1) { ipf.TickerActualizaNumPartidos(); }
         }
 
         public void TickerEscanosEntra()
@@ -341,51 +309,38 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.TickerTDSale(); }
         }
 
-        //PP_PSOE
-        public void PP_PSOEEntra()
-        {
-            if (ipfActivo.Valor == 1) { ipf.PP_PSOEEntra(); }
-        }
-        public void PP_PSOESale()
-        {
-            if (ipfActivo.Valor == 1) { ipf.PP_PSOESale(); }
-        }
-
-        //DESPLIEGAS
-        public void Despliega4()
-        {
-            if (ipfActivo.Valor == 1) { ipf.Despliega4(); }
-        }
-        public void Despliega5()
-        {
-            if (ipfActivo.Valor == 1) { ipf.Despliega5(); }
-        }
-        public void RecuperaTodos()
-        {
-            if (ipfActivo.Valor == 1) { ipf.RecuperaTodos(); }
-        }
-
         //PACTOS
         public void pactosEntra()
         {
             if (ipfActivo.Valor == 1) { ipf.pactosEntra(); }
         }
-        public void pactosReinicio()
+        public void pactosReinicio(string tipoGrafico)
         {
-            if (ipfActivo.Valor == 1) { ipf.pactosReinicio(); }
+            switch (tipoGrafico)
+            {
+                case "FICHAS":
+                    if (ipfActivo.Valor == 1) { ipf.pactosReinicio(); }
+                    break;
+
+                case "ÚLTIMO ESCAÑO":
+                    break;
+                default:
+                    // Si no es ningún tipo específico de pacto gráfico, no hacer nada
+                    break;
+            }
         }
         public void pactosSale()
         {
             if (ipfActivo.Valor == 1) { ipf.pactosSale(); }
         }
 
-        public void pactosEntraDerecha(int posicionPartido)
+        public void pactosEntraDerecha(BrainStormDTO dto, PartidoDTO pSeleccionado)
         {
-            if (ipfActivo.Valor == 1) { ipf.pactosEntraDerecha(posicionPartido); }
+            if (ipfActivo.Valor == 1) { ipf.pactosEntraDerecha(dto, pSeleccionado); }
         }
-        public void pactosEntraIzquierda(int posicionPartido)
+        public void pactosEntraIzquierda(BrainStormDTO dto, PartidoDTO pSeleccionado)
         {
-            if (ipfActivo.Valor == 1) { ipf.pactosEntraIzquierda(posicionPartido); }
+            if (ipfActivo.Valor == 1) { ipf.pactosEntraIzquierda(dto, pSeleccionado); }
         }
 
         public void pactosSaleDerecha(int posicionPartido)

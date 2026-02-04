@@ -85,9 +85,9 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                 ultimo = this.partidos.FirstOrDefault(p => p.esUltimoEscano != 0) ?? new PartidoDTO();
                 siguiente = this.partidos.FirstOrDefault(p => p.luchaUltimoEscano != 0) ?? new PartidoDTO();
             }
-            string resultado = "Codigo;Nombre;Escrutado;Esca�os;Mayor�a;Avance;Participacion;Participacion Historica;Media de Participacion;Votantes;�ltimas Elecciones;Numero de partidos;Ultimo;Siguiente;Resto;NombreSondeo\n";
-            resultado += $"{circunscripcionDTO.codigo};{circunscripcionDTO.nombre};{circunscripcionDTO.escrutado.ToString("F2")};{circunscripcionDTO.escaniosTotales};{circunscripcionDTO.mayoria};{circunscripcionDTO.numAvance};{circunscripcionDTO.participacion.ToString("F2")};{circunscripcionDTO.participacionHistorica.ToString("F2")};{circunscripcionDTO.participacionMedia.ToString("F2")};{circunscripcionDTO.numVotantesTotales};{circunscripcionDTO.anioUltimasElecciones};{numPartidos};{ultimo.codigo};{siguiente.codigo};{siguiente.restoVotos};{nombreSondeo}\n";
-            resultado += $"C�digo;Padre;Siglas;Candidato;Esca�os;Esca�os Desde Sondeo;Hasta Sondeo;Hist�ricos;% Voto;Votantes;Diferencia de esca�os;Tendencia;Diferencia de votos;Tendendia;Votantes Historico;Nombre\n";
+            string resultado = "Código;Nombre;Escrutado;Esca�os;Mayoría;Avance;Participacion;Participacion Historica;Media de Participacion;Votantes;Últimas Elecciones;Numero de partidos;Ultimo;Siguiente;Resto;NombreSondeo\n";
+            resultado += $"{circunscripcionDTO.codigo};{circunscripcionDTO.nombre};{circunscripcionDTO.escrutado.ToString("F2")};{circunscripcionDTO.escaniosTotales};{circunscripcionDTO.mayoria};{circunscripcionDTO.numAvance};{circunscripcionDTO.participacion.ToString("F2")};{circunscripcionDTO.participacionHistorica.ToString("F2")};{circunscripcionDTO.participacionMedia.ToString("F2")};{circunscripcionDTO.numVotantesTotales};{circunscripcionDTO.anioUltimasElecciones};{numPartidos};{ultimo.siglas};{siguiente.siglas};{siguiente.restoVotos};{nombreSondeo}\n";
+            resultado += $"Código;Padre;Siglas;Candidato;Escaños;Escaños Desde Sondeo;Hasta Sondeo;Históricos;% Voto;Votantes;Diferencia de escaños;Tendencia;Diferencia de votos;Tendendia;Votantes Historico;Nombre\n";
             foreach (var p in partidos)
             {
                 string codigo = p.padre;

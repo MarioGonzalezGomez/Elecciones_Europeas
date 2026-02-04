@@ -11,17 +11,50 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
 {
     public class CircunscripcionDTO
     {
-        public string codigo { get; set; }
-        public string nombre { get; set; }
-        public double escrutado { get; set; }
-        public int escaniosTotales { get; set; }
-        public int mayoria { get; set; }
-        public int numAvance { get; set; }
-        public double participacion { get; set; }
-        public double participacionHistorica { get; set; }
-        public double participacionMedia { get; set; }
-        public int numVotantesTotales { get; set; }
-        public string anioUltimasElecciones { get; set; }
+        public string codigo
+        {
+            get; set;
+        }
+        public string nombre
+        {
+            get; set;
+        }
+        public double escrutado
+        {
+            get; set;
+        }
+        public int escaniosTotales
+        {
+            get; set;
+        }
+        public int mayoria
+        {
+            get; set;
+        }
+        public int numAvance
+        {
+            get; set;
+        }
+        public double participacion
+        {
+            get; set;
+        }
+        public double participacionHistorica
+        {
+            get; set;
+        }
+        public double participacionMedia
+        {
+            get; set;
+        }
+        public int numVotantesTotales
+        {
+            get; set;
+        }
+        public string anioUltimasElecciones
+        {
+            get; set;
+        }
 
         private CircunscripcionDTO(string codigo, string nombre, double escrutado, int escaniosTotales, int numVotantesTotales)
         {
@@ -35,12 +68,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         public static CircunscripcionDTO FromCircunscripcion(Circunscripcion c, int avanceActual, int tipoElecciones, ConexionEntityFramework con)
         {
             CircunscripcionDTO dto = new CircunscripcionDTO(c.codigo, c.nombre, c.escrutado, c.escanios, c.votantes);
-            int mayor = dto.escaniosTotales / 2;
-            if (int.IsEvenInteger(mayor))
-            {
-                mayor += 1;
-            }
-            dto.mayoria = mayor;
+            dto.mayoria = (dto.escaniosTotales / 2) + 1;
             dto.numAvance = avanceActual;
             Circunscripcion padre = tipoElecciones == 1
             ? CircunscripcionController.GetInstance(con).FindById("9900000")

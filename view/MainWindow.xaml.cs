@@ -70,7 +70,7 @@ namespace Elecciones
         bool fichaDentro;
         bool superfaldonDentro;
         bool sfFichasDentro;
-        bool sfPactometroDentro;
+        public bool sfPactometroDentro;
         bool sfMayoriasDentro;
         bool sfBipartidismoDentro;
         bool sfGanadorDentro;
@@ -237,10 +237,10 @@ namespace Elecciones
                 cmbSondeo.Items.Clear();
                 // Agregar opción RTVE como primera opción (valores originales)
                 cmbSondeo.Items.Add("RTVE");
-                
+
                 MedioController medioController = new MedioController(conexionActiva);
                 List<src.model.DTO.MedioDTO> medios = medioController.ObtenerMediosConDescripcion();
-                
+
                 foreach (var medio in medios)
                 {
                     cmbSondeo.Items.Add(medio.descripcion);
@@ -370,26 +370,19 @@ namespace Elecciones
                     //Add cambios por actualizacion en vivo en cartones
                     if (string.Equals(graficosHeader.Header, "CARTÓN")) { UpdateCartones(dtoAnterior); }
                     if (string.Equals(graficosHeader.Header, "SUPERFADÓN")) { UpdateSuperfaldones(); }
-                    
+
                     // Actualizar datos en la ventana de Pactos si está abierta
-                    if (pactos != null && pactos.pactoDentro)
+                    // Actualizar datos en la ventana de Pactos si está abierta
+                    if (pactos != null)
                     {
-                        // Obtener el tipo de gráfico actual
-                        string tipoGrafico = graficosListView.SelectedItem?.ToString() ?? "";
-                        
-                        // Obtener el DTO de la circunscripción del pacto (que puede ser diferente a la actual)
-                        string pactoCircunscripcion = pactos.GetCircunscripcionActual();
-                        BrainStormDTO dtoPactos = ObtenerDTO(pactoCircunscripcion);
-                        
-                        // ActualizaPacto validará que los datos correspondan a su circunscripción original
-                        pactos.ActualizaPacto(dtoPactos, oficiales, tipoGrafico);
+                         string tipoGrafico = "";
+                         if (graficosListView.SelectedItem != null)
+                         {
+                             tipoGrafico = graficosListView.SelectedItem.ToString();
+                         }
+                         pactos.ActualizarDatos(oficiales, tipoGrafico, avance, tipoElecciones);
                     }
-                    else if (pactos != null && !pactos.pactoDentro)
-                    {
-                        // Si el pacto no está en emisión, simplemente recargar los datos
-                        pactos.RecargarDatos(dto, oficiales);
-                    }
-                    
+
                     ActualizarInfoInterfaz(seleccionada, dto);
                     EscribirFichero(desdeSede);
                 }
@@ -400,25 +393,10 @@ namespace Elecciones
         {
             List<PartidoDTO> partidosQueCambian = dtoAnterior.partidos.Except(dto.partidos, new PartidoDTOComparer()).ToList();
             List<PartidoDTO> partidosQueNoEstan = dtoAnterior.partidos.Where(par => !dto.partidos.Any(par2 => par2.codigo.Equals(par.codigo))).ToList();
-            if (partidosQueCambian.Count != 0 || dto.numPartidos != dtoAnterior.numPartidos)
+            if (tickerDentro)
             {
-                if (dto.numPartidos != dtoAnterior.numPartidos || partidosQueNoEstan.Count != 0)
-                {
-                    graficos.TickerActualizaNumPartidos();
-                    graficos.TickerYaNoEstaIndividualizado(partidosQueNoEstan);
-                }
-                else if (CompararOrden(dtoAnterior, dto))
-                {
-                    graficos.TickerActualizaDatosIndividualizado(partidosQueCambian);
-                    graficos.TickerActualizaDatos();
-                }
-                else
-                {
-                    graficos.TickerActualizaPosiciones();
-                }
+                graficos.TickerActualiza(dto);
             }
-            graficos.TickerActualizaEscrutado();
-            graficos.TickerActualiza(dto);
             if (botonera.tickerTDIn)
             {
                 graficos.TickerTDActualiza(dtoAnterior, dto);
@@ -745,9 +723,14 @@ namespace Elecciones
                 ActualizarInfoInterfaz(seleccionada, dto);
                 preparado = false;
 
-                if (dto != null && pactos != null)
+                if (pactos != null)
                 {
-                    pactos.RecargarDatos(dto, oficiales);
+                    string tipoGrafico = "";
+                    if (graficosListView.SelectedItem != null)
+                    {
+                        tipoGrafico = graficosListView.SelectedItem.ToString();
+                    }
+                    pactos.ActualizarDatos(oficiales, tipoGrafico, avance, tipoElecciones);
                 }
             }
         }
@@ -928,7 +911,7 @@ namespace Elecciones
                 //PONER LA INFORMACIÓN EN LA INTERFAZ
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 dto = ObtenerDTO(elementoSeleccionado);
-                
+
                 // Aplicar el medio actualmente seleccionado al nuevo DTO
                 if (cmbSondeo.SelectedItem != null && !oficiales)
                 {
@@ -949,7 +932,7 @@ namespace Elecciones
                         }
                     }
                 }
-                
+
                 ActualizarInfoInterfaz(seleccionada, dto);
             }
         }
@@ -1956,7 +1939,7 @@ namespace Elecciones
             try
             {
                 MedioPartidoController medioPartidoController = new MedioPartidoController(conexionActiva);
-                
+
                 // Para cada partido en el DTO, actualizar los escaños de sondeo
                 foreach (var partido in dto.partidos)
                 {

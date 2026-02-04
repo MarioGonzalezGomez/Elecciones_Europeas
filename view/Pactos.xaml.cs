@@ -122,24 +122,24 @@ namespace Elecciones
         {
             if (oficiales)
             {
-                escDesdeIzq.Header = "ESCA�OS";
+                escDesdeIzq.Header = "ESCAÑOS";
                 Binding binding1 = new Binding("escanios");
                 escDesdeIzq.DisplayMemberBinding = binding1;
                 escHastaIzq.Header = "% VOTO";
                 Binding binding2 = new Binding("porcentajeVoto");
                 escHastaIzq.DisplayMemberBinding = binding2;
 
-                escDesdeDentroIzq.Header = "ESCA�OS";
+                escDesdeDentroIzq.Header = "ESCAÑOS";
                 escDesdeDentroIzq.DisplayMemberBinding = binding1;
                 escHastaDentroIzq.Header = "% VOTO";
                 escHastaDentroIzq.DisplayMemberBinding = binding2;
 
-                escDesdeDentroDer.Header = "ESCA�OS";
+                escDesdeDentroDer.Header = "ESCAÑOS";
                 escDesdeDentroDer.DisplayMemberBinding = binding1;
                 escHastaDentroDer.Header = "% VOTO";
                 escHastaDentroDer.DisplayMemberBinding = binding2;
 
-                escDesdeDer.Header = "ESCA�OS";
+                escDesdeDer.Header = "ESCAÑOS";
                 escDesdeDer.DisplayMemberBinding = binding1;
                 escHastaDer.Header = "% VOTO";
                 escHastaDer.DisplayMemberBinding = binding2;
@@ -192,7 +192,7 @@ namespace Elecciones
         /// </summary>
         private List<CPDataDTO> FiltrarPartidosConEscanios(List<CPDataDTO> partidos)
         {
-            return partidos.Where(p => 
+            return partidos.Where(p =>
             {
                 if (int.TryParse(p.escanios, out int escanios))
                 {
@@ -204,14 +204,6 @@ namespace Elecciones
 
         public void RecargarDatos(BrainStormDTO dto, bool oficiales)
         {
-            // Validar que los datos correspondan a la circunscripción original del pacto
-            string circunscripcionNueva = dto?.circunscripcionDTO?.nombre ?? "";
-            if (!string.Equals(circunscripcionNueva, circunscripcionOriginal, StringComparison.OrdinalIgnoreCase))
-            {
-                // Los datos no corresponden a la circunscripción del pacto, no recargar
-                return;
-            }
-
             this.dto = dto;
             this.oficiales = oficiales;
             InitializeVariables();
@@ -230,32 +222,26 @@ namespace Elecciones
         /// <param name="tipoGrafico">Tipo de gráfico que está actualmente en emisión (PACTÓMETRO, MAYORÍAS, CARTÓN PARTIDOS, ÚLTIMO ESCAÑO, etc.)</param>
         public void ActualizaPacto(BrainStormDTO dtoActualizado, bool oficiales, string tipoGrafico)
         {
-            // Validar que los datos actualizados correspondan a la circunscripción original del pacto
-            string circunscripcionActualizada = dtoActualizado?.circunscripcionDTO?.nombre ?? "";
-            if (!string.Equals(circunscripcionActualizada, circunscripcionOriginal, StringComparison.OrdinalIgnoreCase))
-            {
-                // Los datos no corresponden a la circunscripción del pacto, no actualizar
-                return;
-            }
+
 
             // Preservar referencias a los partidos en sus listas actuales
             List<CPDataDTO> partidosEnIzq = partidosDentroIzq.ToList();
             List<CPDataDTO> partidosEnDer = partidosDentroDer.ToList();
-            
+
             // Actualizar el dto con los nuevos datos
             this.dto = dtoActualizado;
             this.oficiales = oficiales;
             this.mayoriaAbsoluta = dto.circunscripcionDTO.mayoria;
-            
+
             // Recargar la lista de partidos disponibles con los nuevos datos filtrados
             List<CPDataDTO> cpdatasNuevas = CPDataDTO.FromBSDto(dto);
             List<CPDataDTO> cpdatasNuevasFiltradas = FiltrarPartidosConEscanios(cpdatasNuevas);
-            
+
             // Actualizar los datos de los partidos preservando su posición en las listas
             ActualizarPartidosEnLista(partidosDentroIzq, cpdatasNuevasFiltradas);
             ActualizarPartidosEnLista(partidosDentroDer, cpdatasNuevasFiltradas);
             ActualizarPartidosEnLista(partidosDisponibles, cpdatasNuevasFiltradas);
-            
+
             // Recalcular totales
             totalIzq = 0;
             totalDer = 0;
@@ -269,11 +255,11 @@ namespace Elecciones
                 if (int.TryParse(partido.escanios, out int esc))
                     totalDer += esc;
             }
-            
+
             lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
             lblEscaniosDer.Content = $"Total escaños: {totalDer}";
             lblMayoria.Content = $"Mayoría absoluta: {mayoriaAbsoluta}";
-            
+
             // Disparar el método para actualizar señales gráficas
             ActualizarSenalesGraficas(dtoActualizado, tipoGrafico);
         }
@@ -288,12 +274,54 @@ namespace Elecciones
             {
                 CPDataDTO partidoActual = lista[i];
                 CPDataDTO datosActualizados = datosNuevos.FirstOrDefault(p => p.codigo == partidoActual.codigo);
-                
+
                 if (datosActualizados != null)
                 {
                     // Actualizar los datos del partido SIN reemplazar el objeto, para que la UI se refresque
                     partidoActual.ActualizarDatos(datosActualizados);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Método de entrada para actualizar los datos desde el exterior.
+        /// Realiza su propia captura de datos utilizando el controlador y la circunscripción original.
+        /// </summary>
+        public void ActualizarDatos(bool oficiales, string tipoGrafico, int avance, int tipoElecciones)
+        {
+            var main = Application.Current.MainWindow as MainWindow;
+            if (main == null || main.conexionActiva == null) return;
+
+            try
+            {
+                BrainStormController controller = BrainStormController.GetInstance(main.conexionActiva);
+                BrainStormDTO dtoActualizado = null;
+
+                if (oficiales)
+                {
+                    dtoActualizado = controller.FindByNameCircunscripcionOficial(circunscripcionOriginal, avance, tipoElecciones);
+                }
+                else
+                {
+                    dtoActualizado = controller.FindByNameCircunscripcionSondeo(circunscripcionOriginal, avance, tipoElecciones);
+                }
+
+                if (dtoActualizado != null)
+                {
+                    if (pactoDentro)
+                    {
+                        ActualizaPacto(dtoActualizado, oficiales, tipoGrafico);
+                    }
+                    else
+                    {
+                        RecargarDatos(dtoActualizado, oficiales);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log or handle exception properly
+                Console.WriteLine($"Error actualizando datos de Pactos: {ex.Message}");
             }
         }
 
@@ -337,13 +365,16 @@ namespace Elecciones
                 lblEscaniosIzq.Content = $"Total esca�os: {totalIzq}";
                 preparado = false;
                 //Mandar mensaje de despliegue individualizado IZQ
-                int index = partidosTotales.IndexOf(seleccionado);
                 if (main.ultimoEscanoDentro)
                 {
                     graficos.ultimoEntraPartido(main.dto, seleccionado, true);
                 }
-                //  graficos.pactosEntraIzquierda(index); }
-
+                else if (main.sfPactometroDentro) { }
+                else
+                {
+                    PartidoDTO pseleccionado = main.dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    graficos.pactosEntraIzquierda(main.dto, pseleccionado);
+                }
             }
         }
 
@@ -358,12 +389,16 @@ namespace Elecciones
                 totalIzq += int.Parse(seleccionado.escanios);
                 lblEscaniosIzq.Content = $"Total esca�os: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado IZQ
-                int index = partidosTotales.IndexOf(seleccionado);
                 if (main.ultimoEscanoDentro)
                 {
                     graficos.ultimoEntraPartido(main.dto, seleccionado, true);
                 }
-                graficos.pactosEntraIzquierda(index);
+                else if (main.sfPactometroDentro) { }
+                else
+                {
+                    PartidoDTO pseleccionado = main.dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    graficos.pactosEntraIzquierda(main.dto, pseleccionado);
+                }
             }
         }
         private void partidosDerListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -377,12 +412,16 @@ namespace Elecciones
                 totalDer += int.Parse(seleccionado.escanios);
                 lblEscaniosDer.Content = $"Total esca�os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
-                int index = partidosTotales.IndexOf(seleccionado);
                 if (main.ultimoEscanoDentro)
                 {
                     graficos.ultimoEntraPartido(main.dto, seleccionado, false);
                 }
-               graficos.pactosEntraDerecha(index);
+                else if (main.sfPactometroDentro) { }
+                else
+                {
+                    PartidoDTO pseleccionado = main.dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    graficos.pactosEntraDerecha(main.dto, pseleccionado);
+                }
             }
         }
 
@@ -492,12 +531,16 @@ namespace Elecciones
                 totalDer += int.Parse(seleccionado.escanios);
                 lblEscaniosDer.Content = $"Total esca�os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
-                int index = partidosTotales.IndexOf(seleccionado);
                 if (main.ultimoEscanoDentro)
                 {
                     graficos.ultimoEntraPartido(main.dto, seleccionado, false);
                 }
-                //if (independentismo) { graficos.independentismoEntraDerecha(index); } else { graficos.pactosEntraDerecha(index); }
+                else if (main.sfPactometroDentro) { }
+                else
+                {
+                    PartidoDTO pseleccionado = main.dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    graficos.pactosEntraDerecha(main.dto, pseleccionado);
+                }
             }
         }
 
@@ -533,10 +576,10 @@ namespace Elecciones
             CargarPartidos();
             totalIzq = 0;
             totalDer = 0;
-            lblEscaniosIzq.Content = $"Total esca�os: {totalIzq}";
-            lblEscaniosDer.Content = $"Total esca�os: {totalDer}";
-
-            // if (independentismo) { graficos.independentismoReinicio(); } else { graficos.pactosReinicio(); }
+            lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
+            lblEscaniosDer.Content = $"Total escaños: {totalDer}";
+            //HARDCODED, esto mejorar para que sea adaptable al tipo de grafico actual
+            graficos.pactosReinicio("FICHAS");
 
         }
 

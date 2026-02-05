@@ -117,9 +117,18 @@ namespace Elecciones.src.mensajes
 
         #region Faldón - Reloj
 
+        bool primerReloj = true;
         public void RelojEntra(int segundos)
         {
-            c.EnviarMensaje(faldonBuilder.EntraReloj());
+            if (primerReloj)
+            {
+                c.EnviarMensaje(faldonBuilder.PreparaReloj(segundos));
+                primerReloj = false;
+            }
+            else
+            {
+                c.EnviarMensaje(faldonBuilder.EntraReloj());
+            }
         }
 
         public void RelojSale()
@@ -297,19 +306,19 @@ namespace Elecciones.src.mensajes
 
         #region Faldón - Sedes
 
-        public void SedesEntra(bool tickerIn, BrainStormDTO dto, PartidoDTO seleccionado)
+        public void SedesEntra(PartidoDTO seleccionado)
         {
-            c.EnviarMensaje(faldonBuilder.SedesEntra(tickerIn, seleccionado.codigo));
+            c.EnviarMensaje(faldonBuilder.SedesEntra(seleccionado));
         }
 
-        public void SedesEncadena(bool tickerIn, string codPartidoSiguiente, string codPartidoAnterior)
+        public void SedesEncadena(PartidoDTO seleccionado)
         {
-            c.EnviarMensaje(faldonBuilder.SedesEncadena(tickerIn, codPartidoSiguiente, codPartidoAnterior));
+            c.EnviarMensaje(faldonBuilder.SedesEncadena(seleccionado));
         }
 
-        public void SedesSale(bool tickerIn)
+        public void SedesSale()
         {
-            c.EnviarMensaje(faldonBuilder.SedesSale(tickerIn));
+            c.EnviarMensaje(faldonBuilder.SedesSale());
         }
 
         #endregion

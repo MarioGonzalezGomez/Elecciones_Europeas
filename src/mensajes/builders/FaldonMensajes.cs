@@ -1,7 +1,9 @@
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using Elecciones.src.logic.comparators;
 using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.IPF;
 using Elecciones.src.model.IPF.DTO;
 
 namespace Elecciones.src.mensajes.builders
@@ -15,6 +17,7 @@ namespace Elecciones.src.mensajes.builders
         private static FaldonMensajes? instance;
         private bool animacionPrimeros = true;
         private bool animacionSondeo = true;
+        private List<string> partidosExpandidos = new List<string>();
 
         private FaldonMensajes() : base() { }
 
@@ -90,20 +93,24 @@ namespace Elecciones.src.mensajes.builders
         #endregion
 
         #region Reloj
-
         public string EntraReloj()
         {
-            return EventRunBuild("EntraReloj");
+            return EventRunBuild("CuentaAtras/Entra");
         }
 
         public string SaleReloj()
         {
-            return EventRunBuild("SaleReloj");
+            return EventRunBuild("CuentaAtras/Sale");
         }
 
-        public string PreparaReloj(string time)
+        public string PreparaReloj(int time)
         {
-            return EventBuild("OBJETO", "TEXT_STRING", time, 1);
+            StringBuilder sb = new StringBuilder();
+            sb.Append(EventBuild("CuentaAtras", "TIMER_LENGTH", time.ToString(), 1));
+            sb.Append(EventRunBuild("CuentaAtras/PonerEnInicio"));
+            sb.Append(EventRunBuild("CuentaAtras/Entra"));
+            sb.Append(EventRunBuild("CuentaAtras/Play"));
+            return sb.ToString();
         }
 
         #endregion
@@ -138,14 +145,14 @@ namespace Elecciones.src.mensajes.builders
 
             // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
+            string tipo = oficiales ? "Escrutinio" : "Sondeo";
             for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
             {
                 PartidoDTO partido = partidosOrdenadosPorComparer[i];
                 string partidoId = partidoIdMap[partido.codigo];
 
                 // Asignar posición al partido (usando su ID basado en código)
-                string tipo = oficiales ? "Escrutinio" : "Sondeo";
-                sb.Append(EventBuild($"{tipo}/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 1));
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 1));
 
                 // Acumular para el siguiente: posición actual + tamaño ficha + margen
                 if (i < partidosOrdenadosPorComparer.Count - 1)
@@ -153,13 +160,63 @@ namespace Elecciones.src.mensajes.builders
                     posicionAcumulada += tamanoFicha + margin;
                 }
             }
-
+            var partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
+            if (partidosActivos.Count > 6)
+            {
+                sb.Append(EventRunBuild("SaleFoto"));
+            }
+            sb.Append(EventRunBuild($"{tipo}/Entra"));
             return sb.ToString();
         }
 
-        public string TickerEncadena(bool oficial)
+        public string TickerEncadena(bool oficiales)
         {
-            return oficial ? Encadena("TICKER") : Encadena("TICKER_SONDEO");
+            var main = Application.Current.MainWindow as MainWindow;
+            var dto = main?.dto;
+            if (dto == null) return "";
+            StringBuilder sb = new StringBuilder();
+            //TAMANO
+            double tamanoFicha = (pxTotales - (margin * (dto.numPartidos - 1))) / dto.numPartidos;
+            sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 2, 0.6, 0));
+
+            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
+            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
+            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
+            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
+            {
+                string partidoId = (i + 1).ToString("D2");
+                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
+            }
+
+            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
+            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
+            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(oficiales));
+            partidosOrdenadosPorComparer.Reverse(); // Descendente
+
+            // Calcular posición acumulativa para cada partido según el orden del comparador
+            double posicionAcumulada = posicionInicial;
+            string tipo = oficiales ? "Escrutinio" : "Sondeo";
+            for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
+            {
+                PartidoDTO partido = partidosOrdenadosPorComparer[i];
+                string partidoId = partidoIdMap[partido.codigo];
+
+                // Asignar posición al partido (usando su ID basado en código)
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 2, 0.6, 0));
+
+                // Acumular para el siguiente: posición actual + tamaño ficha + margen
+                if (i < partidosOrdenadosPorComparer.Count - 1)
+                {
+                    posicionAcumulada += tamanoFicha + margin;
+                }
+            }
+            var partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
+            if (partidosActivos.Count > 6)
+            {
+                sb.Append(EventRunBuild("SaleFoto"));
+            }
+            sb.Append(EventRunBuild($"{tipo}/Actualiza"));
+            return sb.ToString();
         }
 
         public string TickerActualiza(BrainStormDTO dto)
@@ -187,14 +244,14 @@ namespace Elecciones.src.mensajes.builders
 
             // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
+            string tipo = dto.oficiales ? "Escrutinio" : "Sondeo";
             for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
             {
                 PartidoDTO partido = partidosOrdenadosPorComparer[i];
                 string partidoId = partidoIdMap[partido.codigo];
 
                 // Asignar posición al partido (usando su ID basado en código)
-                string tipo = dto.oficiales ? "Escrutinio" : "Sondeo";
-                sb.Append(EventBuild($"{tipo}/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 2, 0.3, 0));
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 2, 0.3, 0));
 
                 // Acumular para el siguiente: posición actual + tamaño ficha + margen
                 if (i < partidosOrdenadosPorComparer.Count - 1)
@@ -202,14 +259,21 @@ namespace Elecciones.src.mensajes.builders
                     posicionAcumulada += tamanoFicha + margin;
                 }
             }
-            sb.Append(EventRunBuild("Escrutinio/Actualiza"));
+            var partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
+            if (partidosActivos.Count > 6)
+            {
+                sb.Append(EventRunBuild("SaleFoto"));
+            }
+            sb.Append(EventRunBuild($"{tipo}/Actualiza"));
             return sb.ToString();
         }
 
         public string TickerSale(bool oficial)
         {
-            return oficial ? EventRunBuild("TICKER/SALE") : EventRunBuild("TICKER_SONDEO/SALE");
+            string tipo = oficial ? "Escrutinio" : "Sondeo";
+            return EventRunBuild($"{tipo}/Sale");
         }
+
 
         public string TickerVotosEntra(bool oficial)
         {
@@ -243,12 +307,12 @@ namespace Elecciones.src.mensajes.builders
 
         public string TickerFotosEntra()
         {
-            return EventRunBuild("TICKER/FOTOS/ENTRA");
+            return EventRunBuild("EntraFoto");
         }
 
         public string TickerFotosSale()
         {
-            return EventRunBuild("TICKER/FOTOS/SALE");
+            return EventRunBuild("SaleFoto");
         }
 
         #endregion
@@ -257,13 +321,151 @@ namespace Elecciones.src.mensajes.builders
 
         public string VideoIn(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
         {
-            string signal = "";
-            signal += EventBuild($"TICKER/FNC_Video{partidoSeleccionado.codigo}", "MAP_EXE");
-            return signal;
+            if (dto == null || partidoSeleccionado == null) return "";
+            StringBuilder sb = new StringBuilder();
+
+            // 1. Gestionar lista de partidos expandidos
+            if (!partidosExpandidos.Contains(partidoSeleccionado.codigo))
+            {
+                partidosExpandidos.Add(partidoSeleccionado.codigo);
+            }
+
+            // 2. Filtrar partidos activos
+            var partidosActivos = dto.partidos
+                .Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
+                .ToList();
+
+            if (!partidosActivos.Any(p => p.codigo == partidoSeleccionado.codigo)) return "";
+
+            // 3. Ordenar
+            partidosActivos.Sort(new PartidoDTOComparerUnified(dto.oficiales));
+            partidosActivos.Reverse(); // Descendente
+
+            // Mapa IDs
+            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
+            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
+            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
+            {
+                string id = (i + 1).ToString("D2");
+                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = id;
+            }
+
+            int count = partidosActivos.Count;
+            if (count == 0) return "";
+
+            // 4. Cálculos de ancho
+            // pxTotales y margin definidos en la clase
+            double totalWidthAvailable = pxTotales - (margin * (count - 1));
+            // double normalWidth = totalWidthAvailable / count; // No usamos normalWidth estático ya
+            double minWidth = pxTotales / 5.0;
+
+            // Contar cuántos partidos ACTIVOS están expandidos
+            int numExpandidos = partidosActivos.Count(p => partidosExpandidos.Contains(p.codigo));
+
+            // Lógica de anchos dinámica
+            double widthOthers;
+
+            if (numExpandidos > 0)
+            {
+                double widthRequiredForExpanded = numExpandidos * minWidth;
+                double remainingSpace = totalWidthAvailable - widthRequiredForExpanded;
+
+                int numOthers = count - numExpandidos;
+
+                if (numOthers > 0)
+                {
+                    widthOthers = remainingSpace / numOthers;
+                }
+                else
+                {
+                    // Todos están expandidos (o intentan estarlo). 
+                    widthOthers = 0;
+                }
+            }
+            else
+            {
+                // Ninguno expandido
+                widthOthers = totalWidthAvailable / count;
+            }
+
+            // 5. Posicionamiento
+            double posicionAcumulada = posicionInicial;
+            string tipo = dto.oficiales ? "Escrutinio" : "Sondeo";
+
+            for (int i = 0; i < partidosActivos.Count; i++)
+            {
+                PartidoDTO partido = partidosActivos[i];
+                string sceneObjectId = partidoIdMap.ContainsKey(partido.codigo) ? partidoIdMap[partido.codigo] : "00";
+
+                double currentWidth;
+                double scaleX = 1.0;
+                double scaleZ = 1.0;
+
+                if (partidosExpandidos.Contains(partido.codigo))
+                {
+                    currentWidth = minWidth; // Este es el ancho expandido
+
+                    // Lógica de escala
+                    if (numExpandidos == 1)
+                    {
+                        // Valores harcodeados por el usuario
+                        if (count == 8) scaleX = 1.85;
+                        else if (count == 7) scaleX = 1.55;
+                        else if (count == 6) scaleX = 1.4;
+                        else if (count == 5) scaleX = 1.04;
+                        else scaleX = Math.Max(1.0, minWidth / (widthOthers > 0 ? widthOthers : 1));
+                    }
+                    else
+                    {
+                        // Fórmula genérica para multi-expansión: Objetivo (minWidth) / Base (widthOthers)
+                        if (widthOthers > 0)
+                            scaleX = minWidth / widthOthers;
+                        else
+                            scaleX = 1.0; // Fallback
+                    }
+
+                    // Z siempre 1.4 si expandido
+                    scaleZ = 1.4;
+                }
+                else
+                {
+                    currentWidth = widthOthers; // Este es el ancho reducido
+                    scaleX = 1.0;
+                    scaleZ = 1.0;
+                }
+
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}",
+                                     "OBJ_DISPLACEMENT[0]",
+                                     posicionAcumulada.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                                     2, 0.5, 0) + "\n");
+                
+                // Aplicar escala específica a la ficha de este partido
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", "OBJ_SCALE[0]", scaleX.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", "OBJ_SCALE[2]", scaleZ.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+
+                posicionAcumulada += currentWidth + margin;
+            }
+
+            // Aplicar tamaño base a las fichas no expandidas.
+            // Asumimos que el usuario manejará el escalado de las expandidas, 
+            // así que establecemos el tamaño base para las "normales/reducidas".
+            double baseWidth = (numExpandidos == count) ? minWidth : widthOthers;
+            sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", baseWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+
+            // ELIMINADO: Las lineas hardcodeadas antiguas que se añadieron fuera del bucle
+            // sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", "OBJ_SCALE[0]", "1.85", 2, 0.5, 0) + "\n");
+            // sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", "OBJ_SCALE[2]", "1.4", 2, 0.5, 0) + "\n");
+
+            return sb.ToString();
         }
 
         public string VideoOut(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
         {
+            if (partidoSeleccionado != null && partidosExpandidos.Contains(partidoSeleccionado.codigo))
+            {
+                partidosExpandidos.Remove(partidoSeleccionado.codigo);
+            }
+
             string signal = "";
             signal += EventBuild($"TICKER/FNC_CierroVideo{partidoSeleccionado.codigo}", "MAP_EXE");
             return signal;
@@ -271,6 +473,8 @@ namespace Elecciones.src.mensajes.builders
 
         public string VideoOutTodos(BrainStormDTO dto)
         {
+            partidosExpandidos.Clear();
+
             string signal = "";
             foreach (var partido in dto.partidos)
             {
@@ -645,7 +849,7 @@ namespace Elecciones.src.mensajes.builders
         {
             if (pSeleccionado == null) return "";
             StringBuilder sb = new StringBuilder();
-            
+
             // Guardar partido en lista si no existe
             if (!partidosEnPactoDerecha.Contains(pSeleccionado.codigo))
             {
@@ -743,43 +947,73 @@ namespace Elecciones.src.mensajes.builders
 
         #region Sedes Faldón
 
-        public string SedesEntra(bool tickerIn, string codPartido)
+        string sedeActual = "01";
+        public string SedesEntra(PartidoDTO pSeleccionado)
         {
-            string signal;
-            if (tickerIn)
+            StringBuilder sb = new StringBuilder();
+            var main = Application.Current.MainWindow as MainWindow;
+            var dto = main?.dto;
+
+            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
+            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
+            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
+            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
             {
-                signal = EventBuild("TOTAL/CualPartidoATotal", "MAP_STRING_PAR", $"'{codPartido}'", 1);
-                signal += EventBuild($"TOTAL/FCN_INI", "MAP_EXE", 1);
-                signal += EventBuild($"TOTAL/FCN_Total", "MAP_EXE", 1);
+                string partidoId = (i + 1).ToString("D2");
+                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
             }
-            else
+
+            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
+            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
+            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(dto.oficiales));
+            partidosOrdenadosPorComparer.Reverse(); // Descendente
+
+            string id = partidoIdMap[pSeleccionado.codigo];
+
+            if (main.tickerDentro)
             {
-                signal = EventBuild($"SEDES/Partido1", "MAP_STRING_PAR", $"'{codPartido}'", 1);
-                signal += Entra($"SEDES");
+                sb.Append(EventBuild($"datosSede{sedeActual}", "MAP_STRING_PAR", $"'{id}'", 1));
+                sb.Append(EventRunBuild($"Sede{sedeActual}/Entra"));
             }
-            return signal;
+            return sb.ToString();
         }
 
-        public string SedesEncadena(bool tickerIn, string codPartidoSiguiente, string codPartidoAnterior)
+        public string SedesEncadena(PartidoDTO pSeleccionado)
         {
-            string signal;
-            if (tickerIn)
+            StringBuilder sb = new StringBuilder();
+            var main = Application.Current.MainWindow as MainWindow;
+            var dto = main?.dto;
+
+            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
+            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
+            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
+            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
             {
-                signal = EventBuild("TOTAL/CualPartidoAEncadenar", "MAP_STRING_PAR", $"'{codPartidoSiguiente}'", 1);
-                signal += EventBuild($"TOTAL/FCN_Sube", "MAP_EXE", 1);
-                signal += EventBuild($"TOTAL/FCN_Encad", "MAP_EXE", 1);
+                string partidoId = (i + 1).ToString("D2");
+                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
             }
-            else
-            {
-                signal = EventBuild("SEDES/Partido2", "MAP_STRING_PAR", $"'{codPartidoSiguiente}'", 1);
-                signal += EventRunBuild($"SEDES/ENCADENO");
-            }
-            return signal;
+
+            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
+            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
+            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(dto.oficiales));
+            partidosOrdenadosPorComparer.Reverse(); // Descendente
+
+            string id = partidoIdMap[pSeleccionado.codigo];
+
+            string sedeSiguiente = sedeActual == "01" ? "04" : "03";
+            string otraSede = sedeActual == "01" ? "02" : "01";
+            sb.Append(EventBuild($"datosSede{otraSede}", "MAP_STRING_PAR", $"'{id}'", 1));
+            sb.Append(EventRunBuild($"Sede{sedeSiguiente}"));
+            sedeActual = otraSede;
+
+            return sb.ToString();
         }
 
-        public string SedesSale(bool tickerIn, string codPartido = "")
+        public string SedesSale()
         {
-            return Sale("SEDES");
+            string signal = EventRunBuild($"Sede{sedeActual}/Sale");
+            sedeActual = "01";
+            return signal;
         }
 
         #endregion

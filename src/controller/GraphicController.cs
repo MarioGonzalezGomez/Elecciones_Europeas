@@ -353,17 +353,17 @@ namespace Elecciones.src.controller
         }
 
         //SEDES
-        public void SedesEntra(bool tickerIn, BrainStormDTO dto, PartidoDTO seleccionado)
+        public void SedesEntra(PartidoDTO seleccionado)
         {
-            if (ipfActivo.Valor == 1) { ipf.SedesEntra(tickerIn, dto, seleccionado); }
+            if (ipfActivo.Valor == 1) { ipf.SedesEntra(seleccionado); }
         }
-        public void SedesEncadena(bool tickerIn, string codPartidoSiguiente, string codPartidoAnterior = "")
+        public void SedesEncadena(PartidoDTO seleccionado)
         {
-            if (ipfActivo.Valor == 1) { ipf.SedesEncadena(tickerIn, codPartidoSiguiente, codPartidoAnterior); }
+            if (ipfActivo.Valor == 1) { ipf.SedesEncadena(seleccionado); }
         }
-        public void SedesSale(bool tickerIn)
+        public void SedesSale()
         {
-            if (ipfActivo.Valor == 1) { ipf.SedesSale(tickerIn); }
+            if (ipfActivo.Valor == 1) { ipf.SedesSale(); }
         }
 
 

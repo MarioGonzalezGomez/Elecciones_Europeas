@@ -375,12 +375,12 @@ namespace Elecciones
                     // Actualizar datos en la ventana de Pactos si está abierta
                     if (pactos != null)
                     {
-                         string tipoGrafico = "";
-                         if (graficosListView.SelectedItem != null)
-                         {
-                             tipoGrafico = graficosListView.SelectedItem.ToString();
-                         }
-                         pactos.ActualizarDatos(oficiales, tipoGrafico, avance, tipoElecciones);
+                        string tipoGrafico = "";
+                        if (graficosListView.SelectedItem != null)
+                        {
+                            tipoGrafico = graficosListView.SelectedItem.ToString();
+                        }
+                        pactos.ActualizarDatos(oficiales, tipoGrafico, avance, tipoElecciones);
                     }
 
                     ActualizarInfoInterfaz(seleccionada, dto);
@@ -1355,9 +1355,9 @@ namespace Elecciones
                 if (dataActual != null)
                 {
                     partidoSeleccionado = dto.partidos.Find(par => string.Equals(par.codigo, dataActual.codigo));
-                    if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES") && partidoSeleccionado != null)
+                    if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES") && partidoSeleccionado != null && sedeDentro)
                     {
-                        graficos.SedesEncadena(false, partidoSeleccionado.codigo);
+                        graficos.SedesEncadena(partidoSeleccionado);
                     }
                 }
             }
@@ -1551,9 +1551,9 @@ namespace Elecciones
                         {
                             if (!sedeDentro)
                             {
-                                graficos.SedesEntra(false, dto, partidoSeleccionado);
+                                graficos.SedesEntra(partidoSeleccionado);
                             }
-                            else { graficos.SedesEncadena(false, partidoSeleccionado.codigo); }
+                            else { graficos.SedesEncadena(partidoSeleccionado); }
                             sedeDentro = true;
                         }
                         break;
@@ -1686,7 +1686,7 @@ namespace Elecciones
                         //  }
                         //  else
                         //  {
-                        graficos.SedesSale(false);
+                        graficos.SedesSale();
                         //   }
                         sedeDentro = false;
                         //}

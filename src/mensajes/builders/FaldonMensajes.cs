@@ -456,26 +456,173 @@ namespace Elecciones.src.mensajes.builders
 
         public string VideoOut(BrainStormDTO dto, PartidoDTO partidoSeleccionado)
         {
-            if (partidoSeleccionado != null && partidosExpandidos.Contains(partidoSeleccionado.codigo))
+            if (dto == null || partidoSeleccionado == null) return "";
+            StringBuilder sb = new StringBuilder();
+
+            // 1. Quitar el partido de la lista de expandidos
+            if (partidosExpandidos.Contains(partidoSeleccionado.codigo))
             {
                 partidosExpandidos.Remove(partidoSeleccionado.codigo);
             }
 
-            string signal = "";
-            signal += EventBuild($"TICKER/FNC_CierroVideo{partidoSeleccionado.codigo}", "MAP_EXE");
-            return signal;
+            // 2. Filtrar partidos activos
+            var partidosActivos = dto.partidos
+                .Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
+                .ToList();
+
+            if (partidosActivos.Count == 0) return "";
+
+            // 3. Ordenar
+            partidosActivos.Sort(new PartidoDTOComparerUnified(dto.oficiales));
+            partidosActivos.Reverse(); // Descendente
+
+            // Mapa IDs
+            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
+            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
+            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
+            {
+                string id = (i + 1).ToString("D2");
+                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = id;
+            }
+
+            int count = partidosActivos.Count;
+            string tipo = dto.oficiales ? "Escrutinio" : "Sondeo";
+
+            // 4. Cálculos de ancho (igual que VideoIn, pero con el partido ya quitado de expandidos)
+            double totalWidthAvailable = pxTotales - (margin * (count - 1));
+            double minWidth = pxTotales / 5.0;
+
+            // Contar cuántos partidos ACTIVOS siguen expandidos
+            int numExpandidos = partidosActivos.Count(p => partidosExpandidos.Contains(p.codigo));
+
+            double widthOthers;
+            if (numExpandidos > 0)
+            {
+                double widthRequiredForExpanded = numExpandidos * minWidth;
+                double remainingSpace = totalWidthAvailable - widthRequiredForExpanded;
+                int numOthers = count - numExpandidos;
+                widthOthers = numOthers > 0 ? remainingSpace / numOthers : 0;
+            }
+            else
+            {
+                // Ninguno expandido: todos vuelven al tamaño normal
+                widthOthers = totalWidthAvailable / count;
+            }
+
+            // 5. Posicionamiento y escalado
+            double posicionAcumulada = posicionInicial;
+
+            for (int i = 0; i < partidosActivos.Count; i++)
+            {
+                PartidoDTO partido = partidosActivos[i];
+                string sceneObjectId = partidoIdMap.ContainsKey(partido.codigo) ? partidoIdMap[partido.codigo] : "00";
+
+                double currentWidth;
+                double scaleX = 1.0;
+                double scaleZ = 1.0;
+
+                if (partidosExpandidos.Contains(partido.codigo))
+                {
+                    // Este partido sigue expandido
+                    currentWidth = minWidth;
+                    if (widthOthers > 0 && count > 4)
+                    {
+                        scaleX = minWidth / widthOthers;
+                    }
+                    scaleZ = 1.4;
+                }
+                else
+                {
+                    // Este partido NO está expandido (incluye el que acabamos de cerrar)
+                    currentWidth = widthOthers;
+                    scaleX = 1.0;
+                    scaleZ = 1.0;
+                }
+
+                // Posición
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}",
+                                     "OBJ_DISPLACEMENT[0]",
+                                     posicionAcumulada.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                                     2, 0.5, 0) + "\n");
+
+                // Escala
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", 
+                    "OBJ_SCALE[0]", scaleX.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", 
+                    "OBJ_SCALE[2]", scaleZ.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+
+                posicionAcumulada += currentWidth + margin;
+            }
+
+            // Tamaño base para fichas no expandidas
+            double baseWidth = (numExpandidos == count) ? minWidth : widthOthers;
+            sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", baseWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+
+            return sb.ToString();
         }
 
         public string VideoOutTodos(BrainStormDTO dto)
         {
+            if (dto == null) return "";
+            StringBuilder sb = new StringBuilder();
+
+            // 1. Limpiar todos los expandidos
             partidosExpandidos.Clear();
 
-            string signal = "";
-            foreach (var partido in dto.partidos)
+            // 2. Filtrar partidos activos
+            var partidosActivos = dto.partidos
+                .Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
+                .ToList();
+
+            if (partidosActivos.Count == 0) return "";
+
+            // 3. Ordenar
+            partidosActivos.Sort(new PartidoDTOComparerUnified(dto.oficiales));
+            partidosActivos.Reverse(); // Descendente
+
+            // Mapa IDs
+            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
+            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
+            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
             {
-                signal += EventBuild($"TICKER/FNC_CierroVideo{partido.codigo}", "MAP_EXE") + "\n";
+                string id = (i + 1).ToString("D2");
+                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = id;
             }
-            return signal;
+
+            int count = partidosActivos.Count;
+            string tipo = dto.oficiales ? "Escrutinio" : "Sondeo";
+
+            // 4. Cálculos de ancho (todos vuelven al tamaño normal)
+            double totalWidthAvailable = pxTotales - (margin * (count - 1));
+            double normalWidth = totalWidthAvailable / count;
+
+            // 5. Posicionamiento y reseteo de escalas
+            double posicionAcumulada = posicionInicial;
+
+            for (int i = 0; i < partidosActivos.Count; i++)
+            {
+                PartidoDTO partido = partidosActivos[i];
+                string sceneObjectId = partidoIdMap.ContainsKey(partido.codigo) ? partidoIdMap[partido.codigo] : "00";
+
+                // Posición
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}",
+                                     "OBJ_DISPLACEMENT[0]",
+                                     posicionAcumulada.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                                     2, 0.5, 0) + "\n");
+
+                // Resetear escala a (1, 1)
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", 
+                    "OBJ_SCALE[0]", "1", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", 
+                    "OBJ_SCALE[2]", "1", 2, 0.5, 0) + "\n");
+
+                posicionAcumulada += normalWidth + margin;
+            }
+
+            // Tamaño base para todas las fichas (todas iguales)
+            sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", normalWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+
+            return sb.ToString();
         }
 
         public string VideoInTodos(BrainStormDTO dto)

@@ -403,28 +403,23 @@ namespace Elecciones.src.mensajes.builders
 
                 if (partidosExpandidos.Contains(partido.codigo))
                 {
-                    currentWidth = minWidth; // Este es el ancho expandido
+                    currentWidth = minWidth; // Este es el ancho expandido (fijo)
 
-                    // Lógica de escala
-                    if (numExpandidos == 1)
+                    // Escala X: calculada dinámicamente para que el tamaño visual sea siempre minWidth
+                    // La fórmula minWidth / widthOthers garantiza que:
+                    // - baseWidth (widthOthers) * scaleX = minWidth (tamaño visual constante)
+                    // Esto funciona igual para 1 o múltiples expandidos
+                    if (widthOthers > 0 && count > 4)
                     {
-                        // Valores harcodeados por el usuario
-                        if (count == 8) scaleX = 1.85;
-                        else if (count == 7) scaleX = 1.55;
-                        else if (count == 6) scaleX = 1.4;
-                        else if (count == 5) scaleX = 1.04;
-                        else scaleX = Math.Max(1.0, minWidth / (widthOthers > 0 ? widthOthers : 1));
+                        scaleX = minWidth / widthOthers;
                     }
                     else
                     {
-                        // Fórmula genérica para multi-expansión: Objetivo (minWidth) / Base (widthOthers)
-                        if (widthOthers > 0)
-                            scaleX = minWidth / widthOthers;
-                        else
-                            scaleX = 1.0; // Fallback
+                        // Para 4 o menos partidos, no hace falta escalar
+                        scaleX = 1.0;
                     }
 
-                    // Z siempre 1.4 si expandido
+                    // Escala Y (OBJ_SCALE[2]) siempre 1.4 cuando está expandido
                     scaleZ = 1.4;
                 }
                 else

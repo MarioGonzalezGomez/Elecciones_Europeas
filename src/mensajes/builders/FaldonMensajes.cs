@@ -202,7 +202,7 @@ namespace Elecciones.src.mensajes.builders
                     posicionAcumulada += tamanoFicha + margin;
                 }
             }
-
+            sb.Append(EventRunBuild("Escrutinio/Actualiza"));
             return sb.ToString();
         }
 

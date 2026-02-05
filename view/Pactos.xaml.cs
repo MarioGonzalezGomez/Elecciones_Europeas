@@ -108,9 +108,9 @@ namespace Elecciones
         private void InitializeInfo()
         {
             lblCircunscripcion.Content = dto.circunscripcionDTO.nombre;
-            lblMayoria.Content = $"Mayor�a absoluta: {mayoriaAbsoluta}";
-            lblEscaniosIzq.Content = $"Total esca�os: {totalIzq}";
-            lblEscaniosDer.Content = $"Total esca�os: {totalDer}";
+            lblMayoria.Content = $"Mayoría absoluta: {mayoriaAbsoluta}";
+            lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
+            lblEscaniosDer.Content = $"Total escaños: {totalDer}";
             CargarPartidos();
             partidosIzqListView.ItemsSource = partidosDisponibles;
             partidosDerListView.ItemsSource = partidosDisponibles;
@@ -362,18 +362,18 @@ namespace Elecciones
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalIzq += int.Parse(seleccionado.escanios);
-                lblEscaniosIzq.Content = $"Total esca�os: {totalIzq}";
+                lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
                 preparado = false;
                 //Mandar mensaje de despliegue individualizado IZQ
                 if (main.ultimoEscanoDentro)
                 {
-                    graficos.ultimoEntraPartido(main.dto, seleccionado, true);
+                    graficos.ultimoEntraPartido(dto, seleccionado, true);
                 }
                 else if (main.sfPactometroDentro) { }
                 else
                 {
-                    PartidoDTO pseleccionado = main.dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    graficos.pactosEntraIzquierda(main.dto, pseleccionado);
+                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    graficos.pactosEntraIzquierda(dto, pseleccionado);
                 }
             }
         }
@@ -387,17 +387,17 @@ namespace Elecciones
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalIzq += int.Parse(seleccionado.escanios);
-                lblEscaniosIzq.Content = $"Total esca�os: {totalIzq}";
+                lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado IZQ
                 if (main.ultimoEscanoDentro)
                 {
-                    graficos.ultimoEntraPartido(main.dto, seleccionado, true);
+                    graficos.ultimoEntraPartido(dto, seleccionado, true);
                 }
                 else if (main.sfPactometroDentro) { }
                 else
                 {
-                    PartidoDTO pseleccionado = main.dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    graficos.pactosEntraIzquierda(main.dto, pseleccionado);
+                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    graficos.pactosEntraIzquierda(dto, pseleccionado);
                 }
             }
         }
@@ -410,17 +410,17 @@ namespace Elecciones
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalDer += int.Parse(seleccionado.escanios);
-                lblEscaniosDer.Content = $"Total esca�os: {totalDer}";
+                lblEscaniosDer.Content = $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 if (main.ultimoEscanoDentro)
                 {
-                    graficos.ultimoEntraPartido(main.dto, seleccionado, false);
+                    graficos.ultimoEntraPartido(dto, seleccionado, false);
                 }
                 else if (main.sfPactometroDentro) { }
                 else
                 {
-                    PartidoDTO pseleccionado = main.dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    graficos.pactosEntraDerecha(main.dto, pseleccionado);
+                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    graficos.pactosEntraDerecha(dto, pseleccionado);
                 }
             }
         }
@@ -433,7 +433,7 @@ namespace Elecciones
                 partidosDentroIzq.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalIzq -= int.Parse(seleccionado.escanios);
-                lblEscaniosIzq.Content = $"Total esca�os: {totalIzq}";
+                lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 graficos.pactosSaleIzquierda(index);
@@ -448,7 +448,7 @@ namespace Elecciones
                 partidosDentroDer.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalDer -= int.Parse(seleccionado.escanios);
-                lblEscaniosDer.Content = $"Total esca�os: {totalDer}";
+                lblEscaniosDer.Content = $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 graficos.pactosSaleDerecha(index);
@@ -479,7 +479,7 @@ namespace Elecciones
                 partidosDentroIzq.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalIzq -= int.Parse(seleccionado.escanios);
-                lblEscaniosIzq.Content = $"Total esca�os: {totalIzq}";
+                lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 graficos.pactosSaleIzquierda(index);
@@ -529,17 +529,17 @@ namespace Elecciones
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalDer += int.Parse(seleccionado.escanios);
-                lblEscaniosDer.Content = $"Total esca�os: {totalDer}";
+                lblEscaniosDer.Content = $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 if (main.ultimoEscanoDentro)
                 {
-                    graficos.ultimoEntraPartido(main.dto, seleccionado, false);
+                    graficos.ultimoEntraPartido(dto, seleccionado, false);
                 }
                 else if (main.sfPactometroDentro) { }
                 else
                 {
-                    PartidoDTO pseleccionado = main.dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    graficos.pactosEntraDerecha(main.dto, pseleccionado);
+                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    graficos.pactosEntraDerecha(dto, pseleccionado);
                 }
             }
         }
@@ -560,7 +560,7 @@ namespace Elecciones
                 partidosDentroDer.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalDer -= int.Parse(seleccionado.escanios);
-                lblEscaniosDer.Content = $"Total esca�os: {totalDer}";
+                lblEscaniosDer.Content = $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 graficos.pactosSaleDerecha(index);

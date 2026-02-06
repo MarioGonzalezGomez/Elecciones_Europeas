@@ -457,19 +457,22 @@ namespace Elecciones.src.mensajes.builders
 
                 posicionAcumulada += currentWidth + margin;
 
-                //TEXTO DIRECTO
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "40", 2, 0.5, 0) + "\n");
-                //CAMBIO POSICION TEXTOS Y LOGO
-                sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "-144", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "-104", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "-140", 2, 0.5, 0) + "\n");
+                if (partido.codigo == partidoSeleccionado.codigo)
+                {
+                    //TEXTO DIRECTO
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "40", 2, 0.5, 0) + "\n");
+                    //CAMBIO POSICION TEXTOS Y LOGO
+                    sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "-144", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "-104", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "-140", 2, 0.5, 0) + "\n");
 
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
 
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
-                //ENTRA VIDEO
-                sb.Append(Entra($"VIDEOS/{sceneObjectId}"));
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
+                    //ENTRA VIDEO
+                    sb.Append(Entra($"VIDEOS/{sceneObjectId}"));
+                }
             }
 
             // Aplicar tamaño base a las fichas no expandidas.
@@ -581,20 +584,23 @@ namespace Elecciones.src.mensajes.builders
 
                 posicionAcumulada += currentWidth + margin;
 
-                //ENTRA VIDEO
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
-                //CAMBIO POSICION TEXTOS
-                sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+                if (partido.codigo == partidoSeleccionado.codigo)
+                {
+                    //ENTRA VIDEO
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
+                    //CAMBIO POSICION TEXTOS
+                    sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
 
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
 
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "-15", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "-15", 2, 0.5, 0) + "\n");
 
-                //SALE VIDEO
-                sb.Append(Sale($"VIDEOS/{sceneObjectId}"));
+                    //SALE VIDEO
+                    sb.Append(Sale($"VIDEOS/{sceneObjectId}"));
+                }
             }
 
             // Tamaño base para fichas no expandidas

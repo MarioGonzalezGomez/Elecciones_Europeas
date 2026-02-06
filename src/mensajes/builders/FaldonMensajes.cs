@@ -294,14 +294,22 @@ namespace Elecciones.src.mensajes.builders
 
         public string TickerVotosEntra(bool oficial)
         {
-            return oficial ? EventRunBuild("TICKER/VOTOS/ENTRA") : EventRunBuild("TICKER_SONDEO/VOTOS/ENTRA");
+            StringBuilder sb = new StringBuilder();
+            sb.Append(EventRunBuild("SaleP_Escanio"));
+            sb.Append(EventRunBuild("EntraP_Porcentaje"));
+            return sb.ToString();
         }
 
         public string TickerVotosSale(bool oficial)
         {
-            return oficial ? EventRunBuild("TICKER/VOTOS/SALE") : EventRunBuild("TICKER_SONDEO/VOTOS/SALE");
+            StringBuilder sb = new StringBuilder();
+            sb.Append(EventRunBuild("SaleP_Porcentaje"));
+            sb.Append(EventRunBuild("EntraP_Escanio"));
+            return sb.ToString();
         }
 
+
+        //NO SE USAN EN ESTA ELECCION ARAGON
         public string TickerHistoricosEntra(bool oficial)
         {
             return oficial ? EventRunBuild("TICKER/HISTORICOS/ENTRA") : EventRunBuild("TICKER_SONDEO/HISTORICOS/ENTRA");
@@ -578,25 +586,25 @@ namespace Elecciones.src.mensajes.builders
 
                 // Escala
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido",
-                    "OBJ_SCALE[0]", scaleX.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+                    "OBJ_SCALE[0]", scaleX.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0.3) + "\n");
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido",
-                    "OBJ_SCALE[2]", scaleZ.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+                    "OBJ_SCALE[2]", scaleZ.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0.3) + "\n");
 
                 posicionAcumulada += currentWidth + margin;
 
                 if (partido.codigo == partidoSeleccionado.codigo)
                 {
-                    //ENTRA VIDEO
+                    //SALE DIRECTO
                     sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
                     //CAMBIO POSICION TEXTOS
-                    sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
-                    sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
-                    sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.3, 0.3) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.3, 0.3) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.3, 0.3) + "\n");
 
-                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
-                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.3, 0.3) + "\n");
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.3, 0.3) + "\n");
 
-                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "-15", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "-15", 2, 0.3, 0.3) + "\n");
 
                     //SALE VIDEO
                     sb.Append(Sale($"VIDEOS/{sceneObjectId}"));
@@ -661,9 +669,9 @@ namespace Elecciones.src.mensajes.builders
 
                 // Resetear escala a (1, 1)
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido",
-                    "OBJ_SCALE[0]", "1", 2, 0.5, 0) + "\n");
+                    "OBJ_SCALE[0]", "1", 2, 0.5, 0.3) + "\n");
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido",
-                    "OBJ_SCALE[2]", "1", 2, 0.5, 0) + "\n");
+                    "OBJ_SCALE[2]", "1", 2, 0.5, 0.3) + "\n");
 
                 posicionAcumulada += normalWidth + margin;
 
@@ -671,14 +679,14 @@ namespace Elecciones.src.mensajes.builders
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
 
                 // Resetear posición de textos (como en VideoOut)
-                sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.3, 0.3) + "\n");
+                sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.3, 0.3) + "\n");
+                sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.3, 0.3) + "\n");
 
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.3, 0.3) + "\n");
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.3, 0.3) + "\n");
 
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "-15", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "-15", 2, 0.3, 0.3) + "\n");
                 // Salir video de este partido
                 sb.Append(Sale($"VIDEOS/{sceneObjectId}"));
             }
@@ -973,7 +981,7 @@ namespace Elecciones.src.mensajes.builders
 
         public string pactosEntra()
         {
-            return Entra("Pactometro");
+            return EventRunBuild("Pactometro/Entra");
         }
 
         public string pactosReinicio()
@@ -998,7 +1006,11 @@ namespace Elecciones.src.mensajes.builders
             acumuladoEscanosIzq = 0;
             partidosEnPactoDerecha.Clear();
             partidosEnPactoIzquierda.Clear();
-            return Sale("Pactometro");
+            StringBuilder sb = new StringBuilder();
+            sb.Append(EventRunBuild("Pactometro/Sale"));
+            sb.Append(EventRunBuild("Pactometro/reinicioPactometroIzq"));
+            sb.Append(EventRunBuild("Pactometro/reinicioPactometroDer"));
+            return sb.ToString();
         }
 
         double pxTotalesPacto = 1748;
@@ -1078,22 +1090,31 @@ namespace Elecciones.src.mensajes.builders
             sb.Append(EventBuild("BarraDerechas", "PRIM_RECGLO_LEN[0]", acumuladoDcha.ToString(), 2, 0.3, 0));
 
             // LOGOS
-            List<PartidoDTO> ordenados = dto.partidos.OrderBy(p => p.codigo).ToList();
-            string partidoId = (ordenados.IndexOf(dto.partidos.FirstOrDefault(par => par.codigo.Equals(pSeleccionado.codigo))) + 1).ToString("D2");
-            sb.Append(EventBuild($"Pactometro/Der/LogosDer/Logo0{partidosEnPactoDerecha.Count}", "OBJ_OVERMAT", $"'Logos/Logo{partidoId}'", 1));
+            var main = Application.Current.MainWindow as MainWindow;
+            var mainDto = main?.dto;
+            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
+            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
+            List<PartidoDTO> partidosOrdenadosPorCodigo = mainDto.partidos.OrderBy(p => p.codigo).ToList();
+            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
+            {
+                string partidoId = (i + 1).ToString("D2");
+                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
+            }
+            string id = partidoIdMap[pSeleccionado.codigo];
+            sb.Append(EventBuild($"Graficos/Pactometro/Der/LogosDer/Logo0{partidosEnPactoDerecha.Count}", "OBJ_OVERMAT", $"'Logos/Logo{id}'", 1));
 
             // Señales condicionales según si es el primero o no
             if (esPrimero)
             {
-                sb.Append(EventBuild("Pactometro/Der/LogosDer", "OBJ_GRID_JUMP_TO_END", 1));
+                sb.Append(EventBuild("Graficos/Pactometro/Der/LogosDer", "OBJ_GRID_JUMP_TO_END", 1));
                 sb.Append(EventRunBuild("Pactometro/lanzaPactometroDer"));
 
                 // COLOR
-                sb.Append(EventBuild("Pactometro/Der/BarraDerechas", "OBJ_OVERMAT", $"{pSeleccionado.siglas}", 1));
+                sb.Append(EventBuild("Graficos/Pactometro/Der/BarraDerechas", "OBJ_OVERMAT", $"'{id}'", 1));
             }
             else
             {
-                sb.Append(EventBuild("Pactometro/Der/LogosDer", "OBJ_GRID_JUMP_NEXT", 1));
+                sb.Append(EventBuild("Graficos/Pactometro/Der/LogosDer", "OBJ_GRID_JUMP_NEXT", 1));
             }
 
             return sb.ToString();
@@ -1123,21 +1144,31 @@ namespace Elecciones.src.mensajes.builders
             sb.Append(EventBuild("BarraIzquierdas", "PRIM_RECGLO_LEN[0]", acumuladoIzq.ToString(), 2, 0.3, 0));
 
             // LOGOS
-            List<PartidoDTO> ordenados = dto.partidos.OrderBy(p => p.codigo).ToList();
-            string partidoId = (ordenados.IndexOf(dto.partidos.FirstOrDefault(par => par.codigo.Equals(pSeleccionado.codigo))) + 1).ToString("D2");
-            sb.Append(EventBuild($"Pactometro/Izq/LogosIzq/Logo0{partidosEnPactoIzquierda.Count}", "OBJ_OVERMAT", $"'Logos/Logo{partidoId}'", 1));
+            // LOGOS
+            var main = Application.Current.MainWindow as MainWindow;
+            var mainDto = main?.dto;
+            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
+            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
+            List<PartidoDTO> partidosOrdenadosPorCodigo = mainDto.partidos.OrderBy(p => p.codigo).ToList();
+            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
+            {
+                string partidoId = (i + 1).ToString("D2");
+                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
+            }
+            string id = partidoIdMap[pSeleccionado.codigo];
+            sb.Append(EventBuild($"Graficos/Pactometro/Izq/LogosIzq/Logo0{partidosEnPactoIzquierda.Count}", "OBJ_OVERMAT", $"'Logos/Logo{id}'", 1));
 
             // Señales condicionales según si es el primero o no
             if (esPrimero)
             {
-                sb.Append(EventBuild("Pactometro/Izq/LogosIzq", "OBJ_GRID_JUMP_TO_END", 1));
+                sb.Append(EventBuild("Graficos/Pactometro/Izq/LogosIzq", "OBJ_GRID_JUMP_TO_END", 1));
                 sb.Append(EventRunBuild("Pactometro/lanzaPactometroIzq"));
                 // COLOR
-                sb.Append(EventBuild("Pactometro/Izq/BarraIzquierdas", "OBJ_OVERMAT", $"{pSeleccionado.siglas}", 1));
+                sb.Append(EventBuild("Graficos/Pactometro/Izq/BarraIzquierdas", "OBJ_OVERMAT", $"'{id}'", 1));
             }
             else
             {
-                sb.Append(EventBuild("Pactometro/Izq/LogosIzq", "OBJ_GRID_JUMP_NEXT", 1));
+                sb.Append(EventBuild("Graficos/Pactometro/Izq/LogosIzq", "OBJ_GRID_JUMP_NEXT", 1));
             }
 
             return sb.ToString();

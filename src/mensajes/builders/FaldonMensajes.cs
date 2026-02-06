@@ -295,16 +295,16 @@ namespace Elecciones.src.mensajes.builders
         public string TickerVotosEntra(bool oficial)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(EventRunBuild("SaleP_Escanio"));
-            sb.Append(EventRunBuild("EntraP_Porcentaje"));
+            sb.Append(EventBuild("Datos", "MAP_STRING_PAR", "DiferenciaSale", 1));
+            sb.Append(EventBuild("Datos", "MAP_STRING_PAR", "PorcentajitoEntra", 1));
             return sb.ToString();
         }
 
         public string TickerVotosSale(bool oficial)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(EventRunBuild("SaleP_Porcentaje"));
-            sb.Append(EventRunBuild("EntraP_Escanio"));
+            sb.Append(EventBuild("Datos", "MAP_STRING_PAR", "PorcentajitoSale", 1));
+            sb.Append(EventBuild("Datos", "MAP_STRING_PAR", "DiferenciaEntra", 1));
             return sb.ToString();
         }
 
@@ -475,7 +475,7 @@ namespace Elecciones.src.mensajes.builders
 
                     //TEXTO DIRECTO: Siempre en 40 si está expandido
                     sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "40", 2, 0.5, 0) + "\n");
-                    
+
                     //CAMBIO POSICION TEXTOS Y LOGO
                     sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", posEscanios.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
                     sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", posPorcentaje.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");

@@ -94,10 +94,10 @@
                             <Button x:Name="btnVideoOut" Content="Video Out" Grid.Column="1" Grid.Row="0" 
                                     Margin="2" Padding="8,6" Background="#f44336" Foreground="White"
                                     Click="btnVideoOut_Click"/>
-                            <Button x:Name="btnEntranTodos" Content="Entran Todos" Grid.Column="0" Grid.Row="1" 
+                            <!--<Button x:Name="btnEntranTodos" Content="Entran Todos" Grid.Column="0" Grid.Row="1" 
                                     Margin="2" Padding="8,6" Background="#4CAF50" Foreground="White"
-                                    Click="btnEntranTodos_Click"/>
-                            <Button x:Name="btnSalenTodos" Content="Salen Todos" Grid.Column="1" Grid.Row="1" 
+                                    Click="btnEntranTodos_Click"/>-->
+                            <Button x:Name="btnSalenTodos" Content="Salen Todos" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" 
                                     Margin="2" Padding="8,6" Background="#f44336" Foreground="White"
                                     Click="btnSalenTodos_Click"/>
                         </Grid>

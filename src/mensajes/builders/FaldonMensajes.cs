@@ -433,12 +433,21 @@ namespace Elecciones.src.mensajes.builders
                                      "OBJ_DISPLACEMENT[0]",
                                      posicionAcumulada.ToString(System.Globalization.CultureInfo.InvariantCulture),
                                      2, 0.5, 0) + "\n");
-                
+
                 // Aplicar escala específica a la ficha de este partido
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", "OBJ_SCALE[0]", scaleX.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", "OBJ_SCALE[2]", scaleZ.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
 
                 posicionAcumulada += currentWidth + margin;
+
+                //TEXTO DIRECTO
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "40", 2, 0.5, 0) + "\n");
+                //CAMBIO POSICION TEXTOS
+                sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "-144", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "-104", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "-140", 2, 0.5, 0) + "\n");
+                //ENTRA VIDEO
+                sb.Append(Entra($"VIDEOS/{sceneObjectId}"));
             }
 
             // Aplicar tamaño base a las fichas no expandidas.
@@ -446,11 +455,7 @@ namespace Elecciones.src.mensajes.builders
             // así que establecemos el tamaño base para las "normales/reducidas".
             double baseWidth = (numExpandidos == count) ? minWidth : widthOthers;
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", baseWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
-
-            // ELIMINADO: Las lineas hardcodeadas antiguas que se añadieron fuera del bucle
-            // sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", "OBJ_SCALE[0]", "1.85", 2, 0.5, 0) + "\n");
-            // sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", "OBJ_SCALE[2]", "1.4", 2, 0.5, 0) + "\n");
-
+            sb.Append(EventRunBuild("Titular/Ocultar") + "\n");
             return sb.ToString();
         }
 
@@ -507,6 +512,7 @@ namespace Elecciones.src.mensajes.builders
             {
                 // Ninguno expandido: todos vuelven al tamaño normal
                 widthOthers = totalWidthAvailable / count;
+                sb.Append(EventRunBuild("Titular/Recuperar") + "\n");
             }
 
             // 5. Posicionamiento y escalado
@@ -546,12 +552,21 @@ namespace Elecciones.src.mensajes.builders
                                      2, 0.5, 0) + "\n");
 
                 // Escala
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", 
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido",
                     "OBJ_SCALE[0]", scaleX.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", 
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido",
                     "OBJ_SCALE[2]", scaleZ.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
 
                 posicionAcumulada += currentWidth + margin;
+
+                //ENTRA VIDEO
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
+                //CAMBIO POSICION TEXTOS
+                sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+                //SALE VIDEO
+                sb.Append(Sale($"VIDEOS/{sceneObjectId}"));
             }
 
             // Tamaño base para fichas no expandidas
@@ -611,9 +626,9 @@ namespace Elecciones.src.mensajes.builders
                                      2, 0.5, 0) + "\n");
 
                 // Resetear escala a (1, 1)
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", 
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido",
                     "OBJ_SCALE[0]", "1", 2, 0.5, 0) + "\n");
-                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido", 
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/fichaPartido",
                     "OBJ_SCALE[2]", "1", 2, 0.5, 0) + "\n");
 
                 posicionAcumulada += normalWidth + margin;

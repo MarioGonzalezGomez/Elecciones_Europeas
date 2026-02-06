@@ -1497,6 +1497,11 @@ namespace Elecciones
             }
             else { Update(); }
 
+            if (!oficiales)
+            {
+                CargarMedios();
+            }
+
             actualizacionActiva = temp;
         }
         private void btnPactos_Click(object sender, RoutedEventArgs e)

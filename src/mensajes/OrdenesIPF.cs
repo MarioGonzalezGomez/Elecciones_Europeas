@@ -155,9 +155,9 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(faldonBuilder.TickerActualiza(dto));
         }
 
-        public void TickerSale(bool oficial)
+        public void TickerSale(bool oficial, BrainStormDTO dto = null)
         {
-            c.EnviarMensaje(faldonBuilder.TickerSale(oficial));
+            c.EnviarMensaje(faldonBuilder.TickerSale(oficial, dto));
         }
 
         public void TickerEscanosEntra()

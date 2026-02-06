@@ -223,6 +223,15 @@ namespace Elecciones.src.mensajes.builders
         {
             if (dto == null) return "";
             StringBuilder sb = new StringBuilder();
+            string tipo = dto.oficiales ? "Escrutinio" : "Sondeo";
+
+            // Si hay partidos expandidos, solo enviar la señal de actualización
+            // para no romper la estructura de posiciones
+            if (partidosExpandidos.Count > 0)
+            {
+                sb.Append(EventRunBuild($"{tipo}/Actualiza"));
+                return sb.ToString();
+            }
 
             //TAMANO
             double tamanoFicha = (pxTotales - (margin * (dto.numPartidos - 1))) / dto.numPartidos;
@@ -244,7 +253,6 @@ namespace Elecciones.src.mensajes.builders
 
             // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
-            string tipo = dto.oficiales ? "Escrutinio" : "Sondeo";
             for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
             {
                 PartidoDTO partido = partidosOrdenadosPorComparer[i];
@@ -268,10 +276,19 @@ namespace Elecciones.src.mensajes.builders
             return sb.ToString();
         }
 
-        public string TickerSale(bool oficial)
+        public string TickerSale(bool oficial, BrainStormDTO dto = null)
         {
+            StringBuilder sb = new StringBuilder();
             string tipo = oficial ? "Escrutinio" : "Sondeo";
-            return EventRunBuild($"{tipo}/Sale");
+
+            // Si hay partidos expandidos, cerrarlos todos antes de salir
+            if (partidosExpandidos.Count > 0 && dto != null)
+            {
+                sb.Append(VideoOutTodos(dto));
+            }
+
+            sb.Append(EventRunBuild($"{tipo}/Sale"));
+            return sb.ToString();
         }
 
 
@@ -632,10 +649,24 @@ namespace Elecciones.src.mensajes.builders
                     "OBJ_SCALE[2]", "1", 2, 0.5, 0) + "\n");
 
                 posicionAcumulada += normalWidth + margin;
+
+                // Resetear texto Directo (como en VideoOut)
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
+
+                // Resetear posición de textos (como en VideoOut)
+                sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+
+                // Salir video de este partido
+                sb.Append(Sale($"VIDEOS/{sceneObjectId}"));
             }
 
             // Tamaño base para todas las fichas (todas iguales)
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", normalWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+
+            // Recuperar titular (como cuando ninguno está expandido en VideoOut)
+            sb.Append(EventRunBuild("Titular/Recuperar") + "\n");
 
             return sb.ToString();
         }

@@ -1673,7 +1673,7 @@ namespace Elecciones
                         graficos.SaleReloj();
                         break;
                     case "FICHAS":
-                        graficos.TickerSale(oficiales);
+                        graficos.TickerSale(oficiales, dto);
                         if (!oficiales) { sondeoEnElAire = false; }
                         tickerDentro = false;
                         break;

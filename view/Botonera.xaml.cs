@@ -199,7 +199,7 @@ namespace Elecciones
         {
             main = Application.Current.MainWindow as MainWindow;
             gController.BajarRotulosPrimeEsp();
-            gController.TickerSale(main.oficiales);
+            gController.TickerSale(main.oficiales, main.dto);
         }
 
         #endregion

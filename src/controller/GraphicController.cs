@@ -211,9 +211,9 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.TickerActualiza(dto); }
         }
-        public void TickerSale(bool oficial)
+        public void TickerSale(bool oficial, BrainStormDTO dto = null)
         {
-            if (ipfActivo.Valor == 1) { ipf.TickerSale(oficial); }
+            if (ipfActivo.Valor == 1) { ipf.TickerSale(oficial, dto); }
         }
 
         public void TickerEscanosEntra()

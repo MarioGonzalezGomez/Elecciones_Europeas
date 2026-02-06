@@ -465,15 +465,17 @@ namespace Elecciones.src.mensajes.builders
 
                 posicionAcumulada += currentWidth + margin;
 
-                if (partido.codigo == partidoSeleccionado.codigo)
+                // Ajustes visuales para TODOS los partidos expandidos (para mantener alineación al cambiar escala)
+                if (partidosExpandidos.Contains(partido.codigo))
                 {
                     // CÁLCULO DINÁMICO DE POSICIONES DE TEXTO (Empírico: 150 - widthOthers)
                     double posEscanios = 150 - widthOthers;
                     double posPorcentaje = posEscanios + 40;
                     double posDiferencia = posEscanios + 4;
 
-                    //TEXTO DIRECTO
+                    //TEXTO DIRECTO: Siempre en 40 si está expandido
                     sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "40", 2, 0.5, 0) + "\n");
+                    
                     //CAMBIO POSICION TEXTOS Y LOGO
                     sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", posEscanios.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
                     sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", posPorcentaje.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
@@ -483,6 +485,11 @@ namespace Elecciones.src.mensajes.builders
                     sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
 
                     sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
+                }
+
+                // Solo si es el partido seleccionado, lanzamos el video
+                if (partido.codigo == partidoSeleccionado.codigo)
+                {
                     //ENTRA VIDEO
                     sb.Append(Entra($"VIDEOS/{sceneObjectId}"));
                 }
@@ -600,9 +607,31 @@ namespace Elecciones.src.mensajes.builders
 
                 posicionAcumulada += currentWidth + margin;
 
+                // Ajustes visuales para TODOS los partidos QUE QUEDAN expandidos
+                if (partidosExpandidos.Contains(partido.codigo))
+                {
+                    // CÁLCULO DINÁMICO DE POSICIONES DE TEXTO (Empírico: 150 - widthOthers)
+                    double posEscanios = 150 - widthOthers;
+                    double posPorcentaje = posEscanios + 40;
+                    double posDiferencia = posEscanios + 4;
+
+                    //TEXTO DIRECTO
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "40", 2, 0.5, 0) + "\n");
+
+                    //CAMBIO POSICION TEXTOS Y LOGO
+                    sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", posEscanios.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", posPorcentaje.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", posDiferencia.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
+
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
+                }
+
                 if (partido.codigo == partidoSeleccionado.codigo)
                 {
-                    //SALE DIRECTO
+                    //ENTRA VIDEO (Reset a 0 porque sale)
                     sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "0", 2, 0.5, 0) + "\n");
                     //CAMBIO POSICION TEXTOS
                     sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.3, 0.3) + "\n");

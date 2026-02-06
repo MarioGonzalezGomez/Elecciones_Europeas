@@ -459,10 +459,15 @@ namespace Elecciones.src.mensajes.builders
 
                 //TEXTO DIRECTO
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "40", 2, 0.5, 0) + "\n");
-                //CAMBIO POSICION TEXTOS
+                //CAMBIO POSICION TEXTOS Y LOGO
                 sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "-144", 2, 0.5, 0) + "\n");
                 sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "-104", 2, 0.5, 0) + "\n");
                 sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "-140", 2, 0.5, 0) + "\n");
+
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
+
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
                 //ENTRA VIDEO
                 sb.Append(Entra($"VIDEOS/{sceneObjectId}"));
             }
@@ -582,6 +587,12 @@ namespace Elecciones.src.mensajes.builders
                 sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
                 sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
                 sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
+
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
+
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "-15", 2, 0.5, 0) + "\n");
+
                 //SALE VIDEO
                 sb.Append(Sale($"VIDEOS/{sceneObjectId}"));
             }
@@ -658,6 +669,10 @@ namespace Elecciones.src.mensajes.builders
                 sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
                 sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "0", 2, 0.5, 0) + "\n");
 
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "-7", 2, 0.5, 0) + "\n");
+
+                sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Logo", "OBJ_DISPLACEMENT[2]", "-15", 2, 0.5, 0) + "\n");
                 // Salir video de este partido
                 sb.Append(Sale($"VIDEOS/{sceneObjectId}"));
             }

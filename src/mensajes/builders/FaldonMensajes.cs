@@ -459,12 +459,17 @@ namespace Elecciones.src.mensajes.builders
 
                 if (partido.codigo == partidoSeleccionado.codigo)
                 {
+                    // CÁLCULO DINÁMICO DE POSICIONES DE TEXTO (Empírico: 150 - widthOthers)
+                    double posEscanios = 150 - widthOthers;
+                    double posPorcentaje = posEscanios + 40;
+                    double posDiferencia = posEscanios + 4;
+
                     //TEXTO DIRECTO
                     sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "40", 2, 0.5, 0) + "\n");
                     //CAMBIO POSICION TEXTOS Y LOGO
-                    sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", "-144", 2, 0.5, 0) + "\n");
-                    sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", "-104", 2, 0.5, 0) + "\n");
-                    sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", "-140", 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Escanios", "TEXT_BLOCK_HOTPOINT[0]", posEscanios.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Porcentaje1", "TEXT_BLOCK_HOTPOINT[0]", posPorcentaje.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+                    sb.Append(EventBuild($"{sceneObjectId}/Diferencia", "TEXT_BLOCK_HOTPOINT[0]", posDiferencia.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
 
                     sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosG{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
                     sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DatosP{sceneObjectId}", "OBJ_DISPLACEMENT[2]", "25", 2, 0.5, 0) + "\n");
@@ -479,7 +484,10 @@ namespace Elecciones.src.mensajes.builders
             // Asumimos que el usuario manejará el escalado de las expandidas, 
             // así que establecemos el tamaño base para las "normales/reducidas".
             double baseWidth = (numExpandidos == count) ? minWidth : widthOthers;
-            sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", baseWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+            if (count > 4)
+            {
+                sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", baseWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+            }
             sb.Append(EventRunBuild("Titular/Ocultar") + "\n");
             return sb.ToString();
         }
@@ -605,8 +613,10 @@ namespace Elecciones.src.mensajes.builders
 
             // Tamaño base para fichas no expandidas
             double baseWidth = (numExpandidos == count) ? minWidth : widthOthers;
-            sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", baseWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
-
+            if (count > 4)
+            {
+                sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", baseWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+            }
             return sb.ToString();
         }
 
@@ -684,7 +694,10 @@ namespace Elecciones.src.mensajes.builders
             }
 
             // Tamaño base para todas las fichas (todas iguales)
-            sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", normalWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+            if (count > 4)
+            {
+                sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", normalWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
+            }
 
             // Recuperar titular (como cuando ninguno está expandido en VideoOut)
             sb.Append(EventRunBuild("Titular/Recuperar") + "\n");

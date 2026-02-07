@@ -436,7 +436,7 @@ namespace Elecciones
                 lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
-                graficos.pactosSaleIzquierda(index);
+                graficos.pactosSaleIzquierda();
                 ReordenarListas();
             }
         }
@@ -451,7 +451,7 @@ namespace Elecciones
                 lblEscaniosDer.Content = $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
-                graficos.pactosSaleDerecha(index);
+                graficos.pactosSaleDerecha();
                 ReordenarListas();
             }
         }
@@ -482,7 +482,7 @@ namespace Elecciones
                 lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
-                graficos.pactosSaleIzquierda(index);
+                graficos.pactosSaleIzquierda();
                 ReordenarListas();
             }
         }
@@ -563,7 +563,7 @@ namespace Elecciones
                 lblEscaniosDer.Content = $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
-                graficos.pactosSaleDerecha(index);
+                graficos.pactosSaleDerecha();
                 ReordenarListas();
             }
         }

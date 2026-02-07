@@ -119,7 +119,7 @@ namespace Elecciones
         {
             main = Application.Current.MainWindow as MainWindow;
             gController.TickerHistoricosEntra(main.oficiales);
-            gController.TickerHistoricosEntraInd();
+            //gController.TickerHistoricosEntraInd();
             histIn = true;
         }
         private void btnMillones_Click(object sender, RoutedEventArgs e)

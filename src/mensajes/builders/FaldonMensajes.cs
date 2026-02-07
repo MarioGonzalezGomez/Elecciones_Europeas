@@ -300,7 +300,7 @@ namespace Elecciones.src.mensajes.builders
             return sb.ToString();
         }
 
-        public string TickerVotosSale(bool oficial)
+        public string TickerHistoricosEntra(bool oficial)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(EventBuild("Datos", "MAP_STRING_PAR", "PorcentajitoSale", 1));
@@ -308,11 +308,13 @@ namespace Elecciones.src.mensajes.builders
             return sb.ToString();
         }
 
-
-        //NO SE USAN EN ESTA ELECCION ARAGON
-        public string TickerHistoricosEntra(bool oficial)
+        //NO SE USA EN ARAGÓN
+        public string TickerVotosSale(bool oficial)
         {
-            return oficial ? EventRunBuild("TICKER/HISTORICOS/ENTRA") : EventRunBuild("TICKER_SONDEO/HISTORICOS/ENTRA");
+            StringBuilder sb = new StringBuilder();
+            sb.Append(EventBuild("Datos", "MAP_STRING_PAR", "PorcentajitoSale", 1));
+            sb.Append(EventBuild("Datos", "MAP_STRING_PAR", "DiferenciaEntra", 1));
+            return sb.ToString();
         }
 
         public string TickerHistoricosSale(bool oficial)

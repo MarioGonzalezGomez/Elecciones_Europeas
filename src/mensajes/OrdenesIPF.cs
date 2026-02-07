@@ -292,14 +292,14 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(faldonBuilder.pactosEntraIzquierda(dto, pSeleccionado));
         }
 
-        public void pactosSaleDerecha(int posicionPartido)
+        public void pactosSaleDerecha()
         {
-            c.EnviarMensaje(faldonBuilder.pactosSaleDerecha(posicionPartido));
+            c.EnviarMensaje(faldonBuilder.pactosSaleDerecha());
         }
 
-        public void pactosSaleIzquierda(int posicionPartido)
+        public void pactosSaleIzquierda()
         {
-            c.EnviarMensaje(faldonBuilder.pactosSaleIzquierda(posicionPartido));
+            c.EnviarMensaje(faldonBuilder.pactosSaleIzquierda());
         }
 
         #endregion

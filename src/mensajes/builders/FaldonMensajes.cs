@@ -1218,13 +1218,82 @@ namespace Elecciones.src.mensajes.builders
             return sb.ToString();
         }
 
-        public string pactosSaleDerecha(int posicionPartido)
+        public string pactosSaleDerecha()
         {
-            return "";
+            if (partidosEnPactoDerecha.Count == 0) return "";
+            StringBuilder sb = new StringBuilder();
+
+            // 1. Identificar el último partido añadido
+            string codigoUltimo = partidosEnPactoDerecha.Last();
+            partidosEnPactoDerecha.RemoveAt(partidosEnPactoDerecha.Count - 1);
+
+            // 2. Obtener el partido del DTO principal para saber sus escaños
+            var main = Application.Current.MainWindow as MainWindow;
+            var dto = main?.dto;
+            if (dto == null) return "";
+
+            var partido = dto.partidos.FirstOrDefault(p => p.codigo == codigoUltimo);
+            if (partido != null)
+            {
+                // 3. Restar escaños del acumulado
+                acumuladoEscanosDer -= partido.escanios;
+                // Evitar negativos por seguridad
+                if (acumuladoEscanosDer < 0) acumuladoEscanosDer = 0;
+
+                sb.Append(EventBuild("Pactometro_DerVALOR", "MAP_INT_PAR", $"{acumuladoEscanosDer}", 1));
+
+                // 4. Restar tamaño de la barra
+                // Usamos la misma fórmula que en la entrada: (escaños * pxTotales) / totalEscaños
+                double tamanoFicha = (partido.escanios * pxTotalesPacto) / dto.circunscripcionDTO.escaniosTotales;
+                acumuladoDcha -= tamanoFicha;
+                // Evitar negativos/errores de precisión
+                if (acumuladoDcha < 0) acumuladoDcha = 0;
+
+                sb.Append(EventBuild("BarraDerechas", "PRIM_RECGLO_LEN[0]", acumuladoDcha.ToString(), 2, 0.3, 0));
+            }
+
+            // 5. Quitar logo (OBJ_GRID_JUMP_BEFORE)
+            // Se envía al controlador de logos de la derecha
+            sb.Append(EventBuild("Graficos/Pactometro/Der/LogosDer", "OBJ_GRID_JUMP_BEFORE", 1));
+
+            return sb.ToString();
         }
-        public string pactosSaleIzquierda(int posicionPartido)
+
+        public string pactosSaleIzquierda()
         {
-            return "";
+            if (partidosEnPactoIzquierda.Count == 0) return "";
+            StringBuilder sb = new StringBuilder();
+
+            // 1. Identificar el último partido añadido
+            string codigoUltimo = partidosEnPactoIzquierda.Last();
+            partidosEnPactoIzquierda.RemoveAt(partidosEnPactoIzquierda.Count - 1);
+
+            // 2. Obtener el partido del DTO principal para saber sus escaños
+            var main = Application.Current.MainWindow as MainWindow;
+            var dto = main?.dto;
+            if (dto == null) return "";
+
+            var partido = dto.partidos.FirstOrDefault(p => p.codigo == codigoUltimo);
+            if (partido != null)
+            {
+                // 3. Restar escaños del acumulado
+                acumuladoEscanosIzq -= partido.escanios;
+                if (acumuladoEscanosIzq < 0) acumuladoEscanosIzq = 0;
+
+                sb.Append(EventBuild("Pactometro_IzqVALOR", "MAP_INT_PAR", $"{acumuladoEscanosIzq}", 1));
+
+                // 4. Restar tamaño de la barra
+                double tamanoFicha = (partido.escanios * pxTotalesPacto) / dto.circunscripcionDTO.escaniosTotales;
+                acumuladoIzq -= tamanoFicha;
+                if (acumuladoIzq < 0) acumuladoIzq = 0;
+
+                sb.Append(EventBuild("BarraIzquierdas", "PRIM_RECGLO_LEN[0]", acumuladoIzq.ToString(), 2, 0.3, 0));
+            }
+
+            // 5. Quitar logo (OBJ_GRID_JUMP_BEFORE)
+            sb.Append(EventBuild("Graficos/Pactometro/Izq/LogosIzq", "OBJ_GRID_JUMP_BEFORE", 1));
+
+            return sb.ToString();
         }
 
         #endregion

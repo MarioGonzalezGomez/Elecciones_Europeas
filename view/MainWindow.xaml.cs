@@ -1375,6 +1375,13 @@ namespace Elecciones
             // Guardar los valores originales de escaños de sondeo
             GuardarValoresOriginalesSondeo(dto);
 
+            // Asegurar el orden correcto de los partidos
+            if (dto != null && dto.partidos != null)
+            {
+                dto.partidos.Sort(new PartidoDTOComparerUnified(oficiales));
+                dto.partidos.Reverse();
+            }
+
             return dto;
         }
 

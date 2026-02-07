@@ -123,12 +123,12 @@
                             <Button x:Name="btnSaleTD" Content="Sale TD" Grid.Column="1" Grid.Row="0" 
                                     Margin="2" Padding="8,6" Background="#ff7979"
                                     Click="btnSaleTD_Click"/>
-                            <Button x:Name="btnEntraEspecial" Content="Entra Especial" Grid.Column="0" Grid.Row="1" 
+                            <!--<Button x:Name="btnEntraEspecial" Content="Entra Especial" Grid.Column="0" Grid.Row="1" 
                                     Margin="2" Padding="8,6" Background="#ffb038"
                                     Click="btnEntraEspecial_Click"/>
                             <Button x:Name="btnSaleEspecial" Content="Sale Especial" Grid.Column="1" Grid.Row="1" 
                                     Margin="2" Padding="8,6" Background="#ff7979"
-                                    Click="btnSaleEspecial_Click"/>
+                                    Click="btnSaleEspecial_Click"/>-->
                         </Grid>
                     </GroupBox>
                     <!--#endregion-->

@@ -1566,6 +1566,7 @@ namespace Elecciones
                         break;
                     default: break;
                 }
+                graficos.SubirRotulosPrimeEsp();
             }
         }
         private void EntraCarton()
@@ -1706,7 +1707,9 @@ namespace Elecciones
                         break;
                     default: break;
                 }
+                graficos.BajarRotulosPrimeEsp();
             }
+            
         }
         private void SaleCarton()
         {
@@ -1909,7 +1912,7 @@ namespace Elecciones
                             }
 
                             // Si hay un gráfico y circunscripción seleccionados, exportar el CSV
-                            if (graficosListView.SelectedItem != null && circunscripcionesListView.SelectedItem != null)
+                            if (graficosListView.SelectedItem != null && circunscripcionesListView.SelectedItem != null || autonomiasListView.SelectedItem != null)
                             {
                                 EscribirFichero();
                             }

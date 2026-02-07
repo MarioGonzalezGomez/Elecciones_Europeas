@@ -44,7 +44,7 @@ namespace Elecciones.src.mensajes.builders
         public string PrimerosResultados(bool activo)
         {
             animacionPrimeros = activo;
-            return activo ? EventBuild("PRIMEROS", "MAP_INT_PAR", "1", 1) : EventBuild("PRIMEROS", "MAP_INT_PAR", "0", 1);
+            return "";
         }
 
         public string AnimacionSondeo(bool activo)
@@ -124,7 +124,10 @@ namespace Elecciones.src.mensajes.builders
         {
             if (dto == null) return "";
             StringBuilder sb = new StringBuilder();
-
+            //PRIMEROS RESULTADOS
+            if (animacionPrimeros) {
+                sb.Append(EventRunBuild("PrimerosResultados/Entra"));
+            }
             //TAMANO
             double tamanoFicha = (pxTotales - (margin * (dto.numPartidos - 1))) / dto.numPartidos;
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 1));
@@ -227,11 +230,11 @@ namespace Elecciones.src.mensajes.builders
 
             // Si hay partidos expandidos, solo enviar la señal de actualización
             // para no romper la estructura de posiciones
-          //  if (partidosExpandidos.Count > 0)
-          //  {
-          //      sb.Append(EventRunBuild($"{tipo}/Actualiza"));
-          //      return sb.ToString();
-          //  }
+            //  if (partidosExpandidos.Count > 0)
+            //  {
+            //      sb.Append(EventRunBuild($"{tipo}/Actualiza"));
+            //      return sb.ToString();
+            //  }
 
             //TAMANO
             double tamanoFicha = (pxTotales - (margin * (dto.numPartidos - 1))) / dto.numPartidos;
@@ -1128,6 +1131,10 @@ namespace Elecciones.src.mensajes.builders
             acumuladoEscanosDer += pSeleccionado.escanios;
             sb.Append(EventBuild("Pactometro_DerVALOR", "MAP_INT_PAR", $"{acumuladoEscanosDer}", 1));
 
+            if (acumuladoEscanosDer > dto.circunscripcionDTO.mayoria) {
+                sb.Append(EventRunBuild("Pactometro/PasaMayoria"));
+            }
+
             // CRECIMIENTO BARRA
             double tamanoFicha = (pSeleccionado.escanios * pxTotalesPacto) / dto.circunscripcionDTO.escaniosTotales;
             acumuladoDcha += tamanoFicha;
@@ -1181,6 +1188,11 @@ namespace Elecciones.src.mensajes.builders
             // NUMERO ESCANOS - suma acumulada de escaños del lado derecho
             acumuladoEscanosIzq += pSeleccionado.escanios;
             sb.Append(EventBuild("Pactometro_IzqVALOR", "MAP_INT_PAR", $"{acumuladoEscanosIzq}", 1));
+
+            if (acumuladoEscanosIzq > dto.circunscripcionDTO.mayoria)
+            {
+                sb.Append(EventRunBuild("Pactometro/PasaMayoria"));
+            }
 
             // CRECIMIENTO BARRA
             double tamanoFicha = (pSeleccionado.escanios * pxTotalesPacto) / dto.circunscripcionDTO.escaniosTotales;

@@ -1,4 +1,4 @@
-using Elecciones.src.conexion;
+﻿using Elecciones.src.conexion;
 using Elecciones.src.controller;
 using Elecciones.src.logic;
 using Elecciones.src.mensajes;
@@ -730,6 +730,7 @@ namespace Elecciones
                 string elementoSeleccionado = circunscripcionesListView.SelectedItem != null ? circunscripcionesListView.SelectedItem.ToString() : autonomiasListView.SelectedItem.ToString();
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 ObtenerDTO(elementoSeleccionado);
+                GestionarMedioSondeo();
                 ActualizarInfoInterfaz(seleccionada, dto);
                 preparado = false;
 
@@ -848,6 +849,7 @@ namespace Elecciones
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"));
                 dto = ObtenerDTO(seleccionada.nombre);
+                GestionarMedioSondeo();
                 ActualizarInfoInterfaz(seleccionada, dto);
                 preparado = false;
             }
@@ -857,6 +859,7 @@ namespace Elecciones
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"));
                 dto = ObtenerDTO(seleccionada.nombre);
+                GestionarMedioSondeo();
                 ActualizarInfoInterfaz(seleccionada, dto);
                 preparado = false;
             }
@@ -902,6 +905,7 @@ namespace Elecciones
                 //PONER LA INFORMACIÓN EN LA INTERFAZ
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 ObtenerDTO(elementoSeleccionado);
+                GestionarMedioSondeo();
                 ActualizarInfoInterfaz(seleccionada, dto);
             }
         }
@@ -923,25 +927,7 @@ namespace Elecciones
                 dto = ObtenerDTO(elementoSeleccionado);
 
                 // Aplicar el medio actualmente seleccionado al nuevo DTO
-                if (cmbSondeo.SelectedItem != null && !oficiales)
-                {
-                    string medioSeleccionado = cmbSondeo.SelectedItem.ToString();
-                    if (medioSeleccionado == "RTVE")
-                    {
-                        RestaurarValoresOriginalesSondeo();
-                    }
-                    else
-                    {
-                        // Obtener el código del medio y actualizar los datos
-                        MedioController medioController = new MedioController(conexionActiva);
-                        List<src.model.DTO.MedioDTO> medios = medioController.ObtenerMediosConDescripcion();
-                        src.model.DTO.MedioDTO medio = medios.FirstOrDefault(m => m.descripcion == medioSeleccionado);
-                        if (medio != null)
-                        {
-                            ActualizarDatosConMedio(medio.codigo);
-                        }
-                    }
-                }
+                GestionarMedioSondeo();
 
                 ActualizarInfoInterfaz(seleccionada, dto);
             }
@@ -1191,6 +1177,7 @@ namespace Elecciones
                     if (dto != null)
                     {
                         ObtenerDTO(dto.circunscripcionDTO.nombre);
+                        GestionarMedioSondeo();
                         ActualizarInfoInterfaz(dto);
                     }
                     break;
@@ -1229,6 +1216,7 @@ namespace Elecciones
                     if (dto != null)
                     {
                         ObtenerDTO(dto.circunscripcionDTO.nombre);
+                        GestionarMedioSondeo();
                         ActualizarInfoInterfaz(dto);
                     }
                     break;
@@ -1266,6 +1254,7 @@ namespace Elecciones
                     if (dto != null)
                     {
                         dto = ObtenerDTO(dto.circunscripcionDTO.nombre);
+                        GestionarMedioSondeo();
                         ActualizarInfoInterfaz(dto);
                     }
                     break;
@@ -1297,6 +1286,7 @@ namespace Elecciones
                     if (dto != null)
                     {
                         dto = ObtenerDTO(dto.circunscripcionDTO.nombre);
+                        GestionarMedioSondeo();
                         ActualizarInfoInterfaz(dto);
                     }
                     break;
@@ -1308,6 +1298,7 @@ namespace Elecciones
                     if (dto != null)
                     {
                         ObtenerDTO(dto.circunscripcionDTO.nombre);
+                        GestionarMedioSondeo();
                         ActualizarInfoInterfaz(dto);
                     }
                     break;
@@ -1319,6 +1310,7 @@ namespace Elecciones
                     if (dto != null)
                     {
                         ObtenerDTO(dto.circunscripcionDTO.nombre);
+                        GestionarMedioSondeo();
                         ActualizarInfoInterfaz(dto);
                     }
                     break;
@@ -1950,6 +1942,28 @@ namespace Elecciones
                         // Restaurar los valores originales
                         partido.escaniosDesdeSondeo = valores.desde;
                         partido.escaniosHastaSondeo = valores.hasta;
+                    }
+                }
+            }
+        }
+
+        private void GestionarMedioSondeo()
+        {
+            if (cmbSondeo.SelectedItem != null && !oficiales)
+            {
+                string medioSeleccionado = cmbSondeo.SelectedItem.ToString();
+                if (medioSeleccionado == "RTVE")
+                {
+                    RestaurarValoresOriginalesSondeo();
+                }
+                else
+                {
+                    MedioController medioController = new MedioController(conexionActiva);
+                    List<src.model.DTO.MedioDTO> medios = medioController.ObtenerMediosConDescripcion();
+                    src.model.DTO.MedioDTO medio = medios.FirstOrDefault(m => m.descripcion == medioSeleccionado);
+                    if (medio != null)
+                    {
+                        ActualizarDatosConMedio(medio.codigo);
                     }
                 }
             }

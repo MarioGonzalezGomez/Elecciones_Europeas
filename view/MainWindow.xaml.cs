@@ -1021,15 +1021,11 @@ namespace Elecciones
             {
                 // Filtrar solo partidos con al menos 1 escaño en datos oficiales
                 filtrados = allCPDatas.Where(p => int.TryParse(p.escanios, out int esc) && esc > 0).ToList();
-                // Ordenar usando CPDataComparer (orden descendente por escaños, voto, votantes)
-                filtrados.Sort((a, b) => -new CPDataComparer().Compare(a, b));
             }
             else
             {
                 // Filtrar solo partidos con al menos 1 escaño en sondeo
                 filtrados = allCPDatas.Where(p => int.TryParse(p.escaniosHastaSondeo, out int esc) && esc > 0).ToList();
-                // Ordenar usando CPDataComparer
-                filtrados.Sort((a, b) => -new CPDataComparer().Compare(a, b));
             }
 
             return filtrados;

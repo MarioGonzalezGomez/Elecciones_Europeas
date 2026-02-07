@@ -116,12 +116,14 @@ namespace Elecciones.src.controller
         {
             if (primeActivo.Valor == 1) { prime.BajarRotulosTD(); }
         }
-        public void SubirRotulosPrimeEsp()
+        public async void SubirRotulosPrimeEsp(int delay = 0)
         {
+            if (delay > 0) await Task.Delay(delay);
             if (primeActivo.Valor == 1) { prime.SubirRotulosEsp(); }
         }
-        public void BajarRotulosPrimeEsp()
+        public async void BajarRotulosPrimeEsp(int delay = 0)
         {
+            if (delay > 0) await Task.Delay(delay);
             if (primeActivo.Valor == 1) { prime.BajarRotulosEsp(); }
         }
 

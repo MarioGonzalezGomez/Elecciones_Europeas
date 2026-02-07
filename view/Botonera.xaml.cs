@@ -192,13 +192,13 @@ namespace Elecciones
         private void btnEntraEspecial_Click(object sender, RoutedEventArgs e)
         {
             main = Application.Current.MainWindow as MainWindow;
-            gController.SubirRotulosPrimeEsp();
+            gController.SubirRotulosPrimeEsp(2000);
             gController.TickerEntra(main.oficiales, main.dto);
         }
         private void btnSaleEspecial_Click(object sender, RoutedEventArgs e)
         {
             main = Application.Current.MainWindow as MainWindow;
-            gController.BajarRotulosPrimeEsp();
+            gController.BajarRotulosPrimeEsp(1000);
             gController.TickerSale(main.oficiales, main.dto);
         }
 

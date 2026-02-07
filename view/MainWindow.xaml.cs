@@ -234,6 +234,9 @@ namespace Elecciones
         {
             try
             {
+                // Guardar la selección actual si existe
+                string? seleccionActual = cmbSondeo.SelectedItem?.ToString();
+
                 cmbSondeo.Items.Clear();
                 // Agregar opción RTVE como primera opción (valores originales)
                 cmbSondeo.Items.Add("RTVE");
@@ -248,7 +251,15 @@ namespace Elecciones
 
                 if (cmbSondeo.Items.Count > 0)
                 {
-                    cmbSondeo.SelectedIndex = 0;
+                    // Intentar restaurar la selección anterior
+                    if (!string.IsNullOrEmpty(seleccionActual) && cmbSondeo.Items.Contains(seleccionActual))
+                    {
+                        cmbSondeo.SelectedItem = seleccionActual;
+                    }
+                    else
+                    {
+                        cmbSondeo.SelectedIndex = 0;
+                    }
                 }
             }
             catch (Exception ex)
@@ -1025,6 +1036,8 @@ namespace Elecciones
             {
                 // Filtrar solo partidos con al menos 1 escaño en sondeo
                 filtrados = allCPDatas.Where(p => int.TryParse(p.escaniosHastaSondeo, out int esc) && esc > 0).ToList();
+                // Ordenar usando CPDataComparerSondeo (orden descendente por escaniosHastaSondeo > escaniosDesdeSondeo)
+                filtrados.Sort((a, b) => -new CPDataComparerSondeo().Compare(a, b));
             }
 
             return filtrados;
@@ -1499,10 +1512,8 @@ namespace Elecciones
             }
             else { Update(); }
 
-            if (!oficiales)
-            {
-                CargarMedios();
-            }
+            // Actualizar siempre la lista de medios por si hay nuevos
+            CargarMedios();
 
             actualizacionActiva = temp;
         }
@@ -1912,7 +1923,7 @@ namespace Elecciones
                             }
 
                             // Si hay un gráfico y circunscripción seleccionados, exportar el CSV
-                            if (graficosListView.SelectedItem != null && circunscripcionesListView.SelectedItem != null || autonomiasListView.SelectedItem != null)
+                            if (graficosListView.SelectedItem != null && circunscripcionesListView.SelectedItem != null)
                             {
                                 EscribirFichero();
                             }

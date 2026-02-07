@@ -993,7 +993,7 @@ namespace Elecciones
         /// Obtiene los datos a mostrar en la tabla según el gráfico seleccionado y el estado (oficiales/sondeo)
         /// </summary>
         private List<CPDataDTO> ObtenerDatosParaTabla(string graficoSeleccionado, BrainStormDTO dto)
-        {
+        {   
             List<CPDataDTO> allCPDatas = CPDataDTO.FromBSDto(dto);
 
             return graficoSeleccionado switch

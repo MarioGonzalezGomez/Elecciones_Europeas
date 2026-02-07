@@ -405,6 +405,7 @@ namespace Elecciones
             List<PartidoDTO> partidosQueNoEstan = dtoAnterior.partidos.Where(par => !dto.partidos.Any(par2 => par2.codigo.Equals(par.codigo))).ToList();
             if (tickerDentro)
             {
+                GestionarMedioSondeo();
                 graficos.TickerActualiza(dto);
             }
             if (botonera.tickerTDIn)
@@ -990,7 +991,7 @@ namespace Elecciones
         /// Obtiene los datos a mostrar en la tabla según el gráfico seleccionado y el estado (oficiales/sondeo)
         /// </summary>
         private List<CPDataDTO> ObtenerDatosParaTabla(string graficoSeleccionado, BrainStormDTO dto)
-        {   
+        {
             List<CPDataDTO> allCPDatas = CPDataDTO.FromBSDto(dto);
 
             return graficoSeleccionado switch
@@ -1712,7 +1713,7 @@ namespace Elecciones
                 }
                 graficos.BajarRotulosPrimeEsp();
             }
-            
+
         }
         private void SaleCarton()
         {
@@ -1915,7 +1916,7 @@ namespace Elecciones
                             }
 
                             // Si hay un gráfico y circunscripción seleccionados, exportar el CSV
-                            if (graficosListView.SelectedItem != null && circunscripcionesListView.SelectedItem != null)
+                            if (graficosListView.SelectedItem != null && (circunscripcionesListView.SelectedItem != null || autonomiasListView.SelectedItem != null))
                             {
                                 EscribirFichero();
                             }

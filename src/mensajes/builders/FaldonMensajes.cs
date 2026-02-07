@@ -124,6 +124,13 @@ namespace Elecciones.src.mensajes.builders
         {
             if (dto == null) return "";
             StringBuilder sb = new StringBuilder();
+
+            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
+            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
+            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(oficiales));
+            partidosOrdenadosPorComparer.Reverse(); // Descendente
+
+            List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
             //PRIMEROS RESULTADOS
             if (animacionPrimeros) {
                 sb.Append(EventRunBuild("PrimerosResultados/Entra"));
@@ -141,10 +148,7 @@ namespace Elecciones.src.mensajes.builders
                 partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
             }
 
-            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
-            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
-            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(oficiales));
-            partidosOrdenadosPorComparer.Reverse(); // Descendente
+            
 
             // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
@@ -163,7 +167,7 @@ namespace Elecciones.src.mensajes.builders
                     posicionAcumulada += tamanoFicha + margin;
                 }
             }
-            var partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
+
             if (partidosActivos.Count > 6)
             {
                 sb.Append(EventRunBuild("SaleFoto"));

@@ -343,13 +343,13 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.pactosEntraIzquierda(dto, pSeleccionado); }
         }
 
-        public void pactosSaleDerecha(int posicionPartido)
+        public void pactosSaleDerecha()
         {
-            if (ipfActivo.Valor == 1) { ipf.pactosSaleDerecha(posicionPartido); }
+            if (ipfActivo.Valor == 1) { ipf.pactosSaleDerecha(); }
         }
-        public void pactosSaleIzquierda(int posicionPartido)
+        public void pactosSaleIzquierda()
         {
-            if (ipfActivo.Valor == 1) { ipf.pactosSaleIzquierda(posicionPartido); }
+            if (ipfActivo.Valor == 1) { ipf.pactosSaleIzquierda(); }
         }
 
         //SEDES

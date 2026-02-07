@@ -227,11 +227,11 @@ namespace Elecciones.src.mensajes.builders
 
             // Si hay partidos expandidos, solo enviar la señal de actualización
             // para no romper la estructura de posiciones
-            if (partidosExpandidos.Count > 0)
-            {
-                sb.Append(EventRunBuild($"{tipo}/Actualiza"));
-                return sb.ToString();
-            }
+          //  if (partidosExpandidos.Count > 0)
+          //  {
+          //      sb.Append(EventRunBuild($"{tipo}/Actualiza"));
+          //      return sb.ToString();
+          //  }
 
             //TAMANO
             double tamanoFicha = (pxTotales - (margin * (dto.numPartidos - 1))) / dto.numPartidos;
@@ -1226,7 +1226,6 @@ namespace Elecciones.src.mensajes.builders
         {
             return "";
         }
-
         #endregion
 
         #region Sedes Faldón

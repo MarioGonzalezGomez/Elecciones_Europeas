@@ -372,7 +372,6 @@ namespace Elecciones
                     if (string.Equals(graficosHeader.Header, "SUPERFADÓN")) { UpdateSuperfaldones(); }
 
                     // Actualizar datos en la ventana de Pactos si está abierta
-                    // Actualizar datos en la ventana de Pactos si está abierta
                     if (pactos != null)
                     {
                         string tipoGrafico = "";

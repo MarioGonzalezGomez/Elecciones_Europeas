@@ -349,7 +349,7 @@ namespace Elecciones
             escuchador = new Escuchador(conexionActiva);
         }
 
-        public void Update(bool desdeSede = false)
+        public void Update()
         {
             string elementoSeleccionado = "";
             if (circunscripcionesListView.SelectedIndex != -1)
@@ -394,7 +394,7 @@ namespace Elecciones
                     }
 
                     ActualizarInfoInterfaz(seleccionada, dto);
-                    EscribirFichero(desdeSede);
+                    EscribirFichero();
                 }
             }
 
@@ -1423,19 +1423,7 @@ namespace Elecciones
 
                     // Always use the unfiltered DTO ordered by codigo
                     var dtoToWrite = CreateOrderedDtoCopyFrom(dto);
-
-                    // Write the single CSV file (all data is the same, no need for duplicates)
-                    if (graficosListView.SelectedItem != null && string.Equals(graficosListView.SelectedValue, "SEDES"))
-                    {
-                        if (desdeSedes)
-                        {
-                            await dtoToWrite.ToCsv("BrainStorm", cmbSondeo.SelectedItem?.ToString() ?? "");
-                        }
-                    }
-                    else
-                    {
-                        await dtoToWrite.ToCsv("BrainStorm", cmbSondeo.SelectedItem?.ToString() ?? "");
-                    }
+                    await dtoToWrite.ToCsv("BrainStorm", cmbSondeo.SelectedItem?.ToString() ?? "");
                 }
                 catch
                 {
@@ -1499,15 +1487,9 @@ namespace Elecciones
         {
             bool temp = actualizacionActiva;
             actualizacionActiva = true;
-            if (graficosListView.SelectedItem != null && (string.Equals(graficosListView.SelectedValue, "SEDES") || string.Equals(graficosListView.SelectedValue, "INDEPENDENTISMO")) && !tickerDentro)
-            {
-                Update(true);
-            }
-            else { Update(); }
-
+            Update();
             // Actualizar siempre la lista de medios por si hay nuevos
             CargarMedios();
-
             actualizacionActiva = temp;
         }
         private void btnPactos_Click(object sender, RoutedEventArgs e)
@@ -1541,6 +1523,7 @@ namespace Elecciones
                         // if (segundos > 0)
                         // {
                         graficos.EntraReloj(segundos);
+                        graficos.SubirRotulosPrimeEsp();
                         // }
                         break;
                     case "FICHAS":
@@ -1552,7 +1535,12 @@ namespace Elecciones
                         else
                         {
                             if (tickerDentro) { graficos.TickerEncadena(oficiales, dto); }
-                            else { graficos.TickerEntra(oficiales, dto); }
+                            else
+                            {
+                                graficos.TickerEntra(oficiales, dto);
+                                graficos.SubirRotulosPrimeEsp(1000);
+                            }
+
                             if (!oficiales) { sondeoEnElAire = true; }
                         }
                         tickerDentro = true;
@@ -1570,7 +1558,6 @@ namespace Elecciones
                         break;
                     default: break;
                 }
-                graficos.SubirRotulosPrimeEsp();
             }
         }
         private void EntraCarton()
@@ -1683,9 +1670,11 @@ namespace Elecciones
                 {
                     case "CUENTA ATRÁS":
                         graficos.SaleReloj();
+                        graficos.BajarRotulosPrimeEsp();
                         break;
                     case "FICHAS":
                         graficos.TickerSale(oficiales, dto);
+                        graficos.BajarRotulosPrimeEsp(1000);
                         if (!oficiales) { sondeoEnElAire = false; }
                         tickerDentro = false;
                         break;
@@ -1711,7 +1700,6 @@ namespace Elecciones
                         break;
                     default: break;
                 }
-                graficos.BajarRotulosPrimeEsp();
             }
 
         }
@@ -1998,6 +1986,7 @@ namespace Elecciones
                         partido.escaniosHastaSondeo = 0;
                     }
                 }
+                dto.numPartidos = dto.partidos.Count(p => oficiales ? p.escanios > 0 : p.escaniosDesdeSondeo > 0);
             }
             catch (Exception ex)
             {

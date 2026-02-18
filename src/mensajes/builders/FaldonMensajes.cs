@@ -3,6 +3,7 @@ using System.Text;
 using System.Windows;
 using Elecciones.src.logic.comparators;
 using Elecciones.src.model.DTO.BrainStormDTO;
+using Elecciones.src.model.DTO.Cartones;
 using Elecciones.src.model.IPF;
 using Elecciones.src.model.IPF.DTO;
 
@@ -34,7 +35,7 @@ namespace Elecciones.src.mensajes.builders
 
         public string SondeoUOficial(bool oficiales)
         {
-            return oficiales ? EventBuild("Sondeo_Oficiales", "MAP_INT_PAR", "1", 1) : EventBuild("Sondeo_Oficiales", "MAP_INT_PAR", "0", 1);
+            return "";
         }
 
         #endregion
@@ -50,17 +51,17 @@ namespace Elecciones.src.mensajes.builders
         public string AnimacionSondeo(bool activo)
         {
             animacionSondeo = activo;
-            return activo ? EventBuild("SONDEO", "MAP_INT_PAR", "1", 1) : EventBuild("SONDEO", "MAP_INT_PAR", "0", 1);
+            return "";
         }
 
         public string RecibirPrimerosResultados()
         {
-            return EventBuild("PRIMEROS", "MAP_INT_PAR", 3);
+            return "";
         }
 
         public string RecibirAnimacionSondeo()
         {
-            return EventBuild("SONDEO", "MAP_INT_PAR", 3);
+            return "";
         }
 
         #endregion
@@ -78,7 +79,7 @@ namespace Elecciones.src.mensajes.builders
 
         public string DeSondeoAOficiales()
         {
-            return EventRunBuild("SONDEOaOFICIALES");
+            return "";
         }
 
         #endregion
@@ -132,11 +133,12 @@ namespace Elecciones.src.mensajes.builders
 
             List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
             //PRIMEROS RESULTADOS
-            if (animacionPrimeros) {
+            if (animacionPrimeros)
+            {
                 sb.Append(EventRunBuild("PrimerosResultados/Entra"));
             }
             //TAMANO
-            double tamanoFicha = (pxTotales - (margin * (dto.numPartidos - 1))) / dto.numPartidos;
+            double tamanoFicha = (pxTotales - (margin * (partidosActivos.Count - 1))) / partidosActivos.Count;
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 1));
 
             // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
@@ -147,8 +149,6 @@ namespace Elecciones.src.mensajes.builders
                 string partidoId = (i + 1).ToString("D2");
                 partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
             }
-
-            
 
             // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
@@ -167,7 +167,6 @@ namespace Elecciones.src.mensajes.builders
                     posicionAcumulada += tamanoFicha + margin;
                 }
             }
-
             if (partidosActivos.Count > 6)
             {
                 sb.Append(EventRunBuild("SaleFoto"));
@@ -182,8 +181,15 @@ namespace Elecciones.src.mensajes.builders
             var dto = main?.dto;
             if (dto == null) return "";
             StringBuilder sb = new StringBuilder();
+
+            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
+            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(oficiales));
+            partidosOrdenadosPorComparer.Reverse(); // Descendente
+
+            List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
+
             //TAMANO
-            double tamanoFicha = (pxTotales - (margin * (dto.numPartidos - 1))) / dto.numPartidos;
+            double tamanoFicha = (pxTotales - (margin * (partidosActivos.Count - 1))) / partidosActivos.Count;
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 2, 0.6, 0));
 
             // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
@@ -194,11 +200,6 @@ namespace Elecciones.src.mensajes.builders
                 string partidoId = (i + 1).ToString("D2");
                 partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
             }
-
-            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
-            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
-            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(oficiales));
-            partidosOrdenadosPorComparer.Reverse(); // Descendente
 
             // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
@@ -217,7 +218,6 @@ namespace Elecciones.src.mensajes.builders
                     posicionAcumulada += tamanoFicha + margin;
                 }
             }
-            var partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
             if (partidosActivos.Count > 6)
             {
                 sb.Append(EventRunBuild("SaleFoto"));
@@ -234,14 +234,20 @@ namespace Elecciones.src.mensajes.builders
 
             // Si hay partidos expandidos, solo enviar la señal de actualización
             // para no romper la estructura de posiciones
-            //  if (partidosExpandidos.Count > 0)
-            //  {
-            //      sb.Append(EventRunBuild($"{tipo}/Actualiza"));
-            //      return sb.ToString();
-            //  }
+            if (partidosExpandidos.Count > 0)
+            {
+                sb.Append(EventRunBuild($"{tipo}/Actualiza"));
+                return sb.ToString();
+            }
+            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
+            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
+            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(dto.oficiales));
+            partidosOrdenadosPorComparer.Reverse(); // Descendente
+
+            List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
 
             //TAMANO
-            double tamanoFicha = (pxTotales - (margin * (dto.numPartidos - 1))) / dto.numPartidos;
+            double tamanoFicha = (pxTotales - (margin * (partidosActivos.Count - 1))) / partidosActivos.Count;
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 2, 0.3, 0));
 
             // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
@@ -252,12 +258,6 @@ namespace Elecciones.src.mensajes.builders
                 string partidoId = (i + 1).ToString("D2");
                 partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
             }
-
-            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
-            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
-            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(dto.oficiales));
-            partidosOrdenadosPorComparer.Reverse(); // Descendente
-
             // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
             for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
@@ -274,7 +274,6 @@ namespace Elecciones.src.mensajes.builders
                     posicionAcumulada += tamanoFicha + margin;
                 }
             }
-            var partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
             if (partidosActivos.Count > 6)
             {
                 sb.Append(EventRunBuild("SaleFoto"));
@@ -800,8 +799,7 @@ namespace Elecciones.src.mensajes.builders
             var activeIndex = siglasActivos
                 .Select((s, i) => new { Sigla = s, Index = i })
                 .ToDictionary(x => x.Sigla, x => x.Index);
-
-            static string Esc(string s) => s?.Replace("+", "_") ?? s;
+            static string Esc(string s) => s?.Replace("+", "_").Replace("-", "_") ?? s;
 
             for (int idx = 0; idx < siglasPartidos.Count; idx++)
             {
@@ -871,7 +869,7 @@ namespace Elecciones.src.mensajes.builders
             int nAnterior = partidosActuales?.Count ?? 0;
             int nNuevo = partidosActivos?.Count ?? 0;
 
-            static string Esc(string s) => s?.Replace("+", "_") ?? s;
+            static string Esc(string s) => s?.Replace("+", "_").Replace("-", "_") ?? s;
 
             var siglasQueSalen = siglasAnteriores.Except(siglasNuevas).ToList();
             var siglasQueEntran = siglasNuevas.Except(siglasAnteriores).ToList();
@@ -1135,7 +1133,8 @@ namespace Elecciones.src.mensajes.builders
             acumuladoEscanosDer += pSeleccionado.escanios;
             sb.Append(EventBuild("Pactometro_DerVALOR", "MAP_INT_PAR", $"{acumuladoEscanosDer}", 1));
 
-            if (acumuladoEscanosDer > dto.circunscripcionDTO.mayoria) {
+            if (acumuladoEscanosDer >= dto.circunscripcionDTO.mayoria)
+            {
                 sb.Append(EventRunBuild("Pactometro/PasaMayoria"));
             }
 
@@ -1193,7 +1192,7 @@ namespace Elecciones.src.mensajes.builders
             acumuladoEscanosIzq += pSeleccionado.escanios;
             sb.Append(EventBuild("Pactometro_IzqVALOR", "MAP_INT_PAR", $"{acumuladoEscanosIzq}", 1));
 
-            if (acumuladoEscanosIzq > dto.circunscripcionDTO.mayoria)
+            if (acumuladoEscanosIzq >= dto.circunscripcionDTO.mayoria)
             {
                 sb.Append(EventRunBuild("Pactometro/PasaMayoria"));
             }
@@ -1270,7 +1269,7 @@ namespace Elecciones.src.mensajes.builders
 
             // 5. Quitar logo (OBJ_GRID_JUMP_BEFORE)
             // Se envía al controlador de logos de la derecha
-            sb.Append(EventBuild("Graficos/Pactometro/Der/LogosDer", "OBJ_GRID_JUMP_BEFORE", 1));
+            sb.Append(EventBuild("Graficos/Pactometro/Der/LogosDer", "OBJ_GRID_JUMP_PREV", 1));
 
             return sb.ToString();
         }
@@ -1307,7 +1306,7 @@ namespace Elecciones.src.mensajes.builders
             }
 
             // 5. Quitar logo (OBJ_GRID_JUMP_BEFORE)
-            sb.Append(EventBuild("Graficos/Pactometro/Izq/LogosIzq", "OBJ_GRID_JUMP_BEFORE", 1));
+            sb.Append(EventBuild("Graficos/Pactometro/Izq/LogosIzq", "OBJ_GRID_JUMP_PREV", 1));
 
             return sb.ToString();
         }

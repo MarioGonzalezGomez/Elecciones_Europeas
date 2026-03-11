@@ -1154,7 +1154,8 @@ namespace Elecciones.src.mensajes.builders
                 }
                 else
                 {
-                    sb.Append(EventBuild("Pactometro_IzqVALOR", "MAP_STRING_PAR", $"{acumuladoEscanosIzqDesde}-{acumuladoEscanosIzqHasta}", 1));
+                    sb.Append(EventBuild("Pactometro_IzqVALORDesde", "MAP_INT_PAR", $"{acumuladoEscanosIzqDesde}", 1));
+                    sb.Append(EventBuild("Pactometro_IzqVALORHasta", "MAP_INT_PAR", $"{acumuladoEscanosIzqHasta}", 1));
                     sb.Append(EventBuild("BarraIzquierdasDesde", "PRIM_RECGLO_LEN[0]", acumuladoIzqDesde.ToString(), 2, 0.3, 0));
                     sb.Append(EventBuild("BarraIzquierdasHasta", "PRIM_RECGLO_LEN[0]", acumuladoIzqHasta.ToString(), 2, 0.3, 0));
                 }
@@ -1168,7 +1169,8 @@ namespace Elecciones.src.mensajes.builders
                 }
                 else
                 {
-                    sb.Append(EventBuild("Pactometro_DerVALOR", "MAP_STRING_PAR", $"{acumuladoEscanosDerDesde}-{acumuladoEscanosDerHasta}", 1));
+                    sb.Append(EventBuild("Pactometro_DerVALORDesde", "MAP_INT_PAR", $"{acumuladoEscanosDerDesde}", 1));
+                    sb.Append(EventBuild("Pactometro_DerVALORHasta", "MAP_INT_PAR", $"{acumuladoEscanosDerHasta}", 1));
                     sb.Append(EventBuild("BarraDerechasDesde", "PRIM_RECGLO_LEN[0]", acumuladoDchaDesde.ToString(), 2, 0.3, 0));
                     sb.Append(EventBuild("BarraDerechasHasta", "PRIM_RECGLO_LEN[0]", acumuladoDchaHasta.ToString(), 2, 0.3, 0));
                 }

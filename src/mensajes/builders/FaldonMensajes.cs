@@ -314,7 +314,7 @@ namespace Elecciones.src.mensajes.builders
             return sb.ToString();
         }
 
-        //NO SE USA EN ARAGÓN
+        //POR AHORA EN DESUSO
         public string TickerVotosSale(bool oficial)
         {
             StringBuilder sb = new StringBuilder();

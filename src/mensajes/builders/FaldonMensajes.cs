@@ -122,50 +122,106 @@ namespace Elecciones.src.mensajes.builders
         double pxTotales = 1748;
         int margin = 10;
         int posicionInicial = 0;
+
+        private double GetTamanoFichaTicker(int partidosActivosCount)
+        {
+            int countSeguro = Math.Max(partidosActivosCount, 1);
+            return (pxTotales - (margin * (countSeguro - 1))) / countSeguro;
+        }
+
+        private void RecolocarPartidosNoActivosAlFinal(
+            StringBuilder sb,
+            string tipo,
+            Dictionary<string, string> partidoIdMap,
+            List<PartidoDTO> partidosActivos,
+            double posicionAcumuladaFinal,
+            double tamanoFicha,
+            int modo,
+            double duracion = 0,
+            double delay = 0)
+        {
+            if (sb == null || string.IsNullOrWhiteSpace(tipo) || partidoIdMap == null || partidoIdMap.Count == 0)
+            {
+                return;
+            }
+
+            HashSet<string> codigosActivos = new HashSet<string>(
+                (partidosActivos ?? new List<PartidoDTO>())
+                .Where(p => !string.IsNullOrWhiteSpace(p.codigo))
+                .Select(p => p.codigo));
+
+            // Colocar los partidos no activos a la derecha del ultimo activo.
+            double posicionBaseNoActivos = posicionAcumuladaFinal + tamanoFicha;
+            int offset = 0;
+
+            foreach (var kvp in partidoIdMap.OrderBy(x => int.TryParse(x.Value, out int n) ? n : int.MaxValue))
+            {
+                if (codigosActivos.Contains(kvp.Key))
+                {
+                    continue;
+                }
+
+                double posicion = posicionBaseNoActivos + (offset * (tamanoFicha + margin));
+                string pathSignal = $"Graficos/{tipo}/partidos/partido{kvp.Value}";
+
+                if (modo == 1)
+                {
+                    sb.Append(EventBuild(pathSignal, "OBJ_DISPLACEMENT[0]", posicion.ToString(), 1));
+                }
+                else
+                {
+                    sb.Append(EventBuild(pathSignal, "OBJ_DISPLACEMENT[0]", posicion.ToString(), 2, duracion, delay));
+                }
+
+                offset++;
+            }
+        }
+
         public string TickerEntra(bool oficiales, BrainStormDTO dto)
         {
             if (dto == null) return "";
             StringBuilder sb = new StringBuilder();
 
-            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
             List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
             partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(oficiales));
-            partidosOrdenadosPorComparer.Reverse(); // Descendente
+            partidosOrdenadosPorComparer.Reverse();
 
-            List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
-            //PRIMEROS RESULTADOS
+            List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer
+                .Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
+                .ToList();
+
             if (animacionPrimeros)
             {
                 sb.Append(EventRunBuild("PrimerosResultados/Entra"));
             }
-            //TAMANO
-            double tamanoFicha = (pxTotales - (margin * (partidosActivos.Count - 1))) / partidosActivos.Count;
+
+            double tamanoFicha = GetTamanoFichaTicker(partidosActivos.Count);
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 1));
 
-            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
             Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(dto);
-
-            // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
             string tipo = oficiales ? "Escrutinio" : "Sondeo";
-            for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
+
+            for (int i = 0; i < partidosActivos.Count; i++)
             {
-                PartidoDTO partido = partidosOrdenadosPorComparer[i];
+                PartidoDTO partido = partidosActivos[i];
                 string partidoId = GetPartidoId(partidoIdMap, partido.codigo);
 
-                // Asignar posición al partido (usando su ID basado en código)
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 1));
 
-                // Acumular para el siguiente: posición actual + tamaño ficha + margen
-                if (i < partidosOrdenadosPorComparer.Count - 1)
+                if (i < partidosActivos.Count - 1)
                 {
                     posicionAcumulada += tamanoFicha + margin;
                 }
             }
+
+            RecolocarPartidosNoActivosAlFinal(sb, tipo, partidoIdMap, partidosActivos, posicionAcumulada, tamanoFicha, 1);
+
             if (partidosActivos.Count > 6)
             {
                 sb.Append(EventRunBuild("SaleFoto"));
             }
+
             sb.Append(EventRunBuild($"{tipo}/Entra"));
             return sb.ToString();
         }
@@ -179,38 +235,39 @@ namespace Elecciones.src.mensajes.builders
 
             List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
             partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(oficiales));
-            partidosOrdenadosPorComparer.Reverse(); // Descendente
+            partidosOrdenadosPorComparer.Reverse();
 
-            List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
+            List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer
+                .Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
+                .ToList();
 
-            //TAMANO
-            double tamanoFicha = (pxTotales - (margin * (partidosActivos.Count - 1))) / partidosActivos.Count;
+            double tamanoFicha = GetTamanoFichaTicker(partidosActivos.Count);
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 2, 0.6, 0));
 
-            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
             Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(dto);
-
-            // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
             string tipo = oficiales ? "Escrutinio" : "Sondeo";
-            for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
+
+            for (int i = 0; i < partidosActivos.Count; i++)
             {
-                PartidoDTO partido = partidosOrdenadosPorComparer[i];
+                PartidoDTO partido = partidosActivos[i];
                 string partidoId = GetPartidoId(partidoIdMap, partido.codigo);
 
-                // Asignar posición al partido (usando su ID basado en código)
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 2, 0.6, 0));
 
-                // Acumular para el siguiente: posición actual + tamaño ficha + margen
-                if (i < partidosOrdenadosPorComparer.Count - 1)
+                if (i < partidosActivos.Count - 1)
                 {
                     posicionAcumulada += tamanoFicha + margin;
                 }
             }
+
+            RecolocarPartidosNoActivosAlFinal(sb, tipo, partidoIdMap, partidosActivos, posicionAcumulada, tamanoFicha, 2, 0.6, 0);
+
             if (partidosActivos.Count > 6)
             {
                 sb.Append(EventRunBuild("SaleFoto"));
             }
+
             sb.Append(EventRunBuild($"{tipo}/Actualiza"));
             return sb.ToString();
         }
@@ -221,46 +278,46 @@ namespace Elecciones.src.mensajes.builders
             StringBuilder sb = new StringBuilder();
             string tipo = dto.oficiales ? "Escrutinio" : "Sondeo";
 
-            // Si hay partidos expandidos, solo enviar la señal de actualización
-            // para no romper la estructura de posiciones
             if (partidosExpandidos.Count > 0)
             {
                 sb.Append(EventRunBuild($"{tipo}/Actualiza"));
                 return sb.ToString();
             }
-            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
+
             List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
             partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(dto.oficiales));
-            partidosOrdenadosPorComparer.Reverse(); // Descendente
+            partidosOrdenadosPorComparer.Reverse();
 
-            List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
+            List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer
+                .Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
+                .ToList();
 
-            //TAMANO
-            double tamanoFicha = (pxTotales - (margin * (partidosActivos.Count - 1))) / partidosActivos.Count;
+            double tamanoFicha = GetTamanoFichaTicker(partidosActivos.Count);
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 2, 0.3, 0));
 
-            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
             Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(dto);
-            // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
-            for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
+
+            for (int i = 0; i < partidosActivos.Count; i++)
             {
-                PartidoDTO partido = partidosOrdenadosPorComparer[i];
+                PartidoDTO partido = partidosActivos[i];
                 string partidoId = GetPartidoId(partidoIdMap, partido.codigo);
 
-                // Asignar posición al partido (usando su ID basado en código)
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 2, 0.3, 0));
 
-                // Acumular para el siguiente: posición actual + tamaño ficha + margen
-                if (i < partidosOrdenadosPorComparer.Count - 1)
+                if (i < partidosActivos.Count - 1)
                 {
                     posicionAcumulada += tamanoFicha + margin;
                 }
             }
+
+            RecolocarPartidosNoActivosAlFinal(sb, tipo, partidoIdMap, partidosActivos, posicionAcumulada, tamanoFicha, 2, 0.3, 0);
+
             if (partidosActivos.Count > 6)
             {
                 sb.Append(EventRunBuild("SaleFoto"));
             }
+
             sb.Append(EventRunBuild($"{tipo}/Actualiza"));
             return sb.ToString();
         }
@@ -1519,5 +1576,3 @@ namespace Elecciones.src.mensajes.builders
         #endregion
     }
 }
-
-

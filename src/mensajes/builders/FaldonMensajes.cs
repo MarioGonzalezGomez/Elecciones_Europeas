@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
+using Elecciones.src.controller;
 using Elecciones.src.logic.comparators;
 using Elecciones.src.model.DTO.BrainStormDTO;
 using Elecciones.src.model.DTO.Cartones;
@@ -142,13 +143,7 @@ namespace Elecciones.src.mensajes.builders
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 1));
 
             // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
-            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
-            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
-            {
-                string partidoId = (i + 1).ToString("D2");
-                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
-            }
+            Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(dto);
 
             // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
@@ -156,7 +151,7 @@ namespace Elecciones.src.mensajes.builders
             for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
             {
                 PartidoDTO partido = partidosOrdenadosPorComparer[i];
-                string partidoId = partidoIdMap[partido.codigo];
+                string partidoId = GetPartidoId(partidoIdMap, partido.codigo);
 
                 // Asignar posición al partido (usando su ID basado en código)
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 1));
@@ -193,13 +188,7 @@ namespace Elecciones.src.mensajes.builders
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 2, 0.6, 0));
 
             // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
-            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
-            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
-            {
-                string partidoId = (i + 1).ToString("D2");
-                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
-            }
+            Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(dto);
 
             // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
@@ -207,7 +196,7 @@ namespace Elecciones.src.mensajes.builders
             for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
             {
                 PartidoDTO partido = partidosOrdenadosPorComparer[i];
-                string partidoId = partidoIdMap[partido.codigo];
+                string partidoId = GetPartidoId(partidoIdMap, partido.codigo);
 
                 // Asignar posición al partido (usando su ID basado en código)
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 2, 0.6, 0));
@@ -251,19 +240,13 @@ namespace Elecciones.src.mensajes.builders
             sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", tamanoFicha.ToString(), 2, 0.3, 0));
 
             // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
-            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
-            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
-            {
-                string partidoId = (i + 1).ToString("D2");
-                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
-            }
+            Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(dto);
             // Calcular posición acumulativa para cada partido según el orden del comparador
             double posicionAcumulada = posicionInicial;
             for (int i = 0; i < partidosOrdenadosPorComparer.Count; i++)
             {
                 PartidoDTO partido = partidosOrdenadosPorComparer[i];
-                string partidoId = partidoIdMap[partido.codigo];
+                string partidoId = GetPartidoId(partidoIdMap, partido.codigo);
 
                 // Asignar posición al partido (usando su ID basado en código)
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{partidoId}", "OBJ_DISPLACEMENT[0]", posicionAcumulada.ToString(), 2, 0.3, 0));
@@ -375,13 +358,7 @@ namespace Elecciones.src.mensajes.builders
             partidosActivos.Reverse(); // Descendente
 
             // Mapa IDs
-            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
-            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
-            {
-                string id = (i + 1).ToString("D2");
-                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = id;
-            }
+            Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(dto);
 
             int count = partidosActivos.Count;
             if (count == 0) return "";
@@ -428,7 +405,7 @@ namespace Elecciones.src.mensajes.builders
             for (int i = 0; i < partidosActivos.Count; i++)
             {
                 PartidoDTO partido = partidosActivos[i];
-                string sceneObjectId = partidoIdMap.ContainsKey(partido.codigo) ? partidoIdMap[partido.codigo] : "00";
+                string sceneObjectId = GetPartidoId(partidoIdMap, partido.codigo);
 
                 double currentWidth;
                 double scaleX = 1.0;
@@ -538,13 +515,7 @@ namespace Elecciones.src.mensajes.builders
             partidosActivos.Reverse(); // Descendente
 
             // Mapa IDs
-            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
-            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
-            {
-                string id = (i + 1).ToString("D2");
-                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = id;
-            }
+            Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(dto);
 
             int count = partidosActivos.Count;
             string tipo = dto.oficiales ? "Escrutinio" : "Sondeo";
@@ -577,7 +548,7 @@ namespace Elecciones.src.mensajes.builders
             for (int i = 0; i < partidosActivos.Count; i++)
             {
                 PartidoDTO partido = partidosActivos[i];
-                string sceneObjectId = partidoIdMap.ContainsKey(partido.codigo) ? partidoIdMap[partido.codigo] : "00";
+                string sceneObjectId = GetPartidoId(partidoIdMap, partido.codigo);
 
                 double currentWidth;
                 double scaleX = 1.0;
@@ -685,13 +656,7 @@ namespace Elecciones.src.mensajes.builders
             partidosActivos.Reverse(); // Descendente
 
             // Mapa IDs
-            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
-            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
-            {
-                string id = (i + 1).ToString("D2");
-                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = id;
-            }
+            Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(dto);
 
             int count = partidosActivos.Count;
             string tipo = dto.oficiales ? "Escrutinio" : "Sondeo";
@@ -706,7 +671,7 @@ namespace Elecciones.src.mensajes.builders
             for (int i = 0; i < partidosActivos.Count; i++)
             {
                 PartidoDTO partido = partidosActivos[i];
-                string sceneObjectId = partidoIdMap.ContainsKey(partido.codigo) ? partidoIdMap[partido.codigo] : "00";
+                string sceneObjectId = GetPartidoId(partidoIdMap, partido.codigo);
 
                 // Posición
                 sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}",
@@ -1106,17 +1071,115 @@ namespace Elecciones.src.mensajes.builders
             return oficiales ? "Graficos/Pactometro" : "Graficos/PactometroSondeo";
         }
 
+        private static string ResolveCodigoPlantilla(string codigoCircunscripcion)
+        {
+            if (string.IsNullOrWhiteSpace(codigoCircunscripcion))
+            {
+                return "";
+            }
+
+            if (codigoCircunscripcion.EndsWith("00000"))
+            {
+                return codigoCircunscripcion;
+            }
+
+            if (codigoCircunscripcion.StartsWith("99"))
+            {
+                return "9900000";
+            }
+
+            if (codigoCircunscripcion.Length >= 2)
+            {
+                return $"{codigoCircunscripcion.Substring(0, 2)}00000";
+            }
+
+            return codigoCircunscripcion;
+        }
+
+        private static List<PartidoDTO> GetPartidosBaseParaIds(BrainStormDTO dto)
+        {
+            if (dto == null || dto.partidos == null)
+            {
+                return new List<PartidoDTO>();
+            }
+
+            var main = Application.Current.MainWindow as MainWindow;
+            if (main?.conexionActiva == null)
+            {
+                return dto.partidos;
+            }
+
+            string codigoPlantilla = ResolveCodigoPlantilla(dto.circunscripcionDTO?.codigo ?? "");
+            if (string.IsNullOrWhiteSpace(codigoPlantilla))
+            {
+                return dto.partidos;
+            }
+
+            try
+            {
+                int avance = dto.circunscripcionDTO?.numAvance > 0 ? dto.circunscripcionDTO.numAvance : 1;
+                int tipoElecciones = codigoPlantilla.StartsWith("99") ? 1 : 2;
+                BrainStormController controller = BrainStormController.GetInstance(main.conexionActiva);
+
+                BrainStormDTO plantilla = dto.oficiales
+                    ? controller.FindByIdCircunscripcionOficialSinFiltrar(codigoPlantilla, avance, tipoElecciones)
+                    : controller.FindByIdCircunscripcionSondeoSinFiltrar(codigoPlantilla, avance, tipoElecciones);
+
+                if (plantilla?.partidos != null && plantilla.partidos.Count > 0)
+                {
+                    return plantilla.partidos;
+                }
+            }
+            catch
+            {
+                // Fallback silencioso a la lista local si no se puede resolver la plantilla.
+            }
+
+            return dto.partidos;
+        }
+
         private static Dictionary<string, string> BuildPartidoIdMap(BrainStormDTO dto)
         {
             Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
-            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
+            int nextIndex = 1;
+
+            List<PartidoDTO> partidosBaseOrdenados = GetPartidosBaseParaIds(dto)
+                .Where(p => !string.IsNullOrWhiteSpace(p.codigo))
+                .GroupBy(p => p.codigo)
+                .Select(g => g.First())
+                .OrderBy(p => p.codigo)
+                .ToList();
+
+            foreach (PartidoDTO partido in partidosBaseOrdenados)
             {
-                string partidoId = (i + 1).ToString("D2");
-                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
+                partidoIdMap[partido.codigo] = nextIndex.ToString("D2");
+                nextIndex++;
+            }
+
+            List<PartidoDTO> partidosActualesOrdenados = (dto.partidos ?? new List<PartidoDTO>())
+                .Where(p => !string.IsNullOrWhiteSpace(p.codigo))
+                .GroupBy(p => p.codigo)
+                .Select(g => g.First())
+                .OrderBy(p => p.codigo)
+                .ToList();
+
+            foreach (PartidoDTO partido in partidosActualesOrdenados)
+            {
+                if (!partidoIdMap.ContainsKey(partido.codigo))
+                {
+                    partidoIdMap[partido.codigo] = nextIndex.ToString("D2");
+                    nextIndex++;
+                }
             }
 
             return partidoIdMap;
+        }
+
+        private static string GetPartidoId(Dictionary<string, string> partidoIdMap, string codigoPartido)
+        {
+            return !string.IsNullOrWhiteSpace(codigoPartido) && partidoIdMap.TryGetValue(codigoPartido, out string? id)
+                ? id
+                : "00";
         }
 
         private static int SafeEscanosTotales(BrainStormDTO dto)
@@ -1255,7 +1318,7 @@ namespace Elecciones.src.mensajes.builders
 
             var mainDto = GetMainDto() ?? dto;
             Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(mainDto);
-            string id = partidoIdMap.TryGetValue(pSeleccionado.codigo, out var partidoId) ? partidoId : "01";
+            string id = GetPartidoId(partidoIdMap, pSeleccionado.codigo);
 
             sb.Append(EventBuild($"{sceneRoot}/Der/LogosDer/Logo0{partidosEnPactoDerecha.Count}", "OBJ_OVERMAT", $"'Logos/Logo{id}'", 1));
 
@@ -1314,7 +1377,7 @@ namespace Elecciones.src.mensajes.builders
 
             var mainDto = GetMainDto() ?? dto;
             Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(mainDto);
-            string id = partidoIdMap.TryGetValue(pSeleccionado.codigo, out var partidoId) ? partidoId : "01";
+            string id = GetPartidoId(partidoIdMap, pSeleccionado.codigo);
 
             sb.Append(EventBuild($"{sceneRoot}/Izq/LogosIzq/Logo0{partidosEnPactoIzquierda.Count}", "OBJ_OVERMAT", $"'Logos/Logo{id}'", 1));
 
@@ -1414,22 +1477,10 @@ namespace Elecciones.src.mensajes.builders
             StringBuilder sb = new StringBuilder();
             var main = Application.Current.MainWindow as MainWindow;
             var dto = main?.dto;
+            if (main == null || dto == null || pSeleccionado == null) return "";
 
-            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
-            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
-            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
-            {
-                string partidoId = (i + 1).ToString("D2");
-                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
-            }
-
-            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
-            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
-            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(dto.oficiales));
-            partidosOrdenadosPorComparer.Reverse(); // Descendente
-
-            string id = partidoIdMap[pSeleccionado.codigo];
+            Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(dto);
+            string id = GetPartidoId(partidoIdMap, pSeleccionado.codigo);
 
             if (main.tickerDentro)
             {
@@ -1444,22 +1495,10 @@ namespace Elecciones.src.mensajes.builders
             StringBuilder sb = new StringBuilder();
             var main = Application.Current.MainWindow as MainWindow;
             var dto = main?.dto;
+            if (main == null || dto == null || pSeleccionado == null) return "";
 
-            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
-            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
-            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
-            {
-                string partidoId = (i + 1).ToString("D2");
-                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
-            }
-
-            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
-            List<PartidoDTO> partidosOrdenadosPorComparer = dto.partidos.ToList();
-            partidosOrdenadosPorComparer.Sort(new PartidoDTOComparerUnified(dto.oficiales));
-            partidosOrdenadosPorComparer.Reverse(); // Descendente
-
-            string id = partidoIdMap[pSeleccionado.codigo];
+            Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(dto);
+            string id = GetPartidoId(partidoIdMap, pSeleccionado.codigo);
 
             string sedeSiguiente = sedeActual == "01" ? "04" : "03";
             string otraSede = sedeActual == "01" ? "02" : "01";
@@ -1480,3 +1519,5 @@ namespace Elecciones.src.mensajes.builders
         #endregion
     }
 }
+
+

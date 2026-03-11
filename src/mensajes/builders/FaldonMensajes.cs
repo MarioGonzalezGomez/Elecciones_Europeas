@@ -1030,145 +1030,253 @@ namespace Elecciones.src.mensajes.builders
 
         public string pactosEntra()
         {
-            return EventRunBuild("Pactometro/Entra");
+            bool oficiales = ResolvePactosOficiales();
+            return EventRunBuild($"{GetPactometroEventRoot(oficiales)}/Entra");
         }
 
         public string pactosReinicio()
         {
-            acumuladoIzq = 0;
-            acumuladoDcha = 0;
-            acumuladoEscanosDer = 0;
-            acumuladoEscanosIzq = 0;
-            partidosEnPactoDerecha.Clear();
-            partidosEnPactoIzquierda.Clear();
+            bool oficiales = ResolvePactosOficiales();
+            string eventRoot = GetPactometroEventRoot(oficiales);
+            ResetPactosState();
+
             StringBuilder sb = new StringBuilder();
-            sb.Append(EventRunBuild("Pactometro/reinicioPactometroIzq"));
-            sb.Append(EventRunBuild("Pactometro/reinicioPactometroDer"));
+            sb.Append(EventRunBuild($"{eventRoot}/reinicioPactometroIzq"));
+            sb.Append(EventRunBuild($"{eventRoot}/reinicioPactometroDer"));
             return sb.ToString();
         }
 
         public string pactosSale()
         {
-            acumuladoIzq = 0;
-            acumuladoDcha = 0;
-            acumuladoEscanosDer = 0;
-            acumuladoEscanosIzq = 0;
-            partidosEnPactoDerecha.Clear();
-            partidosEnPactoIzquierda.Clear();
+            bool oficiales = ResolvePactosOficiales();
+            string eventRoot = GetPactometroEventRoot(oficiales);
+            ResetPactosState();
+
             StringBuilder sb = new StringBuilder();
-            sb.Append(EventRunBuild("Pactometro/Sale"));
-            sb.Append(EventRunBuild("Pactometro/reinicioPactometroIzq"));
-            sb.Append(EventRunBuild("Pactometro/reinicioPactometroDer"));
+            sb.Append(EventRunBuild($"{eventRoot}/Sale"));
+            sb.Append(EventRunBuild($"{eventRoot}/reinicioPactometroIzq"));
+            sb.Append(EventRunBuild($"{eventRoot}/reinicioPactometroDer"));
             return sb.ToString();
         }
 
-        double pxTotalesPacto = 1748;
-        double acumuladoIzq = 0;
-        double acumuladoDcha = 0;
-        int acumuladoEscanosDer = 0;
-        int acumuladoEscanosIzq = 0;
+        private readonly double pxTotalesPacto = 1748;
+        private bool pactoOficiales = true;
+        private double acumuladoIzqDesde = 0;
+        private double acumuladoIzqHasta = 0;
+        private double acumuladoDchaDesde = 0;
+        private double acumuladoDchaHasta = 0;
+        private int acumuladoEscanosDerDesde = 0;
+        private int acumuladoEscanosDerHasta = 0;
+        private int acumuladoEscanosIzqDesde = 0;
+        private int acumuladoEscanosIzqHasta = 0;
 
-        private List<string> partidosEnPactoDerecha = new List<string>();
-        private List<string> partidosEnPactoIzquierda = new List<string>();
+        private readonly List<string> partidosEnPactoDerecha = new List<string>();
+        private readonly List<string> partidosEnPactoIzquierda = new List<string>();
+
+        private static BrainStormDTO? GetMainDto()
+        {
+            var main = Application.Current.MainWindow as MainWindow;
+            return main?.dto;
+        }
+
+        private bool ResolvePactosOficiales(BrainStormDTO? dto = null)
+        {
+            if (dto != null)
+            {
+                pactoOficiales = dto.oficiales;
+                return pactoOficiales;
+            }
+
+            var mainDto = GetMainDto();
+            if (mainDto != null)
+            {
+                pactoOficiales = mainDto.oficiales;
+            }
+
+            return pactoOficiales;
+        }
+
+        private static string GetPactometroEventRoot(bool oficiales)
+        {
+            return oficiales ? "Pactometro" : "PactometroSondeo";
+        }
+
+        private static string GetPactometroSceneRoot(bool oficiales)
+        {
+            return oficiales ? "Graficos/Pactometro" : "Graficos/PactometroSondeo";
+        }
+
+        private static Dictionary<string, string> BuildPartidoIdMap(BrainStormDTO dto)
+        {
+            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
+            List<PartidoDTO> partidosOrdenadosPorCodigo = dto.partidos.OrderBy(p => p.codigo).ToList();
+            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
+            {
+                string partidoId = (i + 1).ToString("D2");
+                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
+            }
+
+            return partidoIdMap;
+        }
+
+        private static int SafeEscanosTotales(BrainStormDTO dto)
+        {
+            return dto.circunscripcionDTO.escaniosTotales > 0 ? dto.circunscripcionDTO.escaniosTotales : 1;
+        }
+
+        private static double CalcAnchoPacto(int escanos, int totalEscanos, double pxTotales)
+        {
+            return (escanos * pxTotales) / totalEscanos;
+        }
+
+        private void ResetPactosState()
+        {
+            acumuladoIzqDesde = 0;
+            acumuladoIzqHasta = 0;
+            acumuladoDchaDesde = 0;
+            acumuladoDchaHasta = 0;
+            acumuladoEscanosDerDesde = 0;
+            acumuladoEscanosDerHasta = 0;
+            acumuladoEscanosIzqDesde = 0;
+            acumuladoEscanosIzqHasta = 0;
+            partidosEnPactoDerecha.Clear();
+            partidosEnPactoIzquierda.Clear();
+        }
+
+        private void AppendPactoValoresYBarras(StringBuilder sb, bool oficiales, bool izquierda)
+        {
+            if (izquierda)
+            {
+                if (oficiales)
+                {
+                    sb.Append(EventBuild("Pactometro_IzqVALOR", "MAP_INT_PAR", $"{acumuladoEscanosIzqDesde}", 1));
+                    sb.Append(EventBuild("BarraIzquierdas", "PRIM_RECGLO_LEN[0]", acumuladoIzqDesde.ToString(), 2, 0.3, 0));
+                }
+                else
+                {
+                    sb.Append(EventBuild("Pactometro_IzqVALOR", "MAP_STRING_PAR", $"{acumuladoEscanosIzqDesde}-{acumuladoEscanosIzqHasta}", 1));
+                    sb.Append(EventBuild("BarraIzquierdasDesde", "PRIM_RECGLO_LEN[0]", acumuladoIzqDesde.ToString(), 2, 0.3, 0));
+                    sb.Append(EventBuild("BarraIzquierdasHasta", "PRIM_RECGLO_LEN[0]", acumuladoIzqHasta.ToString(), 2, 0.3, 0));
+                }
+            }
+            else
+            {
+                if (oficiales)
+                {
+                    sb.Append(EventBuild("Pactometro_DerVALOR", "MAP_INT_PAR", $"{acumuladoEscanosDerDesde}", 1));
+                    sb.Append(EventBuild("BarraDerechas", "PRIM_RECGLO_LEN[0]", acumuladoDchaDesde.ToString(), 2, 0.3, 0));
+                }
+                else
+                {
+                    sb.Append(EventBuild("Pactometro_DerVALOR", "MAP_STRING_PAR", $"{acumuladoEscanosDerDesde}-{acumuladoEscanosDerHasta}", 1));
+                    sb.Append(EventBuild("BarraDerechasDesde", "PRIM_RECGLO_LEN[0]", acumuladoDchaDesde.ToString(), 2, 0.3, 0));
+                    sb.Append(EventBuild("BarraDerechasHasta", "PRIM_RECGLO_LEN[0]", acumuladoDchaHasta.ToString(), 2, 0.3, 0));
+                }
+            }
+        }
 
         public string ActualizaPactometroFichas(BrainStormDTO dtoActualizado)
         {
             if (dtoActualizado == null) return "";
+            bool oficiales = ResolvePactosOficiales(dtoActualizado);
+            int totalEscanos = SafeEscanosTotales(dtoActualizado);
             StringBuilder sb = new StringBuilder();
 
-            // RECALCULAR DERECHA
-            acumuladoEscanosDer = 0;
-            acumuladoDcha = 0;
+            acumuladoEscanosDerDesde = 0;
+            acumuladoEscanosDerHasta = 0;
+            acumuladoDchaDesde = 0;
+            acumuladoDchaHasta = 0;
 
             foreach (var codigo in partidosEnPactoDerecha)
             {
                 var partido = dtoActualizado.partidos.FirstOrDefault(p => p.codigo == codigo);
-                if (partido != null)
-                {
-                    acumuladoEscanosDer += partido.escanios;
-                    double tamanoFicha = (partido.escanios * pxTotalesPacto) / dtoActualizado.circunscripcionDTO.escaniosTotales;
-                    acumuladoDcha += tamanoFicha;
-                }
+                if (partido == null) continue;
+
+                int escanosDesde = oficiales ? partido.escanios : partido.escaniosDesdeSondeo;
+                int escanosHasta = oficiales ? partido.escanios : partido.escaniosHastaSondeo;
+                acumuladoEscanosDerDesde += escanosDesde;
+                acumuladoEscanosDerHasta += escanosHasta;
+                acumuladoDchaDesde += CalcAnchoPacto(escanosDesde, totalEscanos, pxTotalesPacto);
+                acumuladoDchaHasta += CalcAnchoPacto(escanosHasta, totalEscanos, pxTotalesPacto);
             }
+            AppendPactoValoresYBarras(sb, oficiales, izquierda: false);
 
-            sb.Append(EventBuild("Pactometro_DerVALOR", "MAP_INT_PAR", $"{acumuladoEscanosDer}", 1));
-            sb.Append(EventBuild("BarraDerechas", "PRIM_RECGLO_LEN[0]", acumuladoDcha.ToString(), 2, 0.3, 0));
-
-            // RECALCULAR IZQUIERDA
-            acumuladoEscanosIzq = 0;
-            acumuladoIzq = 0;
+            acumuladoEscanosIzqDesde = 0;
+            acumuladoEscanosIzqHasta = 0;
+            acumuladoIzqDesde = 0;
+            acumuladoIzqHasta = 0;
 
             foreach (var codigo in partidosEnPactoIzquierda)
             {
                 var partido = dtoActualizado.partidos.FirstOrDefault(p => p.codigo == codigo);
-                if (partido != null)
-                {
-                    acumuladoEscanosIzq += partido.escanios;
-                    double tamanoFicha = (partido.escanios * pxTotalesPacto) / dtoActualizado.circunscripcionDTO.escaniosTotales;
-                    acumuladoIzq += tamanoFicha;
-                }
-            }
+                if (partido == null) continue;
 
-            sb.Append(EventBuild("Pactometro_IzqVALOR", "MAP_INT_PAR", $"{acumuladoEscanosIzq}", 1));
-            sb.Append(EventBuild("BarraIzquierdas", "PRIM_RECGLO_LEN[0]", acumuladoIzq.ToString(), 2, 0.3, 0));
+                int escanosDesde = oficiales ? partido.escanios : partido.escaniosDesdeSondeo;
+                int escanosHasta = oficiales ? partido.escanios : partido.escaniosHastaSondeo;
+                acumuladoEscanosIzqDesde += escanosDesde;
+                acumuladoEscanosIzqHasta += escanosHasta;
+                acumuladoIzqDesde += CalcAnchoPacto(escanosDesde, totalEscanos, pxTotalesPacto);
+                acumuladoIzqHasta += CalcAnchoPacto(escanosHasta, totalEscanos, pxTotalesPacto);
+            }
+            AppendPactoValoresYBarras(sb, oficiales, izquierda: true);
 
             return sb.ToString();
         }
 
         public string pactosEntraDerecha(BrainStormDTO dto, PartidoDTO pSeleccionado)
         {
-            if (pSeleccionado == null) return "";
+            if (dto == null || pSeleccionado == null) return "";
+            bool oficiales = ResolvePactosOficiales(dto);
+            string eventRoot = GetPactometroEventRoot(oficiales);
+            string sceneRoot = GetPactometroSceneRoot(oficiales);
+            int totalEscanos = SafeEscanosTotales(dto);
             StringBuilder sb = new StringBuilder();
 
-            // Guardar partido en lista si no existe
             if (!partidosEnPactoDerecha.Contains(pSeleccionado.codigo))
             {
                 partidosEnPactoDerecha.Add(pSeleccionado.codigo);
             }
+            bool esPrimero = partidosEnPactoDerecha.Count == 1;
 
-            // Detectar si es el primer partido en entrar por la derecha
-            bool esPrimero = acumuladoDcha == 0;
+            int escanosDesde = oficiales ? pSeleccionado.escanios : pSeleccionado.escaniosDesdeSondeo;
+            int escanosHasta = oficiales ? pSeleccionado.escanios : pSeleccionado.escaniosHastaSondeo;
+            acumuladoEscanosDerDesde += escanosDesde;
+            acumuladoEscanosDerHasta += escanosHasta;
+            acumuladoDchaDesde += CalcAnchoPacto(escanosDesde, totalEscanos, pxTotalesPacto);
+            acumuladoDchaHasta += CalcAnchoPacto(escanosHasta, totalEscanos, pxTotalesPacto);
 
-            // NUMERO ESCANOS - suma acumulada de escaños del lado derecho
-            acumuladoEscanosDer += pSeleccionado.escanios;
-            sb.Append(EventBuild("Pactometro_DerVALOR", "MAP_INT_PAR", $"{acumuladoEscanosDer}", 1));
+            AppendPactoValoresYBarras(sb, oficiales, izquierda: false);
 
-            if (acumuladoEscanosDer >= dto.circunscripcionDTO.mayoria)
+            int escanosMayoria = oficiales ? acumuladoEscanosDerDesde : acumuladoEscanosDerHasta;
+            if (escanosMayoria >= dto.circunscripcionDTO.mayoria)
             {
-                sb.Append(EventRunBuild("Pactometro/PasaMayoria"));
+                sb.Append(EventRunBuild($"{eventRoot}/PasaMayoria"));
             }
 
-            // CRECIMIENTO BARRA
-            double tamanoFicha = (pSeleccionado.escanios * pxTotalesPacto) / dto.circunscripcionDTO.escaniosTotales;
-            acumuladoDcha += tamanoFicha;
-            sb.Append(EventBuild("BarraDerechas", "PRIM_RECGLO_LEN[0]", acumuladoDcha.ToString(), 2, 0.3, 0));
+            var mainDto = GetMainDto() ?? dto;
+            Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(mainDto);
+            string id = partidoIdMap.TryGetValue(pSeleccionado.codigo, out var partidoId) ? partidoId : "01";
 
-            // LOGOS
-            var main = Application.Current.MainWindow as MainWindow;
-            var mainDto = main?.dto;
-            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
-            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            List<PartidoDTO> partidosOrdenadosPorCodigo = mainDto.partidos.OrderBy(p => p.codigo).ToList();
-            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
-            {
-                string partidoId = (i + 1).ToString("D2");
-                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
-            }
-            string id = partidoIdMap[pSeleccionado.codigo];
-            sb.Append(EventBuild($"Graficos/Pactometro/Der/LogosDer/Logo0{partidosEnPactoDerecha.Count}", "OBJ_OVERMAT", $"'Logos/Logo{id}'", 1));
+            sb.Append(EventBuild($"{sceneRoot}/Der/LogosDer/Logo0{partidosEnPactoDerecha.Count}", "OBJ_OVERMAT", $"'Logos/Logo{id}'", 1));
 
-            // Señales condicionales según si es el primero o no
             if (esPrimero)
             {
-                sb.Append(EventBuild("Graficos/Pactometro/Der/LogosDer", "OBJ_GRID_JUMP_TO_END", 1));
-                sb.Append(EventRunBuild("Pactometro/lanzaPactometroDer"));
+                sb.Append(EventBuild($"{sceneRoot}/Der/LogosDer", "OBJ_GRID_JUMP_TO_END", 1));
+                sb.Append(EventRunBuild($"{eventRoot}/lanzaPactometroDer"));
 
-                // COLOR
-                sb.Append(EventBuild("Graficos/Pactometro/Der/BarraDerechas", "OBJ_OVERMAT", $"'{id}'", 1));
+                if (oficiales)
+                {
+                    sb.Append(EventBuild($"{sceneRoot}/Der/BarraDerechas", "OBJ_OVERMAT", $"'{id}'", 1));
+                }
+                else
+                {
+                    sb.Append(EventBuild($"{sceneRoot}/Der/BarraDerechasDesde", "OBJ_OVERMAT", $"'{id}'", 1));
+                    sb.Append(EventBuild($"{sceneRoot}/Der/BarraDerechasHasta", "OBJ_OVERMAT", $"'Hasta/{id}'", 1));
+                }
             }
             else
             {
-                sb.Append(EventBuild("Graficos/Pactometro/Der/LogosDer", "OBJ_GRID_JUMP_NEXT", 1));
+                sb.Append(EventBuild($"{sceneRoot}/Der/LogosDer", "OBJ_GRID_JUMP_NEXT", 1));
             }
 
             return sb.ToString();
@@ -1176,58 +1284,58 @@ namespace Elecciones.src.mensajes.builders
 
         public string pactosEntraIzquierda(BrainStormDTO dto, PartidoDTO pSeleccionado)
         {
-            if (pSeleccionado == null) return "";
+            if (dto == null || pSeleccionado == null) return "";
+            bool oficiales = ResolvePactosOficiales(dto);
+            string eventRoot = GetPactometroEventRoot(oficiales);
+            string sceneRoot = GetPactometroSceneRoot(oficiales);
+            int totalEscanos = SafeEscanosTotales(dto);
             StringBuilder sb = new StringBuilder();
 
-            // Guardar partido en lista si no existe
             if (!partidosEnPactoIzquierda.Contains(pSeleccionado.codigo))
             {
                 partidosEnPactoIzquierda.Add(pSeleccionado.codigo);
             }
+            bool esPrimero = partidosEnPactoIzquierda.Count == 1;
 
-            // Detectar si es el primer partido en entrar por la derecha
-            bool esPrimero = acumuladoIzq == 0;
+            int escanosDesde = oficiales ? pSeleccionado.escanios : pSeleccionado.escaniosDesdeSondeo;
+            int escanosHasta = oficiales ? pSeleccionado.escanios : pSeleccionado.escaniosHastaSondeo;
+            acumuladoEscanosIzqDesde += escanosDesde;
+            acumuladoEscanosIzqHasta += escanosHasta;
+            acumuladoIzqDesde += CalcAnchoPacto(escanosDesde, totalEscanos, pxTotalesPacto);
+            acumuladoIzqHasta += CalcAnchoPacto(escanosHasta, totalEscanos, pxTotalesPacto);
 
-            // NUMERO ESCANOS - suma acumulada de escaños del lado derecho
-            acumuladoEscanosIzq += pSeleccionado.escanios;
-            sb.Append(EventBuild("Pactometro_IzqVALOR", "MAP_INT_PAR", $"{acumuladoEscanosIzq}", 1));
+            AppendPactoValoresYBarras(sb, oficiales, izquierda: true);
 
-            if (acumuladoEscanosIzq >= dto.circunscripcionDTO.mayoria)
+            int escanosMayoria = oficiales ? acumuladoEscanosIzqDesde : acumuladoEscanosIzqHasta;
+            if (escanosMayoria >= dto.circunscripcionDTO.mayoria)
             {
-                sb.Append(EventRunBuild("Pactometro/PasaMayoria"));
+                sb.Append(EventRunBuild($"{eventRoot}/PasaMayoria"));
             }
 
-            // CRECIMIENTO BARRA
-            double tamanoFicha = (pSeleccionado.escanios * pxTotalesPacto) / dto.circunscripcionDTO.escaniosTotales;
-            acumuladoIzq += tamanoFicha;
-            sb.Append(EventBuild("BarraIzquierdas", "PRIM_RECGLO_LEN[0]", acumuladoIzq.ToString(), 2, 0.3, 0));
+            var mainDto = GetMainDto() ?? dto;
+            Dictionary<string, string> partidoIdMap = BuildPartidoIdMap(mainDto);
+            string id = partidoIdMap.TryGetValue(pSeleccionado.codigo, out var partidoId) ? partidoId : "01";
 
-            // LOGOS
-            // LOGOS
-            var main = Application.Current.MainWindow as MainWindow;
-            var mainDto = main?.dto;
-            // Crear partidoIdMap basado en orden por CÓDIGO (PP=00001 → partido01)
-            Dictionary<string, string> partidoIdMap = new Dictionary<string, string>();
-            List<PartidoDTO> partidosOrdenadosPorCodigo = mainDto.partidos.OrderBy(p => p.codigo).ToList();
-            for (int i = 0; i < partidosOrdenadosPorCodigo.Count; i++)
-            {
-                string partidoId = (i + 1).ToString("D2");
-                partidoIdMap[partidosOrdenadosPorCodigo[i].codigo] = partidoId;
-            }
-            string id = partidoIdMap[pSeleccionado.codigo];
-            sb.Append(EventBuild($"Graficos/Pactometro/Izq/LogosIzq/Logo0{partidosEnPactoIzquierda.Count}", "OBJ_OVERMAT", $"'Logos/Logo{id}'", 1));
+            sb.Append(EventBuild($"{sceneRoot}/Izq/LogosIzq/Logo0{partidosEnPactoIzquierda.Count}", "OBJ_OVERMAT", $"'Logos/Logo{id}'", 1));
 
-            // Señales condicionales según si es el primero o no
             if (esPrimero)
             {
-                sb.Append(EventBuild("Graficos/Pactometro/Izq/LogosIzq", "OBJ_GRID_JUMP_TO_END", 1));
-                sb.Append(EventRunBuild("Pactometro/lanzaPactometroIzq"));
-                // COLOR
-                sb.Append(EventBuild("Graficos/Pactometro/Izq/BarraIzquierdas", "OBJ_OVERMAT", $"'{id}'", 1));
+                sb.Append(EventBuild($"{sceneRoot}/Izq/LogosIzq", "OBJ_GRID_JUMP_TO_END", 1));
+                sb.Append(EventRunBuild($"{eventRoot}/lanzaPactometroIzq"));
+
+                if (oficiales)
+                {
+                    sb.Append(EventBuild($"{sceneRoot}/Izq/BarraIzquierdas", "OBJ_OVERMAT", $"'{id}'", 1));
+                }
+                else
+                {
+                    sb.Append(EventBuild($"{sceneRoot}/Izq/BarraIzquierdasDesde", "OBJ_OVERMAT", $"'{id}'", 1));
+                    sb.Append(EventBuild($"{sceneRoot}/Izq/BarraIzquierdasHasta", "OBJ_OVERMAT", $"'Hasta/{id}'", 1));
+                }
             }
             else
             {
-                sb.Append(EventBuild("Graficos/Pactometro/Izq/LogosIzq", "OBJ_GRID_JUMP_NEXT", 1));
+                sb.Append(EventBuild($"{sceneRoot}/Izq/LogosIzq", "OBJ_GRID_JUMP_NEXT", 1));
             }
 
             return sb.ToString();
@@ -1236,78 +1344,64 @@ namespace Elecciones.src.mensajes.builders
         public string pactosSaleDerecha()
         {
             if (partidosEnPactoDerecha.Count == 0) return "";
+            var dto = GetMainDto();
+            if (dto == null) return "";
+
+            bool oficiales = ResolvePactosOficiales(dto);
+            string sceneRoot = GetPactometroSceneRoot(oficiales);
+            int totalEscanos = SafeEscanosTotales(dto);
             StringBuilder sb = new StringBuilder();
 
-            // 1. Identificar el último partido añadido
             string codigoUltimo = partidosEnPactoDerecha.Last();
             partidosEnPactoDerecha.RemoveAt(partidosEnPactoDerecha.Count - 1);
-
-            // 2. Obtener el partido del DTO principal para saber sus escaños
-            var main = Application.Current.MainWindow as MainWindow;
-            var dto = main?.dto;
-            if (dto == null) return "";
 
             var partido = dto.partidos.FirstOrDefault(p => p.codigo == codigoUltimo);
             if (partido != null)
             {
-                // 3. Restar escaños del acumulado
-                acumuladoEscanosDer -= partido.escanios;
-                // Evitar negativos por seguridad
-                if (acumuladoEscanosDer < 0) acumuladoEscanosDer = 0;
+                int escanosDesde = oficiales ? partido.escanios : partido.escaniosDesdeSondeo;
+                int escanosHasta = oficiales ? partido.escanios : partido.escaniosHastaSondeo;
 
-                sb.Append(EventBuild("Pactometro_DerVALOR", "MAP_INT_PAR", $"{acumuladoEscanosDer}", 1));
+                acumuladoEscanosDerDesde = Math.Max(0, acumuladoEscanosDerDesde - escanosDesde);
+                acumuladoEscanosDerHasta = Math.Max(0, acumuladoEscanosDerHasta - escanosHasta);
+                acumuladoDchaDesde = Math.Max(0, acumuladoDchaDesde - CalcAnchoPacto(escanosDesde, totalEscanos, pxTotalesPacto));
+                acumuladoDchaHasta = Math.Max(0, acumuladoDchaHasta - CalcAnchoPacto(escanosHasta, totalEscanos, pxTotalesPacto));
 
-                // 4. Restar tamaño de la barra
-                // Usamos la misma fórmula que en la entrada: (escaños * pxTotales) / totalEscaños
-                double tamanoFicha = (partido.escanios * pxTotalesPacto) / dto.circunscripcionDTO.escaniosTotales;
-                acumuladoDcha -= tamanoFicha;
-                // Evitar negativos/errores de precisión
-                if (acumuladoDcha < 0) acumuladoDcha = 0;
-
-                sb.Append(EventBuild("BarraDerechas", "PRIM_RECGLO_LEN[0]", acumuladoDcha.ToString(), 2, 0.3, 0));
+                AppendPactoValoresYBarras(sb, oficiales, izquierda: false);
             }
 
-            // 5. Quitar logo (OBJ_GRID_JUMP_BEFORE)
-            // Se envía al controlador de logos de la derecha
-            sb.Append(EventBuild("Graficos/Pactometro/Der/LogosDer", "OBJ_GRID_JUMP_PREV", 1));
-
+            sb.Append(EventBuild($"{sceneRoot}/Der/LogosDer", "OBJ_GRID_JUMP_PREV", 1));
             return sb.ToString();
         }
 
         public string pactosSaleIzquierda()
         {
             if (partidosEnPactoIzquierda.Count == 0) return "";
+            var dto = GetMainDto();
+            if (dto == null) return "";
+
+            bool oficiales = ResolvePactosOficiales(dto);
+            string sceneRoot = GetPactometroSceneRoot(oficiales);
+            int totalEscanos = SafeEscanosTotales(dto);
             StringBuilder sb = new StringBuilder();
 
-            // 1. Identificar el último partido añadido
             string codigoUltimo = partidosEnPactoIzquierda.Last();
             partidosEnPactoIzquierda.RemoveAt(partidosEnPactoIzquierda.Count - 1);
-
-            // 2. Obtener el partido del DTO principal para saber sus escaños
-            var main = Application.Current.MainWindow as MainWindow;
-            var dto = main?.dto;
-            if (dto == null) return "";
 
             var partido = dto.partidos.FirstOrDefault(p => p.codigo == codigoUltimo);
             if (partido != null)
             {
-                // 3. Restar escaños del acumulado
-                acumuladoEscanosIzq -= partido.escanios;
-                if (acumuladoEscanosIzq < 0) acumuladoEscanosIzq = 0;
+                int escanosDesde = oficiales ? partido.escanios : partido.escaniosDesdeSondeo;
+                int escanosHasta = oficiales ? partido.escanios : partido.escaniosHastaSondeo;
 
-                sb.Append(EventBuild("Pactometro_IzqVALOR", "MAP_INT_PAR", $"{acumuladoEscanosIzq}", 1));
+                acumuladoEscanosIzqDesde = Math.Max(0, acumuladoEscanosIzqDesde - escanosDesde);
+                acumuladoEscanosIzqHasta = Math.Max(0, acumuladoEscanosIzqHasta - escanosHasta);
+                acumuladoIzqDesde = Math.Max(0, acumuladoIzqDesde - CalcAnchoPacto(escanosDesde, totalEscanos, pxTotalesPacto));
+                acumuladoIzqHasta = Math.Max(0, acumuladoIzqHasta - CalcAnchoPacto(escanosHasta, totalEscanos, pxTotalesPacto));
 
-                // 4. Restar tamaño de la barra
-                double tamanoFicha = (partido.escanios * pxTotalesPacto) / dto.circunscripcionDTO.escaniosTotales;
-                acumuladoIzq -= tamanoFicha;
-                if (acumuladoIzq < 0) acumuladoIzq = 0;
-
-                sb.Append(EventBuild("BarraIzquierdas", "PRIM_RECGLO_LEN[0]", acumuladoIzq.ToString(), 2, 0.3, 0));
+                AppendPactoValoresYBarras(sb, oficiales, izquierda: true);
             }
 
-            // 5. Quitar logo (OBJ_GRID_JUMP_BEFORE)
-            sb.Append(EventBuild("Graficos/Pactometro/Izq/LogosIzq", "OBJ_GRID_JUMP_PREV", 1));
-
+            sb.Append(EventBuild($"{sceneRoot}/Izq/LogosIzq", "OBJ_GRID_JUMP_PREV", 1));
             return sb.ToString();
         }
         #endregion

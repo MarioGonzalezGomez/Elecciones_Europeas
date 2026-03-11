@@ -1399,6 +1399,88 @@ namespace Elecciones
             }
         }
 
+        private List<PartidoDTO> ObtenerPartidosAlineadosParaCsv(BrainStormDTO source)
+        {
+            List<PartidoDTO> actuales = source.partidos
+                .Where(p => !string.IsNullOrWhiteSpace(p.codigo))
+                .OrderBy(p => p.codigo)
+                .ToList();
+
+            // Si estamos ya en la circunscripción general, no hay que rellenar huecos.
+            if (source.circunscripcionDTO.codigo.EndsWith("00000"))
+            {
+                return actuales;
+            }
+
+            try
+            {
+                string codigoPlantilla;
+                if (tipoElecciones == 1)
+                {
+                    codigoPlantilla = "9900000";
+                }
+                else
+                {
+                    string codigoRegional = configuration.GetValue($"codigoRegionalBD{eleccionSeleccionada.Valor + 1}");
+                    if (string.IsNullOrWhiteSpace(codigoRegional) && source.circunscripcionDTO.codigo.Length >= 2)
+                    {
+                        codigoRegional = source.circunscripcionDTO.codigo.Substring(0, 2);
+                    }
+
+                    codigoPlantilla = $"{codigoRegional}00000";
+                }
+
+                BrainStormDTO plantilla = oficiales
+                    ? BrainStormController.GetInstance(conexionActiva).FindByIdCircunscripcionOficialSinFiltrar(codigoPlantilla, avance, tipoElecciones)
+                    : BrainStormController.GetInstance(conexionActiva).FindByIdCircunscripcionSondeoSinFiltrar(codigoPlantilla, avance, tipoElecciones);
+
+                List<PartidoDTO> partidosPlantilla = plantilla.partidos
+                    .Where(p => !string.IsNullOrWhiteSpace(p.codigo))
+                    .OrderBy(p => p.codigo)
+                    .ToList();
+
+                if (partidosPlantilla.Count == 0)
+                {
+                    return actuales;
+                }
+
+                var actualesPorCodigo = actuales
+                    .GroupBy(p => p.codigo)
+                    .ToDictionary(g => g.Key, g => g.First());
+
+                var codigosPlantilla = new HashSet<string>(partidosPlantilla.Select(p => p.codigo));
+                var alineados = new List<PartidoDTO>(partidosPlantilla.Count);
+
+                foreach (PartidoDTO partidoPlantilla in partidosPlantilla)
+                {
+                    if (actualesPorCodigo.TryGetValue(partidoPlantilla.codigo, out PartidoDTO? partidoActual))
+                    {
+                        alineados.Add(partidoActual);
+                    }
+                    else
+                    {
+                        // Partido ausente en esta circunscripción: se deja hueco en el CSV.
+                        alineados.Add(new PartidoDTO());
+                    }
+                }
+
+                // Si aparece algún partido fuera de plantilla, se conserva al final para no perder datos.
+                foreach (PartidoDTO partidoActual in actuales)
+                {
+                    if (!codigosPlantilla.Contains(partidoActual.codigo))
+                    {
+                        alineados.Add(partidoActual);
+                    }
+                }
+
+                return alineados;
+            }
+            catch
+            {
+                return actuales;
+            }
+        }
+
         private async void EscribirFichero(bool desdeSedes = false)
         {
             if (dto != null)
@@ -1415,13 +1497,11 @@ namespace Elecciones
                     BrainStormDTO CreateOrderedDtoCopyFrom(BrainStormDTO source)
                     {
                         var ordered = new BrainStormDTO(source);
-                        ordered.partidos = source.partidos.OrderBy(p => p.codigo).ToList();
-                        // For the code-ordered files we want the full list count (they contain all parties).
+                        ordered.partidos = ObtenerPartidosAlineadosParaCsv(source);
                         ordered.numPartidos = ordered.partidos.Count;
                         return ordered;
                     }
 
-                    // Always use the unfiltered DTO ordered by codigo
                     var dtoToWrite = CreateOrderedDtoCopyFrom(dto);
                     await dtoToWrite.ToCsv("BrainStorm", cmbSondeo.SelectedItem?.ToString() ?? "");
                 }

@@ -90,6 +90,12 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
             resultado += $"Código;Padre;Siglas;Candidato;Escaños;Escaños Desde Sondeo;Hasta Sondeo;Históricos;% Voto;Votantes;Diferencia de escaños;Tendencia;Diferencia de votos;Tendendia;Votantes Historico;Nombre\n";
             foreach (var p in partidos)
             {
+                if (string.IsNullOrWhiteSpace(p.codigo))
+                {
+                    resultado += ";;;;;;;;;;;;;;;\n";
+                    continue;
+                }
+
                 string codigo = p.padre;
                 string codigoPadre = codigo;
                 int difVotos = p.numVotantes - p.numVotantesHistoricos;

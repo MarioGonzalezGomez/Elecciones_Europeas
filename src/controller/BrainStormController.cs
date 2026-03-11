@@ -93,10 +93,24 @@ namespace Elecciones.src.controller
             BrainStormDTO dto = new BrainStormDTO(circunscripcion, avanceActual, tipoElecciones, cps, true, _con);
             return dto;
         }
+        public BrainStormDTO FindByIdCircunscripcionOficialSinFiltrar(string cod, int avanceActual, int tipoElecciones)
+        {
+            Circunscripcion circunscripcion = circunscripcionController.FindById(cod);
+            List<CircunscripcionPartido> cps = cpController.FindByIdCircunscripcionOficialSinFiltrar(cod);
+            BrainStormDTO dto = new BrainStormDTO(circunscripcion, avanceActual, tipoElecciones, cps, true, _con);
+            return dto;
+        }
         public BrainStormDTO FindByIdCircunscripcionSondeo(string cod, int avanceActual, int tipoElecciones)
         {
             Circunscripcion circunscripcion = circunscripcionController.FindById(cod);
             List<CircunscripcionPartido> cps = cpController.FindByIdCircunscripcionSondeo(cod);
+            BrainStormDTO dto = new BrainStormDTO(circunscripcion, avanceActual, tipoElecciones, cps, false, _con);
+            return dto;
+        }
+        public BrainStormDTO FindByIdCircunscripcionSondeoSinFiltrar(string cod, int avanceActual, int tipoElecciones)
+        {
+            Circunscripcion circunscripcion = circunscripcionController.FindById(cod);
+            List<CircunscripcionPartido> cps = cpController.FindByIdCircunscripcionSondeoSinFiltrar(cod);
             BrainStormDTO dto = new BrainStormDTO(circunscripcion, avanceActual, tipoElecciones, cps, false, _con);
             return dto;
         }

@@ -23,7 +23,6 @@ using System.Windows.Shapes;
 using Elecciones.src.utils;
 using System.ComponentModel;
 using Elecciones.src.logic.comparators;
-using Elecciones.src.logic.comparators;
 
 namespace Elecciones
 {
@@ -194,12 +193,28 @@ namespace Elecciones
         {
             return partidos.Where(p =>
             {
-                if (int.TryParse(p.escanios, out int escanios))
+                if (oficiales)
                 {
-                    return escanios > 0;
+                    return int.TryParse(p.escanios, out int escaniosOficiales) && escaniosOficiales > 0;
                 }
-                return false;
+
+                int escaniosDesde = int.TryParse(p.escaniosDesdeSondeo, out int desde) ? desde : 0;
+                int escaniosHasta = int.TryParse(p.escaniosHastaSondeo, out int hasta) ? hasta : 0;
+                return escaniosDesde > 0 || escaniosHasta > 0;
             }).ToList();
+        }
+
+        private int GetEscaniosParaTotal(CPDataDTO partido)
+        {
+            if (partido == null) return 0;
+
+            if (oficiales)
+            {
+                return int.TryParse(partido.escanios, out int escanios) ? escanios : 0;
+            }
+
+            // En sondeo usamos "hasta" para mostrar un total con valor útil.
+            return int.TryParse(partido.escaniosHastaSondeo, out int hasta) ? hasta : 0;
         }
 
         public void RecargarDatos(BrainStormDTO dto, bool oficiales)
@@ -247,13 +262,11 @@ namespace Elecciones
             totalDer = 0;
             foreach (var partido in partidosDentroIzq)
             {
-                if (int.TryParse(partido.escanios, out int esc))
-                    totalIzq += esc;
+                totalIzq += GetEscaniosParaTotal(partido);
             }
             foreach (var partido in partidosDentroDer)
             {
-                if (int.TryParse(partido.escanios, out int esc))
-                    totalDer += esc;
+                totalDer += GetEscaniosParaTotal(partido);
             }
 
             lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
@@ -361,7 +374,7 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosIzqListView.SelectedItem;
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
-                totalIzq += int.Parse(seleccionado.escanios);
+                totalIzq += GetEscaniosParaTotal(seleccionado);
                 lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
                 preparado = false;
                 //Mandar mensaje de despliegue individualizado IZQ
@@ -386,7 +399,7 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosIzqListView.SelectedItem;
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
-                totalIzq += int.Parse(seleccionado.escanios);
+                totalIzq += GetEscaniosParaTotal(seleccionado);
                 lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado IZQ
                 if (main.ultimoEscanoDentro)
@@ -409,7 +422,7 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDerListView.SelectedItem;
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
-                totalDer += int.Parse(seleccionado.escanios);
+                totalDer += GetEscaniosParaTotal(seleccionado);
                 lblEscaniosDer.Content = $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 if (main.ultimoEscanoDentro)
@@ -432,7 +445,7 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDentroIzqListView.SelectedItem;
                 partidosDentroIzq.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
-                totalIzq -= int.Parse(seleccionado.escanios);
+                totalIzq -= GetEscaniosParaTotal(seleccionado);
                 lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
@@ -447,7 +460,7 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDentroDerListView.SelectedItem;
                 partidosDentroDer.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
-                totalDer -= int.Parse(seleccionado.escanios);
+                totalDer -= GetEscaniosParaTotal(seleccionado);
                 lblEscaniosDer.Content = $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
@@ -458,7 +471,10 @@ namespace Elecciones
 
         private void ReordenarListas()
         {
-            List<CPDataDTO> ordenados = partidosDisponibles.OrderByDescending(data => data, new CPDataComparer()).ToList();
+            IComparer<CPDataDTO> comparer = oficiales
+                ? new CPDataComparer()
+                : new CPDataComparerSondeo();
+            List<CPDataDTO> ordenados = partidosDisponibles.OrderByDescending(data => data, comparer).ToList();
             partidosDisponibles.Clear();
             ordenados.ForEach(partidosDisponibles.Add);
         }
@@ -478,7 +494,7 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDentroIzqListView.SelectedItem;
                 partidosDentroIzq.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
-                totalIzq -= int.Parse(seleccionado.escanios);
+                totalIzq -= GetEscaniosParaTotal(seleccionado);
                 lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
@@ -528,7 +544,7 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDerListView.SelectedItem;
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
-                totalDer += int.Parse(seleccionado.escanios);
+                totalDer += GetEscaniosParaTotal(seleccionado);
                 lblEscaniosDer.Content = $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 if (main.ultimoEscanoDentro)
@@ -559,7 +575,7 @@ namespace Elecciones
                 CPDataDTO seleccionado = (CPDataDTO)partidosDentroDerListView.SelectedItem;
                 partidosDentroDer.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
-                totalDer -= int.Parse(seleccionado.escanios);
+                totalDer -= GetEscaniosParaTotal(seleccionado);
                 lblEscaniosDer.Content = $"Total escaños: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);

@@ -59,4 +59,14 @@
     </None>
   </ItemGroup>
 
+  <!-- Evita mezclar la app web dentro del build WPF de escritorio -->
+  <ItemGroup>
+    <Compile Remove="EleccionesWeb\**\*.cs" />
+    <EmbeddedResource Remove="EleccionesWeb\**" />
+    <Content Remove="EleccionesWeb\**" />
+    <None Remove="EleccionesWeb\**" />
+    <Page Remove="EleccionesWeb\**\*.xaml" />
+    <ApplicationDefinition Remove="EleccionesWeb\**\*.xaml" />
+  </ItemGroup>
+
 </Project>

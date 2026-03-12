@@ -1,3 +1,6 @@
+using System.Runtime.InteropServices;
+using System.Text;
+
 using System.Text;
 using Elecciones.src.model.DTO.BrainStormDTO;
 
@@ -19,46 +22,47 @@ namespace Elecciones.src.mensajes.builders
             return instance;
         }
 
-        #region Superfaldón Base
+        #region Carrusel (incluye sedes)
 
-        public string superfaldonEntra() => Entra("SUPERFALDON");
-        public string superfaldonSale() => Sale("SUPERFALDON");
+        public string superfaldonEntra(bool oficiales) => oficiales ? EventRunBuild("Superfaldon/Oficial/Entra") : EventRunBuild("Superfaldon/Sondeo/Entra");
+        public string superfaldonSale(bool oficiales) => oficiales ? EventRunBuild("Superfaldon/Oficial/Sale") : EventRunBuild("Superfaldon/Sondeo/Sale");
 
         #endregion
 
-        #region Último Superfaldón
+        #region Sedes
 
-        public string ultimoSuperEntra()
+        public string desplegarSede(string codPartido)
         {
-            string signal = "";
-            signal += EventBuild("Oficial_Codigo", "MAP_LLSTRING_LOAD") + "\n";
-            signal += EventBuild("UltimoEscanoCSV", "MAP_LLSTRING_LOAD") + "\n";
-            signal += Entra("ULTIMOESCANO") + "\n";
-            return signal;
+            StringBuilder sb = new StringBuilder();
+            sb.Append(EventBuild("codigoSede", "MAP_STRING_PAR", $"'{codPartido}'", 1));
+            sb.Append(EventRunBuild("Superfaldon/Sedes/DespliegaSede"));
+            return sb.ToString();
+        }
+        public string encadenarSede(string codPartido)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(EventBuild("nextCodigoSede", "MAP_STRING_PAR", $"'{codPartido}'", 1));
+            sb.Append(EventRunBuild("Superfaldon/Sedes/PreparaEncadenaSede"));
+            sb.Append(EventRunBuild("Superfaldon/Sedes/EncadenaSede"));
+            return sb.ToString();
+        }
+        public string replegarSede(string codPartido)
+        {
+            return EventRunBuild("Superfaldon/Sedes/RepliegaSede");
         }
 
-        public string ultimoSuperSale() => Sale("ULTIMOESCANO");
+        #endregion
+
+        #region Actualiza
+
+        public string sfFichasSale() => EventRunBuild("ReloadPartidos");
 
         #endregion
 
-        #region Sedes Superfaldón
+        #region Ultimo
 
-        public string superfaldonSedesEntra() => Entra("SEDES");
-        public string superfaldonSedesEncadena() => Entra("SEDES/ENCADENA");
-        public string superfaldonSedesSale() => Sale("SEDES");
-
-        #endregion
-
-        #region Fichas Superfaldón
-
-        // TODO: Construir señal para entrada del gráfico FICHAS en SUPERFALDÓN
-        public string sfFichasEntra() => "";
-
-        // TODO: Construir señal para encadenar entre gráficos FICHAS en SUPERFALDÓN
-        public string sfFichasEncadena() => "";
-
-        // TODO: Construir señal para salida del gráfico FICHAS en SUPERFALDÓN
-        public string sfFichasSale() => "";
+        public string ultimoEntra() => EventRunBuild("ULTIMO/Entra");
+        public string ultimoSale() => EventRunBuild("ULTIMO/Sale");
 
         #endregion
 
@@ -246,29 +250,17 @@ namespace Elecciones.src.mensajes.builders
 
         #endregion
 
-        #region Bipartidismo Superfaldón
+        #region CCAA
 
-        // TODO: Construir señal para entrada del gráfico BIPARTIDISMO en SUPERFALDÓN
-        public string sfBipartidismoEntra() => "";
-
-        // TODO: Construir señal para encadenar entre gráficos BIPARTIDISMO en SUPERFALDÓN
-        public string sfBipartidismoEncadena() => "";
-
-        // TODO: Construir señal para salida del gráfico BIPARTIDISMO en SUPERFALDÓN
-        public string sfBipartidismoSale() => "";
+        public string CCAAEntra() => EventRunBuild("CCAA/Entra");
+        public string CCAAESale() => EventRunBuild("CCAA/Entra");
 
         #endregion
 
-        #region Ganador Superfaldón
+        #region Escrutado
 
-        // TODO: Construir señal para entrada del gráfico GANADOR en SUPERFALDÓN
-        public string sfGanadorEntra() => "";
-
-        // TODO: Construir señal para encadenar entre gráficos GANADOR en SUPERFALDÓN
-        public string sfGanadorEncadena() => "";
-
-        // TODO: Construir señal para salida del gráfico GANADOR en SUPERFALDÓN
-        public string sfGanadorSale() => "";
+        public string EscrutadoEntra() => EventRunBuild("Escrutado/Entra");
+        public string EscrutadoSale() => EventRunBuild("Escrutado/Sale");
 
         #endregion
     }

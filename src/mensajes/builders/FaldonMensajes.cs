@@ -177,6 +177,44 @@ namespace Elecciones.src.mensajes.builders
             }
         }
 
+        private static readonly Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)> tickerTDLayouts = new()
+        {
+            {1, (1341, new[] {512}, -1125, 61)},
+            {2, (660, new[] {170,855}, -765, -300)},
+            {3, (435, new[] {56,512,967}, -675, -400)},
+            {4, (320, new[] {0,341,683,1024}, -621, -441)},
+            {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
+            {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
+            {7, (170, new[] {-35,150,335,520,705,890,1075}, -554, -474)},
+            {8, (157, new[] {-73,95,263,431,599,767,935,1103}, -554, -475)},
+            {9, (131, new[] {-63,82,227,372,517,662,807,952,1097}, -545, -464)},
+        };
+
+        private static (int Size, int[] Positions, int LogoPos, int EscanosPos) GetTickerTDLayout(int partidosActivos)
+        {
+            int countSeguro = Math.Max(partidosActivos, 1);
+            return tickerTDLayouts.TryGetValue(countSeguro, out var layout) ? layout : tickerTDLayouts[1];
+        }
+
+        private int GetTickerTDPosicionNoActivosBase((int Size, int[] Positions, int LogoPos, int EscanosPos) layout, int partidosActivos)
+        {
+            if (layout.Positions == null || layout.Positions.Length == 0)
+            {
+                return layout.Size;
+            }
+
+            int indiceUltimoActivo = partidosActivos > 0
+                ? Math.Min(partidosActivos - 1, layout.Positions.Length - 1)
+                : layout.Positions.Length - 1;
+
+            return layout.Positions[indiceUltimoActivo] + layout.Size;
+        }
+
+        private int GetTickerTDPasoNoActivos((int Size, int[] Positions, int LogoPos, int EscanosPos) layout)
+        {
+            return layout.Size + margin;
+        }
+
         public string TickerEntra(bool oficiales, BrainStormDTO dto)
         {
             if (dto == null) return "";
@@ -788,39 +826,44 @@ namespace Elecciones.src.mensajes.builders
 
         public string TickerTDEntra(BrainStormDTO dto)
         {
-            // Ordenar partidos según PartidoDTOComparerUnified (por escaños/votos descendente)
+            // Ordenar partidos segun PartidoDTOComparerUnified (por escanios/votos descendente)
             List<PartidoDTO> partidosActivos = dto.partidos.ToList();
             partidosActivos.Sort(new PartidoDTOComparerUnified(true));
             partidosActivos.Reverse(); // Descendente
             partidosActivos = partidosActivos.Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
 
+            List<string> siglasPartidos = GetPartidosBaseParaIds(dto)
+                .Select(x => x.siglas)
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct()
+                .ToList();
 
-            List<string> siglasPartidos = dto.partidos.Select(x => x.siglas).ToList();
+            foreach (string sigla in dto.partidos.Select(x => x.siglas).Where(s => !string.IsNullOrWhiteSpace(s)))
+            {
+                if (!siglasPartidos.Contains(sigla))
+                {
+                    siglasPartidos.Add(sigla);
+                }
+            }
+
             List<string> siglasActivos = partidosActivos.Select(x => x.siglas).ToList();
+            HashSet<string> siglasActivasSet = new HashSet<string>(siglasActivos);
+
             string signal = "";
             signal += EventBuild("NumeroEscrutado", "TEXT_STRING", $"'{dto.circunscripcionDTO.escrutado}%'", 2, 0.5, 0) + "\n";
 
             int n = partidosActivos?.Count ?? 0;
-
-            var layoutByCount = new Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)>()
-            {
-                {1, (1341, new[] {512}, -1125, 61)},
-                {2, (660, new[] {170,855}, -765, -300)},
-                {3, (435, new[] {56,512,967}, -675, -400)},
-                {4, (320, new[] {0,341,683,1024}, -621, -441)},
-                {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
-                {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
-                {7, (170, new[] {-35,150,335,520,705,890,1075}, -554, -474)},
-                {8, (157, new[] {-73,95,263,431,599,767,935,1103}, -554, -475)},
-                {9, (131, new[] {-63,82,227,372,517,662,807,952,1097}, -545, -464)},
-            };
-
-            var layout = layoutByCount.ContainsKey(n) ? layoutByCount[n] : layoutByCount[1];
+            var layout = GetTickerTDLayout(n);
             signal += EventBuild("Pastilla", "PRIM_BAR_LEN[0]", $"{layout.Size}", 2, 0.5, 0) + "\n";
+
+            int posicionNoActivosBase = GetTickerTDPosicionNoActivosBase(layout, n);
+            int pasoNoActivos = GetTickerTDPasoNoActivos(layout);
+            int offsetNoActivos = 0;
 
             var activeIndex = siglasActivos
                 .Select((s, i) => new { Sigla = s, Index = i })
                 .ToDictionary(x => x.Sigla, x => x.Index);
+
             static string Esc(string s) => s?.Replace("+", "_").Replace("-", "_") ?? s;
 
             for (int idx = 0; idx < siglasPartidos.Count; idx++)
@@ -828,7 +871,7 @@ namespace Elecciones.src.mensajes.builders
                 var siglaRaw = siglasPartidos[idx];
                 var siglaObj = Esc(siglaRaw);
 
-                // Determinar escala según número de partidos
+                // Determinar escala segun numero de partidos
                 string escala = n <= 7 ? "(1,1,1)" : (n == 8 ? "(0.9,0.9,0.9)" : "(0.75,0.75,0.75)");
 
                 if (activeIndex.TryGetValue(siglaRaw, out int posIndex) && posIndex >= 0 && posIndex < layout.Positions.Length)
@@ -841,10 +884,12 @@ namespace Elecciones.src.mensajes.builders
                 }
                 else
                 {
-                    signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
+                    int posicionNoActivo = posicionNoActivosBase + (offsetNoActivos * pasoNoActivos);
+                    signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{posicionNoActivo}", 2, 0.5, 0) + "\n";
                     signal += EventBuild($"Partidos/{siglaObj}/Logo", "OBJ_DISPLACEMENT[0]", $"{layout.LogoPos}", 1) + "\n";
                     signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layout.EscanosPos}", 1) + "\n";
                     signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_SCALE", escala, 1) + "\n";
+                    offsetNoActivos++;
                 }
             }
 
@@ -852,16 +897,17 @@ namespace Elecciones.src.mensajes.builders
             {
                 var siglaObj = Esc(siglaRaw);
 
-                if (siglasActivos.Contains(siglaRaw))
+                if (siglasActivasSet.Contains(siglaRaw))
                 {
                     PartidoDTO temp = dto.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
+                    int escanios = temp?.escanios ?? 0;
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "0", 2, 0.2, 0) + "\n";
-                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escanios}'", 2, 0.5, 0) + "\n";
+                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{escanios}'", 2, 0.5, 0) + "\n";
                 }
                 else
                 {
                     signal += Oculta_Desoculta(true, $"Partidos/{siglaObj}") + "\n";
-                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'0'", 2, 0.5, 0) + "\n";
+                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", "'0'", 2, 0.5, 0) + "\n";
                 }
             }
 
@@ -881,9 +927,31 @@ namespace Elecciones.src.mensajes.builders
             partidosActivos.Reverse(); // Descendente
             partidosActivos = partidosActivos.Where(p => dtoNuevo.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0).ToList();
 
-            List<string> siglasPartidos = dtoNuevo.partidos.Select(x => x.siglas).ToList();
+            List<string> siglasPartidos = GetPartidosBaseParaIds(dtoNuevo)
+                .Select(x => x.siglas)
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct()
+                .ToList();
+
+            foreach (string sigla in dtoAnterior.partidos.Select(x => x.siglas).Where(s => !string.IsNullOrWhiteSpace(s)))
+            {
+                if (!siglasPartidos.Contains(sigla))
+                {
+                    siglasPartidos.Add(sigla);
+                }
+            }
+
+            foreach (string sigla in dtoNuevo.partidos.Select(x => x.siglas).Where(s => !string.IsNullOrWhiteSpace(s)))
+            {
+                if (!siglasPartidos.Contains(sigla))
+                {
+                    siglasPartidos.Add(sigla);
+                }
+            }
+
             List<string> siglasNuevas = partidosActivos.Select(x => x.siglas).ToList();
             List<string> siglasAnteriores = partidosActuales.Select(x => x.siglas).ToList();
+            HashSet<string> siglasAnterioresSet = new HashSet<string>(siglasAnteriores);
 
             string signal = "";
             signal += EventBuild("NumeroEscrutado", "TEXT_STRING", $"'{dtoNuevo.circunscripcionDTO.escrutado}%'", 2, 0.5, 0) + "\n";
@@ -896,23 +964,15 @@ namespace Elecciones.src.mensajes.builders
             var siglasQueSalen = siglasAnteriores.Except(siglasNuevas).ToList();
             var siglasQueEntran = siglasNuevas.Except(siglasAnteriores).ToList();
 
+            var layoutNuevo = GetTickerTDLayout(nNuevo);
+
             if (nAnterior != nNuevo)
             {
-                var layoutByCount = new Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)>()
-                {
-                    {1, (1341, new[] {512}, -1125, 61)},
-                    {2, (660, new[] {170,855}, -765, -300)},
-                    {3, (435, new[] {56,512,967}, -675, -400)},
-                    {4, (320, new[] {0,341,683,1024}, -621, -441)},
-                    {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
-                    {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
-                    {7, (170, new[] {-35,150,335,520,705,890,1075}, -554, -474)},
-                    {8, (157, new[] {-73,95,263,431,599,767,935,1103}, -554, -475)},
-                    {9, (131, new[] {-63,82,227,372,517,662,807,952,1097}, -545, -464)},
-                };
-
-                var layoutNuevo = layoutByCount.ContainsKey(nNuevo) ? layoutByCount[nNuevo] : layoutByCount[1];
                 signal += EventBuild("Pastilla", "PRIM_BAR_LEN[0]", $"{layoutNuevo.Size}", 2, 0.5, 0) + "\n";
+
+                int posicionNoActivosBase = GetTickerTDPosicionNoActivosBase(layoutNuevo, nNuevo);
+                int pasoNoActivos = GetTickerTDPasoNoActivos(layoutNuevo);
+                int offsetNoActivos = 0;
 
                 var newActiveIndex = siglasNuevas
                     .Select((s, i) => new { Sigla = s, Index = i })
@@ -926,7 +986,7 @@ namespace Elecciones.src.mensajes.builders
                     if (newActiveIndex.TryGetValue(siglaRaw, out int newPosIndex) && newPosIndex >= 0 && newPosIndex < layoutNuevo.Positions.Length)
                     {
                         int newPos = layoutNuevo.Positions[newPosIndex];
-                        bool wasActive = siglasAnteriores.Contains(siglaRaw);
+                        bool wasActive = siglasAnterioresSet.Contains(siglaRaw);
 
                         if (!wasActive)
                         {
@@ -950,38 +1010,32 @@ namespace Elecciones.src.mensajes.builders
                         signal += EventBuild($"Partidos/{siglaObj}/Logo", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.LogoPos}", 1) + "\n";
                         signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.EscanosPos}", 1) + "\n";
 
-                        // Determinar escala según número de partidos
+                        // Determinar escala segun numero de partidos
                         string escalaNuevo = nNuevo <= 7 ? "(1,1,1)" : (nNuevo == 8 ? "(0.9,0.9,0.9)" : "(0.75,0.75,0.75)");
                         signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_SCALE", escalaNuevo, 2, 0.5, 0) + "\n";
 
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
-                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escanios}'", 2, 0.5, 0) + "\n";
+                        int escanios = temp?.escanios ?? 0;
+                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{escanios}'", 2, 0.5, 0) + "\n";
                         signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n";
                     }
                     else
                     {
-                        signal += EventBuild($"Partidos/{Esc(siglaRaw)}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
+                        int posicionNoActivo = posicionNoActivosBase + (offsetNoActivos * pasoNoActivos);
+                        signal += EventBuild($"Partidos/{Esc(siglaRaw)}", "OBJ_DISPLACEMENT[0]", $"{posicionNoActivo}", 2, 0.5, 0) + "\n";
                         signal += EventBuild($"Partidos/{Esc(siglaRaw)}", "OBJ_CULL", "1", 2, 0.3, 0) + "\n";
                         signal += EventBuild($"Escaños/{Esc(siglaRaw)}", "TEXT_STRING", "'0'", 2, 0.5, 0) + "\n";
+                        offsetNoActivos++;
                     }
                 }
             }
             else
             {
-                var layoutByCount = new Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)>()
-                {
-                    {1, (1341, new[] {512}, -1125, 61)},
-                    {2, (660, new[] {170,855}, -765, -300)},
-                    {3, (435, new[] {56,512,967}, -675, -400)},
-                    {4, (320, new[] {0,341,683,1024}, -621, -441)},
-                    {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
-                    {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
-                    {7, (170, new[] {-35,150,335,520,705,890,1075}, -554, -474)},
-                    {8, (157, new[] {-73,95,263,431,599,767,935,1103}, -554, -475)},
-                    {9, (131, new[] {-63,82,227,372,517,662,807,952,1097}, -545, -464)},
-                };
+                (int Size, int[] Positions, int LogoPos, int EscanosPos) layout = layoutNuevo;
 
-                (int Size, int[] Positions, int LogoPos, int EscanosPos) layout = layoutByCount[nNuevo];
+                int posicionNoActivosBase = GetTickerTDPosicionNoActivosBase(layout, nNuevo);
+                int pasoNoActivos = GetTickerTDPasoNoActivos(layout);
+                int offsetNoActivos = 0;
 
                 var newActiveIndex = siglasNuevas
                     .Select((s, i) => new { Sigla = s, Index = i })
@@ -1009,16 +1063,19 @@ namespace Elecciones.src.mensajes.builders
                         }
 
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
-                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escanios}'", 2, 0.5, 0) + "\n";
+                        int escanios = temp?.escanios ?? 0;
+                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{escanios}'", 2, 0.5, 0) + "\n";
                     }
                 }
 
                 foreach (var siglaRaw in siglasQueSalen)
                 {
                     var siglaObj = Esc(siglaRaw);
-                    signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", "1920", 2, 0.5, 0) + "\n";
+                    int posicionNoActivo = posicionNoActivosBase + (offsetNoActivos * pasoNoActivos);
+                    signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{posicionNoActivo}", 2, 0.5, 0) + "\n";
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "1", 2, 0.3, 0) + "\n";
                     signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", "'0'", 2, 0.5, 0) + "\n";
+                    offsetNoActivos++;
                 }
 
                 foreach (var siglaRaw in siglasQueEntran)
@@ -1028,12 +1085,12 @@ namespace Elecciones.src.mensajes.builders
 
                     if (newActiveIndex.TryGetValue(siglaRaw, out int newPosIndex) && newPosIndex >= 0)
                     {
-                        var layout2 = layoutByCount[nNuevo];
-                        int newPos = layout2.Positions[newPosIndex];
+                        int newPos = layout.Positions[newPosIndex];
                         signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
 
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
-                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{temp.escanios}'", 2, 0.5, 0) + "\n";
+                        int escanios = temp?.escanios ?? 0;
+                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{escanios}'", 2, 0.5, 0) + "\n";
                     }
                 }
             }
@@ -1578,3 +1635,4 @@ namespace Elecciones.src.mensajes.builders
         #endregion
     }
 }
+

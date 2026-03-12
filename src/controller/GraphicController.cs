@@ -563,6 +563,10 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.sfPactometroEncadena(); }
         }
+        public void sfPactometroReinicio()
+        {
+            if (ipfActivo.Valor == 1) { ipf.sfPactometroReinicio(); }
+        }
         public void sfPactometroSale()
         {
             if (ipfActivo.Valor == 1) { ipf.sfPactometroSale(); }

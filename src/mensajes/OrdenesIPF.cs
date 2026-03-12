@@ -574,6 +574,11 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(superfaldonBuilder.sfPactometroEncadena());
         }
 
+        public void sfPactometroReinicio()
+        {
+            c.EnviarMensaje(superfaldonBuilder.sfPactometroReinicio());
+        }
+
         public void sfPactometroSale()
         {
             c.EnviarMensaje(superfaldonBuilder.sfPactometroSale());

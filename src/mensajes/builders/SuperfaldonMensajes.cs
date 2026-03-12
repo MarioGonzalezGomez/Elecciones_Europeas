@@ -1,6 +1,9 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
+using System.Text;
+using Elecciones.src.model.DTO.BrainStormDTO;
+
 namespace Elecciones.src.mensajes.builders
 {
     /// <summary>
@@ -65,36 +68,185 @@ namespace Elecciones.src.mensajes.builders
 
         #region Pactómetro Superfaldón
 
-        public string pactometroEntra() => EventRunBuild("PACTOMETRO/Entra");
-        public string pactometroReinicio() => EventRunBuild("PACTOMETRO/Prepara");
-        public string pactometroSale() => EventRunBuild("PACTOMETRO/Sale");
+        // TODO: Construir señal para entrada del gráfico PACTÓMETRO en SUPERFALDÓN
+        private readonly double pxTotalesPactometroSF = 1748;
+        private double acumuladoSFIzqDesde = 0;
+        private double acumuladoSFIzqHasta = 0;
+        private double acumuladoSFDerDesde = 0;
+        private double acumuladoSFDerHasta = 0;
+        private int acumuladoSFEscanosIzqDesde = 0;
+        private int acumuladoSFEscanosIzqHasta = 0;
+        private int acumuladoSFEscanosDerDesde = 0;
+        private int acumuladoSFEscanosDerHasta = 0;
+        private bool ultimaEntradaSFIzqFuePrimera = false;
+        private bool ultimaEntradaSFDerFuePrimera = false;
 
-        public string pactometroPartidoEntra(bool oficiales, string codPartido, bool izq)
+        private readonly List<string> partidosEnPactoSFDerecha = new List<string>();
+        private readonly List<string> partidosEnPactoSFIzquierda = new List<string>();
+
+        public string sfPactometroEntra()
         {
+            ResetPactometroSFState();
+            return EventRunBuild("Pactometro/Entra");
+        }
+
+        // TODO: Construir señal para encadenar entre gráficos PACTÓMETRO en SUPERFALDÓN
+        public string sfPactometroEncadena()
+        {
+            return EventRunBuild("Pactometro/Encadena");
+        }
+
+        // TODO: Construir señal para salida del gráfico PACTÓMETRO en SUPERFALDÓN
+        public string sfPactometroSale()
+        {
+            ResetPactometroSFState();
             StringBuilder sb = new StringBuilder();
-            string sondeo = oficiales ? "" : "Sondeo";
-            string lado = izq ? "Izq" : "Der";
-            bool primerPartido = false;
-
-            if (primerPartido)
-            {
-                sb.Append(EventBuild($"PACTOMETRO/PrimerPartido{lado}{sondeo}", "MAP_STRING_PAR", $"'{codPartido}'", 1));
-            }
-            else
-            {
-                sb.Append(EventBuild($"PACTOMETRO/SiguientePartido{lado}{sondeo}", "MAP_STRING_PAR", $"'{codPartido}'", 1));
-            }
-
-            sb.Append(EventBuild($"PACTOMETRO/CurrentPartidos{lado}{sondeo}", "MAP_INT_PAR", numPartidosEnEseLado, 1));
-            sb.Append(EventBuild($"PACTOMETRO/Escanos{lado}", "MAP_INT_PAR", acumuladoLado, 1));
-            if (!oficiales)
-            {
-                sb.Append(EventBuild($"PACTOMETRO/Escanos{lado}Hasta", "MAP_INT_PAR", acumuladoLadoHasta, 1));
-            }
-
+            sb.Append(EventRunBuild("Pactometro/Sale"));
+            sb.Append(EventRunBuild("Pactometro/reinicioPactometroIzq"));
+            sb.Append(EventRunBuild("Pactometro/reinicioPactometroDer"));
             return sb.ToString();
         }
 
+        public string sfPactometroReinicio()
+        {
+            ResetPactometroSFState();
+            StringBuilder sb = new StringBuilder();
+            sb.Append(EventRunBuild("Pactometro/reinicioPactometroIzq"));
+            sb.Append(EventRunBuild("Pactometro/reinicioPactometroDer"));
+            return sb.ToString();
+        }
+
+        public string pactometroPartidoEntra(BrainStormDTO dto, PartidoDTO pSeleccionado, bool izquierda)
+        {
+            if (dto == null || pSeleccionado == null || string.IsNullOrWhiteSpace(pSeleccionado.codigo))
+            {
+                return "";
+            }
+
+            bool oficiales = dto.oficiales;
+            int totalEscanos = SafeEscanosTotalesSF(dto);
+            var (escanosDesde, escanosHasta) = GetEscanosPartidoSF(pSeleccionado, oficiales);
+            bool esPrimeroEnLado;
+
+            if (izquierda)
+            {
+                if (partidosEnPactoSFIzquierda.Contains(pSeleccionado.codigo))
+                {
+                    return "";
+                }
+
+                partidosEnPactoSFIzquierda.Add(pSeleccionado.codigo);
+                esPrimeroEnLado = partidosEnPactoSFIzquierda.Count == 1;
+
+                acumuladoSFEscanosIzqDesde += escanosDesde;
+                acumuladoSFEscanosIzqHasta += escanosHasta;
+                acumuladoSFIzqDesde += CalcAnchoPactoSF(escanosDesde, totalEscanos, pxTotalesPactometroSF);
+                acumuladoSFIzqHasta += CalcAnchoPactoSF(escanosHasta, totalEscanos, pxTotalesPactometroSF);
+            }
+            else
+            {
+                if (partidosEnPactoSFDerecha.Contains(pSeleccionado.codigo))
+                {
+                    return "";
+                }
+
+                partidosEnPactoSFDerecha.Add(pSeleccionado.codigo);
+                esPrimeroEnLado = partidosEnPactoSFDerecha.Count == 1;
+
+                acumuladoSFEscanosDerDesde += escanosDesde;
+                acumuladoSFEscanosDerHasta += escanosHasta;
+                acumuladoSFDerDesde += CalcAnchoPactoSF(escanosDesde, totalEscanos, pxTotalesPactometroSF);
+                acumuladoSFDerHasta += CalcAnchoPactoSF(escanosHasta, totalEscanos, pxTotalesPactometroSF);
+            }
+
+            if (izquierda)
+            {
+                ultimaEntradaSFIzqFuePrimera = esPrimeroEnLado;
+            }
+            else
+            {
+                ultimaEntradaSFDerFuePrimera = esPrimeroEnLado;
+            }
+
+            return "";
+        }
+
+        public int pactometroNumPartidosLado(bool izquierda)
+        {
+            return izquierda ? partidosEnPactoSFIzquierda.Count : partidosEnPactoSFDerecha.Count;
+        }
+
+        public bool pactometroUltimaEntradaFuePrimera(bool izquierda)
+        {
+            return izquierda ? ultimaEntradaSFIzqFuePrimera : ultimaEntradaSFDerFuePrimera;
+        }
+
+        public (int escanosDesde, int escanosHasta, double barraDesde, double barraHasta) pactometroAcumuladosLado(bool izquierda)
+        {
+            return izquierda
+                ? (acumuladoSFEscanosIzqDesde, acumuladoSFEscanosIzqHasta, acumuladoSFIzqDesde, acumuladoSFIzqHasta)
+                : (acumuladoSFEscanosDerDesde, acumuladoSFEscanosDerHasta, acumuladoSFDerDesde, acumuladoSFDerHasta);
+        }
+
+        private static (int escanosDesde, int escanosHasta) GetEscanosPartidoSF(PartidoDTO partido, bool oficiales)
+        {
+            if (partido == null)
+            {
+                return (0, 0);
+            }
+
+            if (oficiales)
+            {
+                int escanos = Math.Max(0, partido.escanios);
+                return (escanos, escanos);
+            }
+
+            return (Math.Max(0, partido.escaniosDesdeSondeo), Math.Max(0, partido.escaniosHastaSondeo));
+        }
+
+        private static int SafeEscanosTotalesSF(BrainStormDTO dto)
+        {
+            return dto?.circunscripcionDTO?.escaniosTotales > 0 ? dto.circunscripcionDTO.escaniosTotales : 1;
+        }
+
+        private static double CalcAnchoPactoSF(int escanos, int totalEscanos, double pxTotales)
+        {
+            if (totalEscanos <= 0)
+            {
+                return 0;
+            }
+
+            return (escanos * pxTotales) / totalEscanos;
+        }
+
+        private void ResetPactometroSFState()
+        {
+            acumuladoSFIzqDesde = 0;
+            acumuladoSFIzqHasta = 0;
+            acumuladoSFDerDesde = 0;
+            acumuladoSFDerHasta = 0;
+            acumuladoSFEscanosIzqDesde = 0;
+            acumuladoSFEscanosIzqHasta = 0;
+            acumuladoSFEscanosDerDesde = 0;
+            acumuladoSFEscanosDerHasta = 0;
+            ultimaEntradaSFIzqFuePrimera = false;
+            ultimaEntradaSFDerFuePrimera = false;
+            partidosEnPactoSFDerecha.Clear();
+            partidosEnPactoSFIzquierda.Clear();
+        }
+
+        #endregion
+
+        #region Mayorías Superfaldón
+
+        // TODO: Construir señal para entrada del gráfico MAYORÍAS en SUPERFALDÓN
+        public string sfMayoriasEntra() => "";
+
+        // TODO: Construir señal para encadenar entre gráficos MAYORÍAS en SUPERFALDÓN
+        public string sfMayoriasEncadena() => "";
+
+        // TODO: Construir señal para salida del gráfico MAYORÍAS en SUPERFALDÓN
+        public string sfMayoriasSale() => "";
 
         #endregion
 

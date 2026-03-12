@@ -586,6 +586,7 @@ namespace Elecciones
 
         private void btnReset_Click(object sender, RoutedEventArgs e)
         {
+            var main = Application.Current.MainWindow as MainWindow;
             partidosDentroDer.Clear();
             partidosDentroIzq.Clear();
             partidosDisponibles.Clear();
@@ -595,7 +596,14 @@ namespace Elecciones
             lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
             lblEscaniosDer.Content = $"Total escaños: {totalDer}";
             //HARDCODED, esto mejorar para que sea adaptable al tipo de grafico actual
-            graficos.pactosReinicio("FICHAS");
+            if (main != null && main.EsCabeceraSuperfaldon())
+            {
+                graficos.sfPactometroReinicio();
+            }
+            else
+            {
+                graficos.pactosReinicio("FICHAS");
+            }
 
         }
 
@@ -606,21 +614,38 @@ namespace Elecciones
         }
         private void btnEntra_Click(object sender, RoutedEventArgs e)
         {
+            var main = Application.Current.MainWindow as MainWindow;
             if (!preparado)
             {
                 EscribirPacto();
             }
-            graficos.pactosEntra();
+            if (main != null && main.EsCabeceraSuperfaldon())
+            {
+                graficos.sfPactometroEntra();
+                main.sfPactometroDentro = true;
+            }
+            else
+            {
+                graficos.pactosEntra();
+            }
             pactoDentro = true;
 
         }
         private void btnSale_Click(object sender, RoutedEventArgs e)
         {
-            graficos.pactosSale();
+            var main = Application.Current.MainWindow as MainWindow;
+            if (main != null && main.EsCabeceraSuperfaldon())
+            {
+                graficos.sfPactometroSale();
+                main.sfPactometroDentro = false;
+            }
+            else
+            {
+                graficos.pactosSale();
+            }
             graficos.ultimoLimpiaPartidos();
             pactoDentro = false;
-            var main = Application.Current.MainWindow as MainWindow;
-            main.Update();
+            main?.Update();
 
         }
 

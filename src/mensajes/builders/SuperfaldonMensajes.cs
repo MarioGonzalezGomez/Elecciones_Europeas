@@ -1,3 +1,6 @@
+using System.Runtime.InteropServices;
+using System.Text;
+
 using System.Text;
 using Elecciones.src.model.DTO.BrainStormDTO;
 
@@ -21,8 +24,8 @@ namespace Elecciones.src.mensajes.builders
 
         #region Carrusel (incluye sedes)
 
-        public string superfaldonEntra(bool oficiales) => oficiales ? EventRunBuild("Superfaldon/Oficial/Entra") : EventRunBuild("Superfaldon/Sondeo/Entra");
-        public string superfaldonSale(bool oficiales) => oficiales ? EventRunBuild("Superfaldon/Oficial/Sale") : EventRunBuild("Superfaldon/Sondeo/Sale");
+        public string carruselEntra(bool oficiales) => oficiales ? EventRunBuild("Superfaldon/Oficial/Entra") : EventRunBuild("Superfaldon/Sondeo/Entra");
+        public string carruselSale(bool oficiales) => oficiales ? EventRunBuild("Superfaldon/Oficial/Sale") : EventRunBuild("Superfaldon/Sondeo/Sale");
 
         #endregion
 
@@ -43,7 +46,7 @@ namespace Elecciones.src.mensajes.builders
             sb.Append(EventRunBuild("Superfaldon/Sedes/EncadenaSede"));
             return sb.ToString();
         }
-        public string replegarSede()
+        public string replegarSede(string codPartido)
         {
             return EventRunBuild("Superfaldon/Sedes/RepliegaSede");
         }
@@ -237,7 +240,7 @@ namespace Elecciones.src.mensajes.builders
         #region CCAA
 
         public string CCAAEntra() => EventRunBuild("CCAA/Entra");
-        public string CCAASale() => EventRunBuild("CCAA/Sale");
+        public string CCAAESale() => EventRunBuild("CCAA/Entra");
 
         #endregion
 

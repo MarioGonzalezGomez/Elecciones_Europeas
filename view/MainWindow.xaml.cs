@@ -380,7 +380,7 @@ namespace Elecciones
                     if (string.Equals(graficosHeader.Header, "FALDÓN")) { UpdateFaldones(dtoAnterior); }
                     //Add cambios por actualizacion en vivo en cartones
                     if (string.Equals(graficosHeader.Header, "CARTÓN")) { UpdateCartones(dtoAnterior); }
-                    if (string.Equals(graficosHeader.Header, "SUPERFADÓN")) { UpdateSuperfaldones(); }
+                    if (EsCabeceraSuperfaldon()) { UpdateSuperfaldones(); }
 
                     // Actualizar datos en la ventana de Pactos si está abierta
                     if (pactos != null)
@@ -431,6 +431,16 @@ namespace Elecciones
         }
         private void UpdateSuperfaldones()
         {
+        }
+
+        public bool EsCabeceraSuperfaldon()
+        {
+            string cabecera = graficosHeader?.Header?.ToString() ?? "";
+            return string.Equals(cabecera, "SUPERFALDÓN", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(cabecera, "SUPERFADÓN", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(cabecera, "PANTALLA", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(cabecera, "REALIDAD AUMENTADA", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(cabecera, "DRON", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool CompararOrden(BrainStormDTO anterior, BrainStormDTO actual)

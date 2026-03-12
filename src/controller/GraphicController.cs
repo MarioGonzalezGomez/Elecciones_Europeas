@@ -507,13 +507,21 @@ namespace Elecciones.src.controller
         }
 
         //SUPERFALDON
+        public void superfaldonEntra(bool oficiales)
+        {
+            if (ipfActivo.Valor == 1) { ipf.superfaldonEntra(oficiales); }
+        }
         public void superfaldonEntra()
         {
-            if (ipfActivo.Valor == 1) { ipf.superfaldonEntra(); }
+            superfaldonEntra(true);
+        }
+        public void superfaldonSale(bool oficiales)
+        {
+            if (ipfActivo.Valor == 1) { ipf.superfaldonSale(oficiales); }
         }
         public void superfaldonSale()
         {
-            if (ipfActivo.Valor == 1) { ipf.superfaldonSale(); }
+            superfaldonSale(true);
         }
 
         //ACTUALIZA
@@ -522,37 +530,53 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.sfActualiza(); }
         }
 
-        //SEDES
-        public void superfaldonSedesEntra()
+        //ESCRUTADO/CCAA/ULTIMO
+        public void sfEscrutadoEntra()
         {
-            if (ipfActivo.Valor == 1) { ipf.superfaldonSedesEntra(); }
+            if (ipfActivo.Valor == 1) { ipf.sfEscrutadoEntra(); }
         }
-        public void superfaldonSedesEncadena()
+        public void sfEscrutadoSale()
         {
-            if (ipfActivo.Valor == 1) { ipf.superfaldonSedesEncadena(); }
+            if (ipfActivo.Valor == 1) { ipf.sfEscrutadoSale(); }
         }
-        public void superfaldonSedesSale()
+        public void sfCCAAEntra()
         {
-            if (ipfActivo.Valor == 1) { ipf.superfaldonSedesSale(); }
+            if (ipfActivo.Valor == 1) { ipf.sfCCAAEntra(); }
+        }
+        public void sfCCAASale()
+        {
+            if (ipfActivo.Valor == 1) { ipf.sfCCAASale(); }
         }
 
-        //SUPERFALDON - FICHAS
-        public void sfFichasEntra()
+        //SEDES (solo carrusel superfaldón)
+        public void sfDesplegarSede(string codPartido)
         {
-            if (ipfActivo.Valor == 1) { ipf.sfFichasEntra(); }
-            // Enviar TickerFotosEntra a IPF2 (equipo secundario con Faldones)
-            ConexionGraficos.EnviarTickerFotosIPF2();
+            if (ipfActivo.Valor == 1) { ipf.sfDesplegarSede(codPartido); }
         }
-        public void sfFichasEncadena()
+        public void sfEncadenarSede(string codPartido)
         {
-            if (ipfActivo.Valor == 1) { ipf.sfFichasEncadena(); }
-            // Enviar TickerFotosEntra a IPF2 (equipo secundario con Faldones)
-            ConexionGraficos.EnviarTickerFotosIPF2();
+            if (ipfActivo.Valor == 1) { ipf.sfEncadenarSede(codPartido); }
         }
-        public void sfFichasSale()
+        public void sfReplegarSede()
         {
-            if (ipfActivo.Valor == 1) { ipf.sfFichasSale(); }
+            if (ipfActivo.Valor == 1) { ipf.sfReplegarSede(); }
         }
+
+        // Compatibilidad con llamadas legacy de superfaldón
+        public void sfFichasEntra() => sfEscrutadoEntra();
+        public void sfFichasEncadena() => sfEscrutadoEntra();
+        public void sfFichasSale() => sfEscrutadoSale();
+        public void superfaldonSedesEntra() { }
+        public void superfaldonSedesEncadena() { }
+        public void superfaldonSedesSale() => sfReplegarSede();
+        public void sfMayoriasEntra() => sfCCAAEntra();
+        public void sfMayoriasEncadena() => sfCCAAEntra();
+        public void sfMayoriasSale() => sfCCAASale();
+        public void sfBipartidismoEntra() => ultimoSuperEntra();
+        public void sfBipartidismoEncadena() => ultimoSuperEntra();
+        public void sfBipartidismoSale() => ultimoSuperSale();
+        public void sfGanadorSale() => ultimoSuperSale();
+        public void sfGanadorEntra() => ultimoSuperEntra();
 
         //SUPERFALDON - PACTOMETRO
         public void sfPactometroEntra()

@@ -74,6 +74,11 @@ namespace Elecciones
         bool sfMayoriasDentro;
         bool sfBipartidismoDentro;
         bool sfGanadorDentro;
+        bool sfCarruselDentro;
+        bool sfEscrutadoDentro;
+        bool sfCCAADentro;
+        bool sfUltimoDentro;
+        string? sfCodigoSedeDesplegada;
         bool cartonPartidosDentro;
         public bool ultimoEscanoDentro;
 
@@ -134,6 +139,11 @@ namespace Elecciones
             sfMayoriasDentro = false;
             sfBipartidismoDentro = false;
             sfGanadorDentro = false;
+            sfCarruselDentro = false;
+            sfEscrutadoDentro = false;
+            sfCCAADentro = false;
+            sfUltimoDentro = false;
+            sfCodigoSedeDesplegada = null;
             cartonPartidosDentro = false;
             ultimoEscanoDentro = false;
             circunscripcionNames = new ObservableCollection<string>();
@@ -437,7 +447,8 @@ namespace Elecciones
         public bool EsCabeceraSuperfaldon()
         {
             string cabecera = graficosHeader?.Header?.ToString() ?? "";
-            return string.Equals(cabecera, "SUPERFALDÓN", StringComparison.OrdinalIgnoreCase);
+            return string.Equals(cabecera, "SUPERFALDÓN", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(cabecera, "SUPERFADÓN", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool CompararOrden(BrainStormDTO anterior, BrainStormDTO actual)
@@ -1371,6 +1382,48 @@ namespace Elecciones
             }
         }
 
+        private void datosListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (dto == null || datosListView.SelectedItem == null)
+            {
+                return;
+            }
+
+            CPDataDTO? dataActual = datosListView.SelectedItem as CPDataDTO;
+            if (dataActual == null)
+            {
+                return;
+            }
+
+            partidoSeleccionado = dto.partidos.Find(par => string.Equals(par.codigo, dataActual.codigo));
+            if (partidoSeleccionado == null || string.IsNullOrWhiteSpace(partidoSeleccionado.codigo))
+            {
+                return;
+            }
+
+            if (!EsCabeceraSuperfaldon() || !sfCarruselDentro)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(sfCodigoSedeDesplegada))
+            {
+                graficos.sfDesplegarSede(partidoSeleccionado.codigo);
+                sfCodigoSedeDesplegada = partidoSeleccionado.codigo;
+                return;
+            }
+
+            if (string.Equals(sfCodigoSedeDesplegada, partidoSeleccionado.codigo, StringComparison.Ordinal))
+            {
+                graficos.sfReplegarSede();
+                sfCodigoSedeDesplegada = null;
+                return;
+            }
+
+            graficos.sfEncadenarSede(partidoSeleccionado.codigo);
+            sfCodigoSedeDesplegada = partidoSeleccionado.codigo;
+        }
+
         //LOGICA DE FICHEROS
         private BrainStormDTO ObtenerDTO(string circunscripcion)
         {
@@ -1548,6 +1601,11 @@ namespace Elecciones
             sondeoEnElAire = false;
             tickerDentro = false;
             sedeDentro = false;
+            sfCarruselDentro = false;
+            sfEscrutadoDentro = false;
+            sfCCAADentro = false;
+            sfUltimoDentro = false;
+            sfCodigoSedeDesplegada = null;
             if (pactos != null) { pactos.pactoDentro = false; }
         }
         private void btnPrepara_Click(object sender, RoutedEventArgs e)
@@ -1559,7 +1617,7 @@ namespace Elecciones
             if (!preparado) { EscribirFichero(); }
             if (string.Equals(graficosHeader.Header, "FALDÓN")) { EntraFaldon(); }
             if (string.Equals(graficosHeader.Header, "CARTÓN")) { EntraCarton(); }
-            if (string.Equals(graficosHeader.Header, "SUPERFALDÓN")) { EntraSuperfaldon(); }
+            if (EsCabeceraSuperfaldon()) { EntraSuperfaldon(); }
             if (string.Equals(graficosHeader.Header, "PANTALLA")) { EntraSuperfaldon(); }
             if (string.Equals(graficosHeader.Header, "REALIDAD AUMENTADA")) { EntraSuperfaldon(); }
             if (string.Equals(graficosHeader.Header, "DRON")) { EntraSuperfaldon(); }
@@ -1568,7 +1626,7 @@ namespace Elecciones
         {
             if (string.Equals(graficosHeader.Header, "FALDÓN")) { SaleFaldon(); }
             if (string.Equals(graficosHeader.Header, "CARTÓN")) { SaleCarton(); }
-            if (string.Equals(graficosHeader.Header, "SUPERFALDÓN")) { SaleSuperfaldon(); }
+            if (EsCabeceraSuperfaldon()) { SaleSuperfaldon(); }
         }
         private void btnActualiza_Click(object sender, RoutedEventArgs e)
         {
@@ -1682,8 +1740,8 @@ namespace Elecciones
                         else { graficos.ccaaEntra(dto); }
                         break;
                     case "SUPERFALDÓN":
-                        if (superfaldonDentro) { graficos.superfaldonEntra(); }
-                        else { graficos.superfaldonEntra(); }
+                        graficos.superfaldonEntra(oficiales);
+                        superfaldonDentro = true;
                         break;
                     case "VS":
                         //graficos.superfaldonEntra();
@@ -1719,24 +1777,20 @@ namespace Elecciones
                 switch (graficosListView.SelectedValue.ToString())
                 {
                     case "ESCRUTADO":
-                        if (sfFichasDentro) { graficos.sfFichasEncadena(); }
-                        else { graficos.sfFichasEntra(); }
-                        sfFichasDentro = true;
+                        graficos.sfEscrutadoEntra();
+                        sfEscrutadoDentro = true;
                         break;
                     case "CARRUSEL":
-                        if (sfPactometroDentro) { graficos.sfPactometroEncadena(); }
-                        else { graficos.sfPactometroEntra(); }
-                        sfPactometroDentro = true;
+                        graficos.superfaldonEntra(oficiales);
+                        sfCarruselDentro = true;
                         break;
                     case "CCAA":
-                        if (sfMayoriasDentro) { graficos.sfMayoriasEncadena(); }
-                        else { graficos.sfMayoriasEntra(); }
-                        sfMayoriasDentro = true;
+                        graficos.sfCCAAEntra();
+                        sfCCAADentro = true;
                         break;
                     case "ULTIMO":
-                        if (sfBipartidismoDentro) { graficos.sfBipartidismoEncadena(); }
-                        else { graficos.sfBipartidismoEntra(); }
-                        sfBipartidismoDentro = true;
+                        graficos.ultimoSuperEntra();
+                        sfUltimoDentro = true;
                         break;
 
                     default: break;
@@ -1808,7 +1862,8 @@ namespace Elecciones
                         fichaDentro = false;
                         break;
                     case "SUPERFALDÓN":
-                        graficos.superfaldonSale();
+                        graficos.superfaldonSale(oficiales);
+                        superfaldonDentro = false;
                         break;
                     case "VS":
                         // graficos.superfaldonEntra();
@@ -1834,25 +1889,26 @@ namespace Elecciones
             {
                 switch (graficosListView.SelectedValue.ToString())
                 {
-                    case "FICHAS":
-                        graficos.sfFichasSale();
-                        sfFichasDentro = false;
+                    case "ESCRUTADO":
+                        graficos.sfEscrutadoSale();
+                        sfEscrutadoDentro = false;
                         break;
-                    case "PACTÓMETRO":
-                        graficos.sfPactometroSale();
-                        sfPactometroDentro = false;
+                    case "CARRUSEL":
+                        graficos.superfaldonSale(oficiales);
+                        if (!string.IsNullOrWhiteSpace(sfCodigoSedeDesplegada))
+                        {
+                            graficos.sfReplegarSede();
+                        }
+                        sfCarruselDentro = false;
+                        sfCodigoSedeDesplegada = null;
                         break;
-                    case "MAYORÍAS":
-                        graficos.sfMayoriasSale();
-                        sfMayoriasDentro = false;
+                    case "CCAA":
+                        graficos.sfCCAASale();
+                        sfCCAADentro = false;
                         break;
-                    case "BIPARTIDISMO":
-                        graficos.sfBipartidismoSale();
-                        sfBipartidismoDentro = false;
-                        break;
-                    case "GANADOR":
-                        graficos.sfGanadorSale();
-                        sfGanadorDentro = false;
+                    case "ULTIMO":
+                        graficos.ultimoSuperSale();
+                        sfUltimoDentro = false;
                         break;
 
                     default: break;

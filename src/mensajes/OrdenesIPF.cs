@@ -491,6 +491,51 @@ namespace Elecciones.src.mensajes
         #endregion
 
         #region Superfaldón - Último
+        public void superfaldonEntra(bool oficiales)
+        {
+            c.EnviarMensaje(superfaldonBuilder.superfaldonEntra(oficiales));
+        }
+
+        public void superfaldonSale(bool oficiales)
+        {
+            c.EnviarMensaje(superfaldonBuilder.superfaldonSale(oficiales));
+        }
+
+        public void sfEscrutadoEntra()
+        {
+            c.EnviarMensaje(superfaldonBuilder.EscrutadoEntra());
+        }
+
+        public void sfEscrutadoSale()
+        {
+            c.EnviarMensaje(superfaldonBuilder.EscrutadoSale());
+        }
+
+        public void sfCCAAEntra()
+        {
+            c.EnviarMensaje(superfaldonBuilder.CCAAEntra());
+        }
+
+        public void sfCCAASale()
+        {
+            c.EnviarMensaje(superfaldonBuilder.CCAASale());
+        }
+
+        public void sfDesplegarSede(string codPartido)
+        {
+            c.EnviarMensaje(superfaldonBuilder.desplegarSede(codPartido));
+        }
+
+        public void sfEncadenarSede(string codPartido)
+        {
+            c.EnviarMensaje(superfaldonBuilder.encadenarSede(codPartido));
+        }
+
+        public void sfReplegarSede()
+        {
+            c.EnviarMensaje(superfaldonBuilder.replegarSede());
+        }
+
         public void sfActualiza()
         {
             c.EnviarMensaje(superfaldonBuilder.sfActualiza());

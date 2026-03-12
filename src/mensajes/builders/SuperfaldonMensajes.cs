@@ -1,6 +1,3 @@
-using System.Runtime.InteropServices;
-using System.Text;
-
 using System.Text;
 using Elecciones.src.model.DTO.BrainStormDTO;
 
@@ -46,7 +43,7 @@ namespace Elecciones.src.mensajes.builders
             sb.Append(EventRunBuild("Superfaldon/Sedes/EncadenaSede"));
             return sb.ToString();
         }
-        public string replegarSede(string codPartido)
+        public string replegarSede()
         {
             return EventRunBuild("Superfaldon/Sedes/RepliegaSede");
         }
@@ -240,7 +237,7 @@ namespace Elecciones.src.mensajes.builders
         #region CCAA
 
         public string CCAAEntra() => EventRunBuild("CCAA/Entra");
-        public string CCAAESale() => EventRunBuild("CCAA/Entra");
+        public string CCAASale() => EventRunBuild("CCAA/Sale");
 
         #endregion
 

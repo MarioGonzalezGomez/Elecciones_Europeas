@@ -227,7 +227,7 @@
                 </ListView.View>
             </ListView>
         </Grid>
-        <ListView Name="datosListView" Margin="5,0,5,0" Grid.Row="2" Grid.Column="2"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.CanContentScroll="False" SizeChanged="datosListView_SizeChanged" SelectionChanged="datosListView_SelectionChanged">
+        <ListView Name="datosListView" Margin="5,0,5,0" Grid.Row="2" Grid.Column="2"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.CanContentScroll="False" SizeChanged="datosListView_SizeChanged" SelectionChanged="datosListView_SelectionChanged" MouseDoubleClick="datosListView_MouseDoubleClick">
             <ListView.View>
                 <GridView>
                     <GridView.ColumnHeaderContainerStyle>

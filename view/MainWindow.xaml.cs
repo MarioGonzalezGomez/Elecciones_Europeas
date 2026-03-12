@@ -296,8 +296,8 @@ namespace Elecciones
                     graficosListView.Items.Add("ESCRUTADO");
                     graficosListView.Items.Add("CARRUSEL");
                     graficosListView.Items.Add("CCAA");
-                    graficosListView.Items.Add("PACTÓMETRO");
-                    //graficosListView.Items.Add("GANADOR");
+                    //graficosListView.Items.Add("PACTÓMETRO");
+                    graficosListView.Items.Add("ULTIMO");
                     break;
                 case 4:
                     graficosListView.Items.Add("PANTALLA 1");
@@ -431,6 +431,7 @@ namespace Elecciones
         }
         private void UpdateSuperfaldones()
         {
+            graficos.sfActualiza();
         }
 
         private bool CompararOrden(BrainStormDTO anterior, BrainStormDTO actual)
@@ -1711,30 +1712,25 @@ namespace Elecciones
             {
                 switch (graficosListView.SelectedValue.ToString())
                 {
-                    case "FICHAS":
+                    case "ESCRUTADO":
                         if (sfFichasDentro) { graficos.sfFichasEncadena(); }
                         else { graficos.sfFichasEntra(); }
                         sfFichasDentro = true;
                         break;
-                    case "PACTÓMETRO":
+                    case "CARRUSEL":
                         if (sfPactometroDentro) { graficos.sfPactometroEncadena(); }
                         else { graficos.sfPactometroEntra(); }
                         sfPactometroDentro = true;
                         break;
-                    case "MAYORÍAS":
+                    case "CCAA":
                         if (sfMayoriasDentro) { graficos.sfMayoriasEncadena(); }
                         else { graficos.sfMayoriasEntra(); }
                         sfMayoriasDentro = true;
                         break;
-                    case "BIPARTIDISMO":
+                    case "ULTIMO":
                         if (sfBipartidismoDentro) { graficos.sfBipartidismoEncadena(); }
                         else { graficos.sfBipartidismoEntra(); }
                         sfBipartidismoDentro = true;
-                        break;
-                    case "GANADOR":
-                        if (sfGanadorDentro) { graficos.sfGanadorEncadena(); }
-                        else { graficos.sfGanadorEntra(); }
-                        sfGanadorDentro = true;
                         break;
 
                     default: break;

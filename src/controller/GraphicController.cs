@@ -516,6 +516,12 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.superfaldonSale(); }
         }
 
+        //ACTUALIZA
+        public void sfActualiza()
+        {
+            if (ipfActivo.Valor == 1) { ipf.sfActualiza(); }
+        }
+
         //SEDES
         public void superfaldonSedesEntra()
         {
@@ -620,5 +626,7 @@ namespace Elecciones.src.controller
                     break;
             }
         }
+
+        
     }
 }

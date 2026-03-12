@@ -490,7 +490,13 @@ namespace Elecciones.src.mensajes
 
         #endregion
 
+
+
         #region Superfaldón - Último
+        public void sfActualiza()
+        {
+            c.EnviarMensaje(superfaldonBuilder.sfActualiza());
+        }
 
         public void ultimoSuperEntra()
         {
@@ -575,60 +581,11 @@ namespace Elecciones.src.mensajes
 
         #endregion
 
-        #region Superfaldón - Mayorías
 
-        public void sfMayoriasEntra()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfMayoriasEntra());
-        }
 
-        public void sfMayoriasEncadena()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfMayoriasEncadena());
-        }
+ 
 
-        public void sfMayoriasSale()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfMayoriasSale());
-        }
 
-        #endregion
-
-        #region Superfaldón - Bipartidismo
-
-        public void sfBipartidismoEntra()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfBipartidismoEntra());
-        }
-
-        public void sfBipartidismoEncadena()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfBipartidismoEncadena());
-        }
-
-        public void sfBipartidismoSale()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfBipartidismoSale());
-        }
-
-        #endregion
-
-        #region Superfaldón - Ganador
-
-        public void sfGanadorEntra()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfGanadorEntra());
-        }
-
-        public void sfGanadorEncadena()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfGanadorEncadena());
-        }
-
-        public void sfGanadorSale()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfGanadorSale());
-        }
 
         //ACTUALIZAS DE PACTOS
         public void ActualizaPactometroFichas(BrainStormDTO dtoActualizado)
@@ -640,6 +597,5 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(cartonBuilder.ActualizaPactometroUltimoEscano(dtoActualizado));
         }
 
-        #endregion
     }
 }

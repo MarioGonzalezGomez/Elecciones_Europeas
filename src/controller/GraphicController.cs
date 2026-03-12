@@ -572,47 +572,7 @@ namespace Elecciones.src.controller
             if (ipfActivo.Valor == 1) { ipf.sfPactometroSale(); }
         }
 
-        //SUPERFALDON - MAYORIAS
-        public void sfMayoriasEntra()
-        {
-            if (ipfActivo.Valor == 1) { ipf.sfMayoriasEntra(); }
-        }
-        public void sfMayoriasEncadena()
-        {
-            if (ipfActivo.Valor == 1) { ipf.sfMayoriasEncadena(); }
-        }
-        public void sfMayoriasSale()
-        {
-            if (ipfActivo.Valor == 1) { ipf.sfMayoriasSale(); }
-        }
-
-        //SUPERFALDON - BIPARTIDISMO
-        public void sfBipartidismoEntra()
-        {
-            if (ipfActivo.Valor == 1) { ipf.sfBipartidismoEntra(); }
-        }
-        public void sfBipartidismoEncadena()
-        {
-            if (ipfActivo.Valor == 1) { ipf.sfBipartidismoEncadena(); }
-        }
-        public void sfBipartidismoSale()
-        {
-            if (ipfActivo.Valor == 1) { ipf.sfBipartidismoSale(); }
-        }
-
-        //SUPERFALDON - GANADOR
-        public void sfGanadorEntra()
-        {
-            if (ipfActivo.Valor == 1) { ipf.sfGanadorEntra(); }
-        }
-        public void sfGanadorEncadena()
-        {
-            if (ipfActivo.Valor == 1) { ipf.sfGanadorEncadena(); }
-        }
-        public void sfGanadorSale()
-        {
-            if (ipfActivo.Valor == 1) { ipf.sfGanadorSale(); }
-        }
+        
 
         public void pactometroActualiza(BrainStormDTO dtoActualizado, string tipoGrafico)
         {

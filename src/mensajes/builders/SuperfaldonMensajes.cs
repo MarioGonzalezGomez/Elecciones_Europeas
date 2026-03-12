@@ -55,7 +55,7 @@ namespace Elecciones.src.mensajes.builders
 
         #region Actualiza
 
-        public string sfFichasSale() => EventRunBuild("ReloadPartidos");
+        public string sfActualiza() => EventRunBuild("ReloadPartidos");
 
         #endregion
 
@@ -234,19 +234,6 @@ namespace Elecciones.src.mensajes.builders
             partidosEnPactoSFDerecha.Clear();
             partidosEnPactoSFIzquierda.Clear();
         }
-
-        #endregion
-
-        #region Mayorías Superfaldón
-
-        // TODO: Construir señal para entrada del gráfico MAYORÍAS en SUPERFALDÓN
-        public string sfMayoriasEntra() => "";
-
-        // TODO: Construir señal para encadenar entre gráficos MAYORÍAS en SUPERFALDÓN
-        public string sfMayoriasEncadena() => "";
-
-        // TODO: Construir señal para salida del gráfico MAYORÍAS en SUPERFALDÓN
-        public string sfMayoriasSale() => "";
 
         #endregion
 

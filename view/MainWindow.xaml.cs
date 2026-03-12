@@ -437,11 +437,7 @@ namespace Elecciones
         public bool EsCabeceraSuperfaldon()
         {
             string cabecera = graficosHeader?.Header?.ToString() ?? "";
-            return string.Equals(cabecera, "SUPERFALDÓN", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(cabecera, "SUPERFADÓN", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(cabecera, "PANTALLA", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(cabecera, "REALIDAD AUMENTADA", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(cabecera, "DRON", StringComparison.OrdinalIgnoreCase);
+            return string.Equals(cabecera, "SUPERFALDÓN", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool CompararOrden(BrainStormDTO anterior, BrainStormDTO actual)

@@ -490,8 +490,6 @@ namespace Elecciones.src.mensajes
 
         #endregion
 
-
-
         #region Superfaldón - Último
         public void sfActualiza()
         {
@@ -500,64 +498,12 @@ namespace Elecciones.src.mensajes
 
         public void ultimoSuperEntra()
         {
-            c.EnviarMensaje(superfaldonBuilder.ultimoSuperEntra());
+            c.EnviarMensaje(superfaldonBuilder.ultimoEntra());
         }
 
         public void ultimoSuperSale()
         {
-            c.EnviarMensaje(superfaldonBuilder.ultimoSuperSale());
-        }
-
-        #endregion
-
-        #region Superfaldón - Base
-
-        public void superfaldonEntra()
-        {
-            c.EnviarMensaje(superfaldonBuilder.superfaldonEntra());
-        }
-
-        public void superfaldonSale()
-        {
-            c.EnviarMensaje(superfaldonBuilder.superfaldonSale());
-        }
-
-        #endregion
-
-        #region Superfaldón - Sedes
-
-        public void superfaldonSedesEntra()
-        {
-            c.EnviarMensaje(superfaldonBuilder.superfaldonSedesEntra());
-        }
-
-        public void superfaldonSedesEncadena()
-        {
-            c.EnviarMensaje(superfaldonBuilder.superfaldonSedesEncadena());
-        }
-
-        public void superfaldonSedesSale()
-        {
-            c.EnviarMensaje(superfaldonBuilder.superfaldonSedesSale());
-        }
-
-        #endregion
-
-        #region Superfaldón - Fichas
-
-        public void sfFichasEntra()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfFichasEntra());
-        }
-
-        public void sfFichasEncadena()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfFichasEncadena());
-        }
-
-        public void sfFichasSale()
-        {
-            c.EnviarMensaje(superfaldonBuilder.sfFichasSale());
+            c.EnviarMensaje(superfaldonBuilder.ultimoSale());
         }
 
         #endregion
@@ -585,11 +531,6 @@ namespace Elecciones.src.mensajes
         }
 
         #endregion
-
-
-
- 
-
 
 
         //ACTUALIZAS DE PACTOS

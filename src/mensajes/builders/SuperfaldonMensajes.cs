@@ -1,3 +1,6 @@
+using System.Runtime.InteropServices;
+using System.Text;
+
 namespace Elecciones.src.mensajes.builders
 {
     /// <summary>
@@ -16,79 +19,88 @@ namespace Elecciones.src.mensajes.builders
             return instance;
         }
 
-        #region Superfaldón
+        #region Carrusel (incluye sedes)
 
-        public string superfaldonEntra(bool oficiales) => oficiales?EventRunBuild("Superfaldon/Oficial/Entra") : EventRunBuild("Superfaldon/Sondeo/Entra");
+        public string superfaldonEntra(bool oficiales) => oficiales ? EventRunBuild("Superfaldon/Oficial/Entra") : EventRunBuild("Superfaldon/Sondeo/Entra");
         public string superfaldonSale(bool oficiales) => oficiales ? EventRunBuild("Superfaldon/Oficial/Sale") : EventRunBuild("Superfaldon/Sondeo/Sale");
-
-        #endregion
-
-        #region Último Superfaldón
-
-        public string ultimoSuperEntra()
-        {
-            string signal = "";
-            signal += EventBuild("Oficial_Codigo", "MAP_LLSTRING_LOAD") + "\n";
-            signal += EventBuild("UltimoEscanoCSV", "MAP_LLSTRING_LOAD") + "\n";
-            signal += Entra("ULTIMOESCANO") + "\n";
-            return signal;
-        }
-
-        public string ultimoSuperSale() => Sale("ULTIMOESCANO");
 
         #endregion
 
         #region Sedes
 
-        public string superfaldonSedesEntra() => Entra("SEDES");
-        public string superfaldonSedesEncadena() => Entra("SEDES/ENCADENA");
-        public string superfaldonSedesSale() => Sale("SEDES");
+        public string desplegarSede(string codPartido)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(EventBuild("codigoSede", "MAP_STRING_PAR", $"'{codPartido}'", 1));
+            sb.Append(EventRunBuild("Superfaldon/Sedes/DespliegaSede"));
+            return sb.ToString();
+        }
+        public string encadenarSede(string codPartido)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(EventBuild("nextCodigoSede", "MAP_STRING_PAR", $"'{codPartido}'", 1));
+            sb.Append(EventRunBuild("Superfaldon/Sedes/PreparaEncadenaSede"));
+            sb.Append(EventRunBuild("Superfaldon/Sedes/EncadenaSede"));
+            return sb.ToString();
+        }
+        public string replegarSede(string codPartido)
+        {
+            return EventRunBuild("Superfaldon/Sedes/RepliegaSede");
+        }
 
         #endregion
 
-        #region Fichas Superfaldón
+        #region Actualiza
 
-        // TODO: Construir señal para entrada del gráfico FICHAS en SUPERFALDÓN
-        public string sfFichasEntra() => "";
+        public string sfFichasSale() => EventRunBuild("ReloadPartidos");
 
-        // TODO: Construir señal para encadenar entre gráficos FICHAS en SUPERFALDÓN
-        public string sfFichasEncadena() => "";
+        #endregion
 
-        // TODO: Construir señal para salida del gráfico FICHAS en SUPERFALDÓN
-        public string sfFichasSale() => "";
+        #region Ultimo
+
+        public string ultimoEntra() => EventRunBuild("ULTIMO/Entra");
+        public string ultimoSale() => EventRunBuild("ULTIMO/Sale");
 
         #endregion
 
         #region Pactómetro Superfaldón
 
-        // TODO: Construir señal para entrada del gráfico PACTÓMETRO en SUPERFALDÓN
-        public string sfPactometroEntra() => "";
+        public string pactometroEntra() => EventRunBuild("PACTOMETRO/Entra");
+        public string pactometroReinicio() => EventRunBuild("PACTOMETRO/Prepara");
+        public string pactometroSale() => EventRunBuild("PACTOMETRO/Sale");
 
-        // TODO: Construir señal para encadenar entre gráficos PACTÓMETRO en SUPERFALDÓN
-        public string sfPactometroEncadena() => "";
+        public string pactometroPartidoEntra(bool oficiales, string codPartido, bool izq)
+        {
+            StringBuilder sb = new StringBuilder();
+            string sondeo = oficiales ? "" : "Sondeo";
+            string lado = izq ? "Izq" : "Der";
+            bool primerPartido = false;
 
-        // TODO: Construir señal para salida del gráfico PACTÓMETRO en SUPERFALDÓN
-        public string sfPactometroSale() => "";
+            if (primerPartido)
+            {
+                sb.Append(EventBuild($"PACTOMETRO/PrimerPartido{lado}{sondeo}", "MAP_STRING_PAR", $"'{codPartido}'", 1));
+            }
+            else
+            {
+                sb.Append(EventBuild($"PACTOMETRO/SiguientePartido{lado}{sondeo}", "MAP_STRING_PAR", $"'{codPartido}'", 1));
+            }
 
-        #endregion
+            sb.Append(EventBuild($"PACTOMETRO/CurrentPartidos{lado}{sondeo}", "MAP_INT_PAR", numPartidosEnEseLado, 1));
+            sb.Append(EventBuild($"PACTOMETRO/Escanos{lado}", "MAP_INT_PAR", acumuladoLado, 1));
+            if (!oficiales)
+            {
+                sb.Append(EventBuild($"PACTOMETRO/Escanos{lado}Hasta", "MAP_INT_PAR", acumuladoLadoHasta, 1));
+            }
 
-        #region Mayorías Superfaldón
+            return sb.ToString();
+        }
 
-        // TODO: Construir señal para entrada del gráfico MAYORÍAS en SUPERFALDÓN
-        public string sfMayoriasEntra() => "";
-
-        // TODO: Construir señal para encadenar entre gráficos MAYORÍAS en SUPERFALDÓN
-        public string sfMayoriasEncadena() => "";
-
-        // TODO: Construir señal para salida del gráfico MAYORÍAS en SUPERFALDÓN
-        public string sfMayoriasSale() => "";
 
         #endregion
 
         #region CCAA
 
         public string CCAAEntra() => EventRunBuild("CCAA/Entra");
-
         public string CCAAESale() => EventRunBuild("CCAA/Entra");
 
         #endregion

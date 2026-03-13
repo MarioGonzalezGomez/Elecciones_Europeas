@@ -156,7 +156,7 @@ namespace Elecciones.src.mensajes.builders
                 ultimaEntradaSFDerFuePrimera = esPrimeroEnLado;
             }
 
-            return BuildPactometroPartidoSignal(oficiales, izquierda, pSeleccionado.codigo);
+            return BuildPactometroPartidoSignal(oficiales, izquierda, pSeleccionado.codigo, esPrimeroEnLado);
         }
 
         public int pactometroNumPartidosLado(bool izquierda)
@@ -207,7 +207,7 @@ namespace Elecciones.src.mensajes.builders
             return (escanos * pxTotales) / totalEscanos;
         }
 
-        private string BuildPactometroPartidoSignal(bool oficiales, bool izquierda, string codigoEntrante)
+        private string BuildPactometroPartidoSignal(bool oficiales, bool izquierda, string codigoEntrante, bool esPrimeroEnLado)
         {
             string lado = izquierda ? "Izq" : "Der";
             string sufijoSondeo = oficiales ? "" : "Sondeo";
@@ -224,16 +224,23 @@ namespace Elecciones.src.mensajes.builders
             int escanosHasta = izquierda ? acumuladoSFEscanosIzqHasta : acumuladoSFEscanosDerHasta;
 
             StringBuilder sb = new StringBuilder();
-            sb.Append(EventBuild($"PACTOMETRO/PrimerPartido{lado}{sufijoSondeo}", "MAP_STRING_PAR", $"'{codigoPrimer}'", 1));
             sb.Append(EventBuild($"PACTOMETRO/CurrentPartidos{lado}{sufijoSondeo}", "MAP_INT_PAR", numeroPartidosActuales.ToString(), 1));
             sb.Append(EventBuild($"PACTOMETRO/Escanos{lado}", "MAP_INT_PAR", escanosDesde.ToString(), 1));
+
+            if (esPrimeroEnLado)
+            {
+                sb.Append(EventBuild($"PACTOMETRO/PrimerPartido{lado}{sufijoSondeo}", "MAP_STRING_PAR", $"'{codigoPrimer}'", 1));
+            }
 
             if (!oficiales)
             {
                 sb.Append(EventBuild($"PACTOMETRO/Escanos{lado}Hasta", "MAP_INT_PAR", escanosHasta.ToString(), 1));
             }
 
-            sb.Append(EventBuild($"PACTOMETRO/SiguientePartido{lado}{sufijoSondeo}", "MAP_STRING_PAR", $"'{codigoEntrante}'", 1));
+            if (!esPrimeroEnLado)
+            {
+                sb.Append(EventBuild($"PACTOMETRO/SiguientePartido{lado}{sufijoSondeo}", "MAP_STRING_PAR", $"'{codigoEntrante}'", 1));
+            }
             return sb.ToString();
         }
 

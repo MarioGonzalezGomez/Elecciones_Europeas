@@ -575,6 +575,11 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(superfaldonBuilder.sfPactometroSale());
         }
 
+        public void sfPactometroPartidoEntra(BrainStormDTO dto, PartidoDTO pSeleccionado, bool izquierda)
+        {
+            c.EnviarMensaje(superfaldonBuilder.pactometroPartidoEntra(dto, pSeleccionado, izquierda));
+        }
+
         #endregion
 
 

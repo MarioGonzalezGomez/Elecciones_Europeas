@@ -382,7 +382,9 @@ namespace Elecciones
                 {
                     graficos.ultimoEntraPartido(dto, seleccionado, true);
                 }
-                else if (main.sfPactometroDentro) { }
+                else if (main.sfPactometroDentro) {
+                
+                }
                 else
                 {
                     PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));

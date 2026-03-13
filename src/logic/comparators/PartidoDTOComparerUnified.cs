@@ -89,14 +89,19 @@ namespace Elecciones.src.logic.comparators
             }
             else
             {
-                // Datos de sondeo: escaniosHastaSondeo > escaniosDesdeSondeo > escaniosHistoricos
+                // Datos de sondeo: escaniosHastaSondeo > escaniosDesdeSondeo > porcentajeVotoSondeo > escaniosHistoricos
                 comp = Comparer<int>.Default.Compare(x.escaniosHastaSondeo, y.escaniosHastaSondeo);
                 if (comp == 0)
                 {
                     comp = Comparer<int>.Default.Compare(x.escaniosDesdeSondeo, y.escaniosDesdeSondeo);
                     if (comp == 0)
                     {
-                        comp = Comparer<int>.Default.Compare(x.escaniosHistoricos, y.escaniosHistoricos);
+                        // En modo sondeo, porcentajeVoto ya contiene el porcentaje de sondeo.
+                        comp = Comparer<double>.Default.Compare(x.porcentajeVoto, y.porcentajeVoto);
+                        if (comp == 0)
+                        {
+                            comp = Comparer<int>.Default.Compare(x.escaniosHistoricos, y.escaniosHistoricos);
+                        }
                     }
                 }
             }

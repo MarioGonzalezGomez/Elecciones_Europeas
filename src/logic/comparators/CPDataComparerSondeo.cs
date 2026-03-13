@@ -1,6 +1,7 @@
 using Elecciones.src.model.IPF.DTO;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace Elecciones.src.logic.comparators
 {
     /// <summary>
     /// Comparador para CPDataDTO en modo sondeo.
-    /// Ordena por: escaniosHastaSondeo > escaniosDesdeSondeo > escaniosHistoricos
+    /// Ordena por: escaniosHastaSondeo > escaniosDesdeSondeo > porcentajeVoto > escaniosHistoricos
     /// </summary>
     internal class CPDataComparerSondeo : IComparer<CPDataDTO>
     {
@@ -37,14 +38,42 @@ namespace Elecciones.src.logic.comparators
 
                 if (comp == 0)
                 {
-                    // En caso de empate, comparar por escaniosHistoricos
-                    comp = Comparer<int>.Default.Compare(
-                        int.TryParse(o1.escaniosHistoricos, out int escHist1) ? escHist1 : 0,
-                        int.TryParse(o2.escaniosHistoricos, out int escHist2) ? escHist2 : 0);
+                    // En caso de empate, comparar por porcentaje de voto sondeo
+                    comp = Comparer<double>.Default.Compare(
+                        ParseDoubleSafe(o1.porcentajeVoto),
+                        ParseDoubleSafe(o2.porcentajeVoto));
+
+                    if (comp == 0)
+                    {
+                        // Si persiste el empate, comparar por escaniosHistoricos
+                        comp = Comparer<int>.Default.Compare(
+                            int.TryParse(o1.escaniosHistoricos, out int escHist1) ? escHist1 : 0,
+                            int.TryParse(o2.escaniosHistoricos, out int escHist2) ? escHist2 : 0);
+                    }
                 }
             }
 
             return comp;
+        }
+
+        private static double ParseDoubleSafe(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return 0;
+            }
+
+            if (double.TryParse(value, NumberStyles.Float, CultureInfo.CurrentCulture, out double parsed))
+            {
+                return parsed;
+            }
+
+            if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out parsed))
+            {
+                return parsed;
+            }
+
+            return 0;
         }
     }
 }

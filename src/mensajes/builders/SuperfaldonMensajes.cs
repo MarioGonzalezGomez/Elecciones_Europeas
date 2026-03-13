@@ -1,6 +1,3 @@
-using System.Runtime.InteropServices;
-using System.Text;
-
 using System.Text;
 using Elecciones.src.model.DTO.BrainStormDTO;
 
@@ -96,6 +93,11 @@ namespace Elecciones.src.mensajes.builders
             return EventRunBuild("PACTOMETRO/Sale");
         }
 
+        public string sfPactometroEncadena()
+        {
+            return EventRunBuild("PACTOMETRO/Encadena");
+        }
+
         public string sfPactometroReinicio()
         {
             ResetPactometroSFState();
@@ -154,7 +156,7 @@ namespace Elecciones.src.mensajes.builders
                 ultimaEntradaSFDerFuePrimera = esPrimeroEnLado;
             }
 
-            return "";
+            return BuildPactometroPartidoSignal(oficiales, izquierda, pSeleccionado.codigo);
         }
 
         public int pactometroNumPartidosLado(bool izquierda)
@@ -203,6 +205,36 @@ namespace Elecciones.src.mensajes.builders
             }
 
             return (escanos * pxTotales) / totalEscanos;
+        }
+
+        private string BuildPactometroPartidoSignal(bool oficiales, bool izquierda, string codigoEntrante)
+        {
+            string lado = izquierda ? "Izq" : "Der";
+            string sufijoSondeo = oficiales ? "" : "Sondeo";
+
+            List<string> partidosLado = izquierda ? partidosEnPactoSFIzquierda : partidosEnPactoSFDerecha;
+            if (partidosLado.Count == 0)
+            {
+                return "";
+            }
+
+            string codigoPrimer = partidosLado[0];
+            int numeroPartidosActuales = partidosLado.Count;
+            int escanosDesde = izquierda ? acumuladoSFEscanosIzqDesde : acumuladoSFEscanosDerDesde;
+            int escanosHasta = izquierda ? acumuladoSFEscanosIzqHasta : acumuladoSFEscanosDerHasta;
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append(EventBuild($"PACTOMETRO/PrimerPartido{lado}{sufijoSondeo}", "MAP_STRING_PAR", $"'{codigoPrimer}'", 1));
+            sb.Append(EventBuild($"PACTOMETRO/CurrentPartidos{lado}{sufijoSondeo}", "MAP_INT_PAR", numeroPartidosActuales.ToString(), 1));
+            sb.Append(EventBuild($"PACTOMETRO/Escanos{lado}", "MAP_INT_PAR", escanosDesde.ToString(), 1));
+
+            if (!oficiales)
+            {
+                sb.Append(EventBuild($"PACTOMETRO/Escanos{lado}Hasta", "MAP_INT_PAR", escanosHasta.ToString(), 1));
+            }
+
+            sb.Append(EventBuild($"PACTOMETRO/SiguientePartido{lado}{sufijoSondeo}", "MAP_STRING_PAR", $"'{codigoEntrante}'", 1));
+            return sb.ToString();
         }
 
         private void ResetPactometroSFState()

@@ -382,7 +382,14 @@ namespace Elecciones
                 {
                     graficos.ultimoEntraPartido(dto, seleccionado, true);
                 }
-                else if (main.sfPactometroDentro) { }
+                else if (main.sfPactometroDentro)
+                {
+                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    if (pseleccionado != null)
+                    {
+                        graficos.sfPactometroPartidoEntra(dto, pseleccionado, true);
+                    }
+                }
                 else
                 {
                     PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
@@ -406,7 +413,14 @@ namespace Elecciones
                 {
                     graficos.ultimoEntraPartido(dto, seleccionado, true);
                 }
-                else if (main.sfPactometroDentro) { }
+                else if (main.sfPactometroDentro)
+                {
+                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    if (pseleccionado != null)
+                    {
+                        graficos.sfPactometroPartidoEntra(dto, pseleccionado, true);
+                    }
+                }
                 else
                 {
                     PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
@@ -429,7 +443,14 @@ namespace Elecciones
                 {
                     graficos.ultimoEntraPartido(dto, seleccionado, false);
                 }
-                else if (main.sfPactometroDentro) { }
+                else if (main.sfPactometroDentro)
+                {
+                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    if (pseleccionado != null)
+                    {
+                        graficos.sfPactometroPartidoEntra(dto, pseleccionado, false);
+                    }
+                }
                 else
                 {
                     PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
@@ -551,7 +572,14 @@ namespace Elecciones
                 {
                     graficos.ultimoEntraPartido(dto, seleccionado, false);
                 }
-                else if (main.sfPactometroDentro) { }
+                else if (main.sfPactometroDentro)
+                {
+                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
+                    if (pseleccionado != null)
+                    {
+                        graficos.sfPactometroPartidoEntra(dto, pseleccionado, false);
+                    }
+                }
                 else
                 {
                     PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));

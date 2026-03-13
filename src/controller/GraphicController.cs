@@ -595,6 +595,10 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.sfPactometroSale(); }
         }
+        public void sfPactometroPartidoEntra(BrainStormDTO dto, PartidoDTO partido, bool izquierda)
+        {
+            if (ipfActivo.Valor == 1) { ipf.sfPactometroPartidoEntra(dto, partido, izquierda); }
+        }
 
         
 

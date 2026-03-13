@@ -493,12 +493,12 @@ namespace Elecciones.src.mensajes
         #region Superfaldón - Último
         public void superfaldonEntra(bool oficiales)
         {
-            c.EnviarMensaje(superfaldonBuilder.superfaldonEntra(oficiales));
+            c.EnviarMensaje(superfaldonBuilder.carruselEntra(oficiales));
         }
 
         public void superfaldonSale(bool oficiales)
         {
-            c.EnviarMensaje(superfaldonBuilder.superfaldonSale(oficiales));
+            c.EnviarMensaje(superfaldonBuilder.carruselSale(oficiales));
         }
 
         public void sfEscrutadoEntra()

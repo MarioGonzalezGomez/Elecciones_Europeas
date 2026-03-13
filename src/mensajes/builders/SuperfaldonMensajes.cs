@@ -46,7 +46,7 @@ namespace Elecciones.src.mensajes.builders
             sb.Append(EventRunBuild("Superfaldon/Sedes/EncadenaSede"));
             return sb.ToString();
         }
-        public string replegarSede(string codPartido)
+        public string replegarSede()
         {
             return EventRunBuild("Superfaldon/Sedes/RepliegaSede");
         }
@@ -87,33 +87,19 @@ namespace Elecciones.src.mensajes.builders
         public string sfPactometroEntra()
         {
             ResetPactometroSFState();
-            return EventRunBuild("Pactometro/Entra");
+            return EventRunBuild("PACTOMETRO/Entra");
         }
 
-        // TODO: Construir señal para encadenar entre gráficos PACTÓMETRO en SUPERFALDÓN
-        public string sfPactometroEncadena()
-        {
-            return EventRunBuild("Pactometro/Encadena");
-        }
-
-        // TODO: Construir señal para salida del gráfico PACTÓMETRO en SUPERFALDÓN
         public string sfPactometroSale()
         {
             ResetPactometroSFState();
-            StringBuilder sb = new StringBuilder();
-            sb.Append(EventRunBuild("Pactometro/Sale"));
-            sb.Append(EventRunBuild("Pactometro/reinicioPactometroIzq"));
-            sb.Append(EventRunBuild("Pactometro/reinicioPactometroDer"));
-            return sb.ToString();
+            return EventRunBuild("PACTOMETRO/Sale");
         }
 
         public string sfPactometroReinicio()
         {
             ResetPactometroSFState();
-            StringBuilder sb = new StringBuilder();
-            sb.Append(EventRunBuild("Pactometro/reinicioPactometroIzq"));
-            sb.Append(EventRunBuild("Pactometro/reinicioPactometroDer"));
-            return sb.ToString();
+            return EventRunBuild("PACTOMETRO/Prepara");
         }
 
         public string pactometroPartidoEntra(BrainStormDTO dto, PartidoDTO pSeleccionado, bool izquierda)
@@ -240,7 +226,7 @@ namespace Elecciones.src.mensajes.builders
         #region CCAA
 
         public string CCAAEntra() => EventRunBuild("CCAA/Entra");
-        public string CCAAESale() => EventRunBuild("CCAA/Entra");
+        public string CCAASale() => EventRunBuild("CCAA/Sale");
 
         #endregion
 

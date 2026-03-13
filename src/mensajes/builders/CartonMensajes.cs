@@ -569,8 +569,8 @@ namespace Elecciones.src.mensajes.builders
             string siglasP = partido.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","");
             int anchoPartido = (int)Math.Round((double)TAMANO_MAXIMO_FICHA / escaniosTotales * int.Parse(partido.escanios));
 
-            string[] barrasIzq = { "Barra_Izq", "Barra_Izq1", "Barra_Izq2", "Barra_Izq3" };
-            string[] barrasDch = { "Barra_Dch", "Barra_Dch1", "Barra_Dch2", "Barra_Dch3" };
+            string[] barrasIzq = { "Barra_Izq", "Barra_Izq1", "Barra_Izq2", "Barra_Izq3", "Barra_Izq4", "Barra_Izq5" };
+            string[] barrasDch = { "Barra_Dch", "Barra_Dch1", "Barra_Dch2", "Barra_Dch3", "Barra_Dch4", "Barra_Dch5" };
 
             int indexPartido = ultimoEscanoPartidos.Count(p => p.esIzquierda == esIzquierda);
             if (indexPartido >= 4) return "";
@@ -664,8 +664,8 @@ namespace Elecciones.src.mensajes.builders
             anchoAcumuladoIzq = anchoAcumuladoDch = escaniosAcumuladosIzq = escaniosAcumuladosDch = 0;
             var nuevaLista = new List<(bool esIzquierda, string siglas, int ancho)>();
 
-            string[] barrasIzq = { "Barra_Izq", "Barra_Izq1", "Barra_Izq2", "Barra_Izq3" };
-            string[] barrasDch = { "Barra_Dch", "Barra_Dch1", "Barra_Dch2", "Barra_Dch3" };
+            string[] barrasIzq = { "Barra_Izq", "Barra_Izq1", "Barra_Izq2", "Barra_Izq3", "Barra_Izq4", "Barra_Izq5" };
+            string[] barrasDch = { "Barra_Dch", "Barra_Dch1", "Barra_Dch2", "Barra_Dch3", "Barra_Dch4", "Barra_Dch5" };
             int idxIzq = 0, idxDch = 0;
 
             foreach (var item in ultimoEscanoPartidos)
@@ -721,7 +721,6 @@ namespace Elecciones.src.mensajes.builders
             siglasUltimoEscano = siglasLuchaEscano = "";
             return Sale("ULTIMO_ESCANO");
         }
-
 
 
         #endregion

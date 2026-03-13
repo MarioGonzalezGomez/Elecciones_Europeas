@@ -236,11 +236,7 @@ namespace Elecciones.src.mensajes.builders
             {
                 sb.Append(EventBuild($"PACTOMETRO/Escanos{lado}Hasta", "MAP_INT_PAR", escanosHasta.ToString(), 1));
             }
-
-            if (!esPrimeroEnLado)
-            {
-                sb.Append(EventBuild($"PACTOMETRO/SiguientePartido{lado}{sufijoSondeo}", "MAP_STRING_PAR", $"'{codigoEntrante}'", 1));
-            }
+            sb.Append(EventBuild($"PACTOMETRO/SiguientePartido{lado}{sufijoSondeo}", "MAP_STRING_PAR", $"'{codigoEntrante}'", 1));
             return sb.ToString();
         }
 

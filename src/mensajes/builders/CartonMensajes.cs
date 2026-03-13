@@ -565,7 +565,7 @@ namespace Elecciones.src.mensajes.builders
             if (dto == null || partido == null) return "";
             StringBuilder signal = new StringBuilder();
 
-            int escaniosTotales = dto.circunscripcionDTO?.escaniosTotales ?? 65;
+            int escaniosTotales = dto.circunscripcionDTO?.escaniosTotales ?? 82;
             string siglasP = partido.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","");
             int anchoPartido = (int)Math.Round((double)TAMANO_MAXIMO_FICHA / escaniosTotales * int.Parse(partido.escanios));
 
@@ -573,7 +573,7 @@ namespace Elecciones.src.mensajes.builders
             string[] barrasDch = { "Barra_Dch", "Barra_Dch1", "Barra_Dch2", "Barra_Dch3", "Barra_Dch4", "Barra_Dch5" };
 
             int indexPartido = ultimoEscanoPartidos.Count(p => p.esIzquierda == esIzquierda);
-            if (indexPartido >= 4) return "";
+            if (indexPartido >= barrasIzq.Length) return "";
 
             string nombreBarra = esIzquierda ? barrasIzq[indexPartido] : barrasDch[indexPartido];
             string nombreGrupo = esIzquierda ? "Barras_Izq" : "Barras_Dch";

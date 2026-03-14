@@ -1,4 +1,4 @@
-﻿using Elecciones.src.conexion;
+using Elecciones.src.conexion;
 using Elecciones.src.controller;
 using Elecciones.src.logic;
 using Elecciones.src.mensajes;
@@ -1578,8 +1578,8 @@ namespace Elecciones
 
                 if (graficos.primeActivo.Valor == 1)
                 {
-                    if (oficiales) { dto = BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones); }
-                    else { dto = BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(dto.circunscripcionDTO.nombre, avance, tipoElecciones); }
+                    // La reasignación de dto aquí se ha eliminado porque sobreescribía los valores
+                    // de sondeo aplicados por GestionarMedioSondeo(). 
                     // await EscribirJsonPrimeAsync();
                 }
                 // await EscribirJsonPrimeAsync();

@@ -177,43 +177,7 @@ namespace Elecciones.src.mensajes.builders
             }
         }
 
-        private static readonly Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)> tickerTDLayouts = new()
-        {
-            {1, (1341, new[] {512}, -1125, 61)},
-            {2, (660, new[] {170,855}, -765, -300)},
-            {3, (435, new[] {56,512,967}, -675, -400)},
-            {4, (320, new[] {0,341,683,1024}, -621, -441)},
-            {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
-            {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
-            {7, (170, new[] {-35,150,335,520,705,890,1075}, -554, -474)},
-            {8, (157, new[] {-73,95,263,431,599,767,935,1103}, -554, -475)},
-            {9, (131, new[] {-63,82,227,372,517,662,807,952,1097}, -545, -464)},
-        };
 
-        private static (int Size, int[] Positions, int LogoPos, int EscanosPos) GetTickerTDLayout(int partidosActivos)
-        {
-            int countSeguro = Math.Max(partidosActivos, 1);
-            return tickerTDLayouts.TryGetValue(countSeguro, out var layout) ? layout : tickerTDLayouts[1];
-        }
-
-        private int GetTickerTDPosicionNoActivosBase((int Size, int[] Positions, int LogoPos, int EscanosPos) layout, int partidosActivos)
-        {
-            if (layout.Positions == null || layout.Positions.Length == 0)
-            {
-                return layout.Size;
-            }
-
-            int indiceUltimoActivo = partidosActivos > 0
-                ? Math.Min(partidosActivos - 1, layout.Positions.Length - 1)
-                : layout.Positions.Length - 1;
-
-            return layout.Positions[indiceUltimoActivo] + layout.Size;
-        }
-
-        private int GetTickerTDPasoNoActivos((int Size, int[] Positions, int LogoPos, int EscanosPos) layout)
-        {
-            return layout.Size + margin;
-        }
 
         public string TickerEntra(bool oficiales, BrainStormDTO dto)
         {
@@ -225,7 +189,7 @@ namespace Elecciones.src.mensajes.builders
             partidosOrdenadosPorComparer.Reverse();
 
             List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer
-                .Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
+                .Where(p => oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
                 .ToList();
 
             if (animacionPrimeros)
@@ -276,7 +240,7 @@ namespace Elecciones.src.mensajes.builders
             partidosOrdenadosPorComparer.Reverse();
 
             List<PartidoDTO> partidosActivos = partidosOrdenadosPorComparer
-                .Where(p => dto.oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
+                .Where(p => oficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
                 .ToList();
 
             double tamanoFicha = GetTamanoFichaTicker(partidosActivos.Count);
@@ -872,7 +836,16 @@ namespace Elecciones.src.mensajes.builders
                 var siglaObj = Esc(siglaRaw);
 
                 // Determinar escala segun numero de partidos
-                string escala = n <= 7 ? "(1,1,1)" : (n == 8 ? "(0.9,0.9,0.9)" : "(0.75,0.75,0.75)");
+                string escala = n switch
+                {
+                    8 => "(0.85,0.85,0.85)",
+                    9 => "(0.70,0.70,0.70)",
+                    10 => "(0.65,0.65,0.65)",
+                    11 => "(0.65,0.65,0.65)",
+                    12 => "(0.65,0.65,0.65)",
+                    _ => "(1,1,1)"
+                };
+                    
 
                 if (activeIndex.TryGetValue(siglaRaw, out int posIndex) && posIndex >= 0 && posIndex < layout.Positions.Length)
                 {
@@ -1011,7 +984,15 @@ namespace Elecciones.src.mensajes.builders
                         signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_DISPLACEMENT[0]", $"{layoutNuevo.EscanosPos}", 1) + "\n";
 
                         // Determinar escala segun numero de partidos
-                        string escalaNuevo = nNuevo <= 7 ? "(1,1,1)" : (nNuevo == 8 ? "(0.9,0.9,0.9)" : "(0.75,0.75,0.75)");
+                        string escalaNuevo = nNuevo switch
+                        {
+                            8 => "(0.85,0.85,0.85)",
+                            9 => "(0.70,0.70,0.70)",
+                            10 => "(0.65,0.65,0.65)",
+                            11 => "(0.65,0.65,0.65)",
+                            12 => "(0.65,0.65,0.65)",
+                            _ => "(1,1,1)"
+                        };
                         signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_SCALE", escalaNuevo, 2, 0.5, 0) + "\n";
 
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
@@ -1101,6 +1082,47 @@ namespace Elecciones.src.mensajes.builders
         public string TickerTDSale()
         {
             return Sale("FALDON_TD");
+        }
+
+        private static readonly Dictionary<int, (int Size, int[] Positions, int LogoPos, int EscanosPos)> tickerTDLayouts = new()
+        {
+            {1, (1341, new[] {512}, -1125, 61)},
+            {2, (660, new[] {170,855}, -765, -300)},
+            {3, (435, new[] {56,512,967}, -675, -400)},
+            {4, (320, new[] {0,341,683,1024}, -621, -441)},
+            {5, (255, new[] {-33,240,513,787,1060}, -591, -476)},
+            {6, (205, new[] {-59,169,397,626,854,1082}, -571, -495)},
+            {7, (170, new[] {-35,150,335,520,705,890,1075}, -554, -474)},
+            {8, (157, new[] {-73,95,263,431,599,767,935,1103}, -554, -475)},
+            {9, (131, new[] {-63,82,227,372,517,662,807,952,1097}, -545, -464)},
+            {10, (116, new[] {-50,76,202,328,454,580,706,832,958,1084}, -537, -490)},
+            {11, (105, new[] {-58,57,172,287,402,517,632,747,862,977,1092}, -537, -495)},
+            {12, (95, new[] {-60,45,150,255,360,465,570,675,780,885,990,1095}, -537, -500)}
+        };
+
+        private static (int Size, int[] Positions, int LogoPos, int EscanosPos) GetTickerTDLayout(int partidosActivos)
+        {
+            int countSeguro = Math.Max(partidosActivos, 1);
+            return tickerTDLayouts.TryGetValue(countSeguro, out var layout) ? layout : tickerTDLayouts[1];
+        }
+
+        private int GetTickerTDPosicionNoActivosBase((int Size, int[] Positions, int LogoPos, int EscanosPos) layout, int partidosActivos)
+        {
+            if (layout.Positions == null || layout.Positions.Length == 0)
+            {
+                return layout.Size;
+            }
+
+            int indiceUltimoActivo = partidosActivos > 0
+                ? Math.Min(partidosActivos - 1, layout.Positions.Length - 1)
+                : layout.Positions.Length - 1;
+
+            return layout.Positions[indiceUltimoActivo] + layout.Size;
+        }
+
+        private int GetTickerTDPasoNoActivos((int Size, int[] Positions, int LogoPos, int EscanosPos) layout)
+        {
+            return layout.Size + margin;
         }
 
         #endregion

@@ -312,11 +312,11 @@ namespace Elecciones
 
                 if (oficiales)
                 {
-                    dtoActualizado = controller.FindByNameCircunscripcionOficial(circunscripcionOriginal, avance, tipoElecciones);
+                    dtoActualizado = controller.FindByNameCircunscripcionOficialSinFiltrar(circunscripcionOriginal, avance, tipoElecciones);
                 }
                 else
                 {
-                    dtoActualizado = controller.FindByNameCircunscripcionSondeo(circunscripcionOriginal, avance, tipoElecciones);
+                    dtoActualizado = controller.FindByNameCircunscripcionSondeoSinFiltrar(circunscripcionOriginal, avance, tipoElecciones);
                 }
 
                 if (dtoActualizado != null)
@@ -673,8 +673,6 @@ namespace Elecciones
             }
             graficos.ultimoLimpiaPartidos();
             pactoDentro = false;
-            main?.Update();
-
         }
 
         //Este metodo tambien deselecciona los partidos, para poder elegir el siguiente

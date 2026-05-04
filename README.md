@@ -39,7 +39,7 @@ Este repositorio incluye dos aplicaciones complementarias:
 - Windows (para la app WPF de escritorio)
 - Acceso a base de datos MySQL con el esquema electoral correspondiente
 
-## Configuraci�n
+## Configuración
 
 La aplicación de escritorio usa `config.ini` (copiado al output en build), donde se definen:
 

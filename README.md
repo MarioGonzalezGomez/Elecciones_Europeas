@@ -4,8 +4,8 @@ Aplicación de operación para la noche electoral, diseñada para controlar y ac
 
 Este repositorio incluye dos aplicaciones complementarias:
 
-- `Elecciones` (WPF, escritorio): herramienta principal de control de realizaci�n.
-- `EleccionesWeb` (Blazor Server): interfaz web para operaci�n remota/multioperador.
+- `Elecciones` (WPF, escritorio): herramienta principal de control de realización.
+- `EleccionesWeb` (Blazor Server): interfaz web para operación remota/multioperador.
 
 ## Qué hace este proyecto
 

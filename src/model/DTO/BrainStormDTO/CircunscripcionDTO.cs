@@ -51,23 +51,28 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         {
             get; set;
         }
+        public int numVotantesFaltan
+        {
+            get; set;
+        }
         public string anioUltimasElecciones
         {
             get; set;
         }
 
-        private CircunscripcionDTO(string codigo, string nombre, double escrutado, int escaniosTotales, int numVotantesTotales)
+        private CircunscripcionDTO(string codigo, string nombre, double escrutado, int escaniosTotales, int numVotantesTotales, int numVotantesFaltan)
         {
             this.codigo = codigo;
             this.nombre = nombre;
             this.escrutado = escrutado;
             this.escaniosTotales = escaniosTotales;
             this.numVotantesTotales = numVotantesTotales;
+            this.numVotantesFaltan = numVotantesFaltan;
         }
 
         public static CircunscripcionDTO FromCircunscripcion(Circunscripcion c, int avanceActual, int tipoElecciones, ConexionEntityFramework con)
         {
-            CircunscripcionDTO dto = new CircunscripcionDTO(c.codigo, c.nombre, c.escrutado, c.escanios, c.votantes);
+            CircunscripcionDTO dto = new CircunscripcionDTO(c.codigo, c.nombre, c.escrutado, c.escanios, c.votantes, c.votantesFaltan);
             dto.mayoria = (dto.escaniosTotales / 2) + 1;
             dto.numAvance = avanceActual;
             Circunscripcion padre = tipoElecciones == 1

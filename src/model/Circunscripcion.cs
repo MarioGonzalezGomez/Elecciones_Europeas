@@ -20,6 +20,7 @@ namespace Elecciones.src.model.IPF
         public double avance3 { get; set; }
         public double participacionFinal { get; set; }
         public int votantes { get; set; }
+        public int votantesFaltan { get; set; }
         public int escaniosHistoricos { get; set; }
         public double avance1Hist { get; set; }
         public double avance2Hist { get; set; }

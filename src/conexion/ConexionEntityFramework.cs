@@ -171,6 +171,7 @@ namespace Elecciones.src.conexion
                 entity.Property("avance3").HasColumnName("avance3");
                 entity.Property("participacionFinal").HasColumnName("participacion");
                 entity.Property("votantes").HasColumnName("votantes");
+                entity.Property("votantesFaltan").HasColumnName("votantes_faltan");
                 entity.Property("escaniosHistoricos").HasColumnName("escanos_hist");
                 entity.Property("avance1Hist").HasColumnName("avance1_hist");
                 entity.Property("avance2Hist").HasColumnName("avance2_hist");

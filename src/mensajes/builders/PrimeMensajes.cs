@@ -1,21 +1,19 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using Elecciones.src.utils;
 
 namespace Elecciones.src.mensajes.builders
 {
     internal class PrimeMensajes
     {
         public static PrimeMensajes? instance;
-        //Este bool nos ayuda a hacer play la primera vez, y resume las siguientes (por si se pausase un video y se continuase)
+        // This bool helps us play first time and resume on subsequent calls.
         bool primerPlay = true;
-
+        private readonly ConfigManager configuration;
 
         private PrimeMensajes()
         {
+            configuration = ConfigManager.GetInstance();
+            configuration.ReadConfig();
         }
 
         public static PrimeMensajes GetInstance()
@@ -27,12 +25,12 @@ namespace Elecciones.src.mensajes.builders
             return instance;
         }
 
-        //MENSAJES ESPECÍFICOS
+        // SPECIFIC MESSAGES
 
         public string SubirRotulosEspeciales()
         {
             string signal = "";
-            signal += CambioDeProyecto("Especiales_ConPicto_2026");
+            signal += CambioDeProyecto(GetProyectoPrime());
             signal += CambioParametroProyecto("Par_Posicion_GrupoXY", "2");
             return signal;
         }
@@ -40,7 +38,7 @@ namespace Elecciones.src.mensajes.builders
         public string BajarRotulosEspeciales()
         {
             string signal = "";
-            signal += CambioDeProyecto("Especiales_ConPicto_2026");
+            signal += CambioDeProyecto(GetProyectoPrime());
             signal += CambioParametroProyecto("Par_Posicion_GrupoXY", "1");
             return signal;
         }
@@ -61,7 +59,14 @@ namespace Elecciones.src.mensajes.builders
             return signal;
         }
 
-        //MÉTODOS GENÉRICOS DONDE PODER ESPECIFICAR POR PARÁMETRO
+        private string GetProyectoPrime()
+        {
+            configuration.ReadConfig();
+            string proyectoPrime = configuration.GetValue("proyectoPrime");
+            return string.IsNullOrWhiteSpace(proyectoPrime) ? "Especiales_ConPicto_2026" : proyectoPrime;
+        }
+
+        // GENERIC METHODS TO PARAMETERIZE SIGNALS
 
         public string Entra(string escena)
         {
@@ -110,13 +115,10 @@ namespace Elecciones.src.mensajes.builders
             return $"P\\COMMAND:Program\\1\\*\\{nombreData}.Update\\\\\r\n";
         }
 
-
-        //MÉTODOS GENÉRICOS PARA EL MANEJO DE VIDEO
+        // GENERIC VIDEO METHODS
         public string PlayVideo(string nombreElementoClip)
         {
             string play;
-            //Utilizo un bool para hacer play de inicio o continuando en un pause dependiendo de si es la primera vez que se ejecuta en una escena o no.
-            //Por tanto, para cada nueva escena que se cargue, debería pasarse esta variable a true
             if (primerPlay)
             {
                 play = $"P\\COMMAND:Program\\1\\*\\{nombreElementoClip}.Play\\\\\r\n";
@@ -128,6 +130,7 @@ namespace Elecciones.src.mensajes.builders
             }
             return play;
         }
+
         public string PauseVideo(string nombreElementoClip)
         {
             return $"P\\COMMAND:Program\\1\\*\\{nombreElementoClip}.Pause\\\\\r\n";
@@ -138,9 +141,7 @@ namespace Elecciones.src.mensajes.builders
             return $"P\\COMMAND:Program\\1\\*\\{nombreElementoClip}.Cue\\\\\r\n";
         }
 
-
-        //ACCIONES A NIVEL DE PROYECTO
-
+        // PROJECT-LEVEL ACTIONS
         public string CambioDeProyecto(string rutaAbsProyecto)
         {
             rutaAbsProyecto.Replace("\\", "/");
@@ -152,9 +153,7 @@ namespace Elecciones.src.mensajes.builders
             return $"P\\PROJECT_PARAMETER\\{parametroName}\\{parametroValue}\\\\\r\n";
         }
 
-
-        //CONSTRUCTORES BASE PARA LAS DIFERENTES SEÑALES
-
+        // BASE BUILDERS
         private string ConstructorBase(string accion, string escena)
         {
             return $"P\\{accion}\\{escena}\\\\\r\n";

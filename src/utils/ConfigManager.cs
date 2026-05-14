@@ -157,6 +157,7 @@ namespace Elecciones.src.utils
                     defaultContent.AppendLine("ipPrime=127.0.0.1");
                     defaultContent.AppendLine("puertoPrime=8080");
                     defaultContent.AppendLine("activoPrime=0");
+                    defaultContent.AppendLine("proyectoPrime=Especiales_ConPicto_2026");
                     defaultContent.AppendLine("ipIPF=172.28.51.26");
                     defaultContent.AppendLine("puertoIPF=5123");
                     defaultContent.AppendLine("bdIPF=Cartones");
@@ -227,6 +228,7 @@ namespace Elecciones.src.utils
                 // Ensure newly-introduced keys exist in the in-memory config (without overwriting existing values)
                 var defaults = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                 {
+                    {"proyectoPrime", "Especiales_ConPicto_2026" },
                     {"horaAvance1", "" },
                     {"horaAvance2", "" },
                     {"horaAvance3", "" },

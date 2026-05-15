@@ -1,4 +1,5 @@
 using System.Text;
+using System.Windows;
 using Elecciones.src.model.DTO.BrainStormDTO;
 
 namespace Elecciones.src.mensajes.builders
@@ -12,6 +13,7 @@ namespace Elecciones.src.mensajes.builders
         private static SuperfaldonMensajes? instance;
         private string ultimoEscanoSnapshot = "";
         private bool ultimoEscanoSnapshotInicializado = false;
+        private bool ultimoEscanoCambioDetectado = false;
 
         private SuperfaldonMensajes() : base() { }
 
@@ -54,7 +56,16 @@ namespace Elecciones.src.mensajes.builders
 
         #region Actualiza
 
-        public string sfActualiza() => EventRunBuild("ReloadPartidos");
+        public string sfActualiza()
+        {
+            var main = Application.Current.MainWindow as MainWindow;
+            if (main?.ultimoSuperfaldonDentro == true && ultimoEscanoCambioDetectado)
+            {
+                return "";
+            }
+
+            return EventRunBuild("ReloadPartidos");
+        }
 
         #endregion
 
@@ -65,6 +76,7 @@ namespace Elecciones.src.mensajes.builders
         {
             ultimoEscanoSnapshot = "";
             ultimoEscanoSnapshotInicializado = false;
+            ultimoEscanoCambioDetectado = false;
             return EventRunBuild("UltimoEscanoSF/Sale");
         }
 
@@ -82,6 +94,7 @@ namespace Elecciones.src.mensajes.builders
 
             var snapshotActual = ConstruyeSnapshotUltimoEscano(dto);
             bool hayCambio = ultimoEscanoSnapshotInicializado && !string.Equals(ultimoEscanoSnapshot, snapshotActual, StringComparison.Ordinal);
+            ultimoEscanoCambioDetectado = hayCambio;
             ultimoEscanoSnapshot = snapshotActual;
             ultimoEscanoSnapshotInicializado = true;
             return hayCambio;

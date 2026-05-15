@@ -38,6 +38,7 @@ namespace Elecciones.src.mensajes.builders
         private string siglasLuchaEscano = "";
         private string ultimoEscanoSnapshot = "";
         private bool ultimoEscanoSnapshotInicializado = false;
+        private bool ultimoEscanoCambioDetectado = false;
 
         private CartonMensajes() : base() { }
 
@@ -51,6 +52,12 @@ namespace Elecciones.src.mensajes.builders
 
         public string CartonesActualiza()
         {
+            var main = Application.Current.MainWindow as MainWindow;
+            if (main?.ultimoEscanoDentro == true && ultimoEscanoCambioDetectado)
+            {
+                return "";
+            }
+
             string signal = "";
             signal += EventBuild("Oficial_Codigo", "MAP_LLSTRING_LOAD") + "\n";
             signal += EventBuild("UltimoEscanoNDatos/CSV", "MAP_LLSTRING_LOAD") + "\n";
@@ -613,7 +620,11 @@ namespace Elecciones.src.mensajes.builders
 
         public string ultimoActualiza(BrainStormDTO dto)
         {
-            if (dto == null) return "";
+            if (dto == null)
+            {
+                ultimoEscanoCambioDetectado = false;
+                return "";
+            }
             var main = Application.Current.MainWindow as MainWindow;
             var con = main?.conexionActiva;
             StringBuilder sb = new StringBuilder();
@@ -654,7 +665,9 @@ namespace Elecciones.src.mensajes.builders
             // }
             //
             var snapshotActual = ConstruyeSnapshotUltimoEscano(dto);
-            if (ultimoEscanoSnapshotInicializado && !string.Equals(ultimoEscanoSnapshot, snapshotActual, StringComparison.Ordinal))
+            bool hayCambio = ultimoEscanoSnapshotInicializado && !string.Equals(ultimoEscanoSnapshot, snapshotActual, StringComparison.Ordinal);
+            ultimoEscanoCambioDetectado = hayCambio;
+            if (hayCambio)
             {
                 sb.Append(EventRunBuild("UltimoEscanoN/Cambio") + "\n");
             }
@@ -665,6 +678,11 @@ namespace Elecciones.src.mensajes.builders
             ultimoEscanoSnapshot = snapshotActual;
             ultimoEscanoSnapshotInicializado = true;
             return sb.ToString();
+        }
+
+        public bool HayCambioUltimoEscanoActual()
+        {
+            return ultimoEscanoCambioDetectado;
         }
 
         public string ActualizaPactometroUltimoEscano(BrainStormDTO dtoNuevo)
@@ -733,6 +751,7 @@ namespace Elecciones.src.mensajes.builders
             siglasUltimoEscano = siglasLuchaEscano = "";
             ultimoEscanoSnapshot = "";
             ultimoEscanoSnapshotInicializado = false;
+            ultimoEscanoCambioDetectado = false;
             return Sale("UltimoEscanoN");
         }
 

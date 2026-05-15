@@ -478,9 +478,10 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.ultimoEncadena(dtoAnterior, dto); }
         }
-        public void ultimoActualiza(BrainStormDTO dtoNuevo)
+        public bool ultimoActualiza(BrainStormDTO dtoNuevo)
         {
-            if (ipfActivo.Valor == 1) { ipf.ultimoActualiza(dtoNuevo); }
+            if (ipfActivo.Valor == 1) { return ipf.ultimoActualiza(dtoNuevo); }
+            return false;
         }
         public void ultimoLimpiaPartidos()
         {

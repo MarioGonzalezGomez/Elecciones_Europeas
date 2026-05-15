@@ -81,6 +81,7 @@ namespace Elecciones
         string? sfCodigoSedeDesplegada;
         bool cartonPartidosDentro;
         public bool ultimoEscanoDentro;
+        public bool ultimoSuperfaldonDentro => sfUltimoDentro;
 
         //Estas conexiones serán null si no están activadas por Configuración
         OrdenesIPF? ipf;
@@ -425,6 +426,17 @@ namespace Elecciones
         }
         private void UpdateCartones(BrainStormDTO dtoAnterior)
         {
+            if (ultimoEscanoDentro)
+            {
+                bool hayCambioUltimo = graficos.ultimoActualiza(dto);
+                if (hayCambioUltimo)
+                {
+                    return;
+                }
+
+                return;
+            }
+
             if (fichaDentro)
             {
                 graficos.fichaActualiza(oficiales, dtoAnterior, dto);
@@ -433,14 +445,7 @@ namespace Elecciones
             {
                 graficos.cartonPartidosActualiza(dto);
             }
-            if (ultimoEscanoDentro)
-            {
-                graficos.ultimoActualiza(dto);
-            }
-            else
-            {
-                graficos.CartonesActualiza();
-            }
+            graficos.CartonesActualiza();
         }
         private void UpdateSuperfaldones()
         {

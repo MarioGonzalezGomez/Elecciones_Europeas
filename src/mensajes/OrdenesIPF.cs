@@ -327,7 +327,11 @@ namespace Elecciones.src.mensajes
 
         public void CartonesActualiza()
         {
-            c.EnviarMensaje(cartonBuilder.CartonesActualiza());
+            string signal = cartonBuilder.CartonesActualiza();
+            if (!string.IsNullOrWhiteSpace(signal))
+            {
+                c.EnviarMensaje(signal);
+            }
         }
 
         #endregion
@@ -468,9 +472,15 @@ namespace Elecciones.src.mensajes
             c.EnviarMensaje(cartonBuilder.ultimoEncadena(dtoAnterior, dto));
         }
 
-        public void ultimoActualiza(BrainStormDTO dtoNuevo)
+        public bool ultimoActualiza(BrainStormDTO dtoNuevo)
         {
-            c.EnviarMensaje(cartonBuilder.ultimoActualiza(dtoNuevo));
+            string signal = cartonBuilder.ultimoActualiza(dtoNuevo);
+            if (!string.IsNullOrWhiteSpace(signal))
+            {
+                c.EnviarMensaje(signal);
+            }
+
+            return cartonBuilder.HayCambioUltimoEscanoActual();
         }
 
         public void ultimoEntraPartido(BrainStormDTO dto, CPDataDTO partido, bool esIzquierda)
@@ -538,7 +548,11 @@ namespace Elecciones.src.mensajes
 
         public void sfActualiza()
         {
-            c.EnviarMensaje(superfaldonBuilder.sfActualiza());
+            string signal = superfaldonBuilder.sfActualiza();
+            if (!string.IsNullOrWhiteSpace(signal))
+            {
+                c.EnviarMensaje(signal);
+            }
         }
         public bool ultimoSuperCambia(BrainStormDTO dtoNuevo)
         {

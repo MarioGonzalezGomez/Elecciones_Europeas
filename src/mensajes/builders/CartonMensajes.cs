@@ -36,6 +36,8 @@ namespace Elecciones.src.mensajes.builders
         private int escaniosAcumuladosDch = 0;
         private string siglasUltimoEscano = "";
         private string siglasLuchaEscano = "";
+        private string ultimoEscanoSnapshot = "";
+        private bool ultimoEscanoSnapshotInicializado = false;
 
         private CartonMensajes() : base() { }
 
@@ -651,6 +653,14 @@ namespace Elecciones.src.mensajes.builders
             //     sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siglasOcultar}", "OBJ_CULL", "1", 2, 0.25, 0) + "\n");
             // }
             //
+            var snapshotActual = ConstruyeSnapshotUltimoEscano(dto);
+            if (ultimoEscanoSnapshotInicializado && !string.Equals(ultimoEscanoSnapshot, snapshotActual, StringComparison.Ordinal))
+            {
+                sb.Append(EventRunBuild("UltimoEscanoSF/Cambio") + "\n");
+            }
+            ultimoEscanoSnapshot = snapshotActual;
+            ultimoEscanoSnapshotInicializado = true;
+
             sb.Append(CartonesActualiza());
             return sb.ToString();
         }
@@ -719,7 +729,50 @@ namespace Elecciones.src.mensajes.builders
             ultimoEscanoPartidos.Clear();
             anchoAcumuladoIzq = anchoAcumuladoDch = escaniosAcumuladosIzq = escaniosAcumuladosDch = 0;
             siglasUltimoEscano = siglasLuchaEscano = "";
+            ultimoEscanoSnapshot = "";
+            ultimoEscanoSnapshotInicializado = false;
             return Sale("ULTIMO_ESCANO");
+        }
+
+        private static string ConstruyeSnapshotUltimoEscano(BrainStormDTO dto)
+        {
+            if (dto?.partidos == null || dto.partidos.Count == 0)
+            {
+                return "U:|L:";
+            }
+
+            static string IdPartido(PartidoDTO partido)
+            {
+                if (!string.IsNullOrWhiteSpace(partido.codigo))
+                {
+                    return $"C:{partido.codigo.Trim()}";
+                }
+
+                if (!string.IsNullOrWhiteSpace(partido.siglas))
+                {
+                    return $"S:{partido.siglas.Trim()}";
+                }
+
+                return "";
+            }
+
+            var ultimo = dto.partidos
+                .Where(p => p.esUltimoEscano == 1)
+                .Select(IdPartido)
+                .Where(id => !string.IsNullOrEmpty(id))
+                .Distinct()
+                .OrderBy(id => id, StringComparer.Ordinal)
+                .ToList();
+
+            var lucha = dto.partidos
+                .Where(p => p.luchaUltimoEscano == 1)
+                .Select(IdPartido)
+                .Where(id => !string.IsNullOrEmpty(id))
+                .Distinct()
+                .OrderBy(id => id, StringComparer.Ordinal)
+                .ToList();
+
+            return $"U:{string.Join(",", ultimo)}|L:{string.Join(",", lucha)}";
         }
 
 

@@ -58,8 +58,8 @@ namespace Elecciones.src.mensajes.builders
 
         #region Ultimo
 
-        public string ultimoEntra() => EventRunBuild("ULTIMO/Entra");
-        public string ultimoSale() => EventRunBuild("ULTIMO/Sale");
+        public string ultimoEntra() => EventRunBuild("UltimoEscanoSF/Entra");
+        public string ultimoSale() => EventRunBuild("UltimoEscanoSF/Sale");
 
         #endregion
 

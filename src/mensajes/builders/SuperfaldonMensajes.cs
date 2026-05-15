@@ -60,12 +60,12 @@ namespace Elecciones.src.mensajes.builders
 
         #region Ultimo
 
-        public string ultimoEntra() => EventRunBuild("ULTIMO/Entra");
+        public string ultimoEntra() => EventRunBuild("UltimoEscanoSF/Entra");
         public string ultimoSale()
         {
             ultimoEscanoSnapshot = "";
             ultimoEscanoSnapshotInicializado = false;
-            return EventRunBuild("ULTIMO/Sale");
+            return EventRunBuild("UltimoEscanoSF/Sale");
         }
 
         public string ultimoCambia(BrainStormDTO dto)

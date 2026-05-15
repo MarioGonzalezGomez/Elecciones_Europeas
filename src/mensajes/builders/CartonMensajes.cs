@@ -53,7 +53,7 @@ namespace Elecciones.src.mensajes.builders
         {
             string signal = "";
             signal += EventBuild("Oficial_Codigo", "MAP_LLSTRING_LOAD") + "\n";
-            signal += EventBuild("UltimoEscanoCSV", "MAP_LLSTRING_LOAD") + "\n";
+            signal += EventBuild("UltimoEscanoNDatos/CSV", "MAP_LLSTRING_LOAD") + "\n";
             return signal;
         }
 
@@ -275,7 +275,7 @@ namespace Elecciones.src.mensajes.builders
             catch { }
 
             var partidos = dto.partidos ?? new List<PartidoDTO>();
-            var siglasLocal = partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","")).ToList();
+            var siglasLocal = partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "")).ToList();
             for (int i = 0; i < siglasLocal.Count; i++)
             {
                 signal.Append(EventBuild($"CCAA_Carton/Fichas/{siglasLocal[i]}", "OBJ_DISPLACEMENT[2]", $"{i * -110}", 1) + "\n");
@@ -308,7 +308,7 @@ namespace Elecciones.src.mensajes.builders
         public string fichaEntra(bool oficiales, BrainStormDTO dto, PartidoDTO? seleccionado = null)
         {
             fichaSeleccionada = seleccionado;
-            siglas = dto.partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","")).ToList();
+            siglas = dto.partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "")).ToList();
             string mode = oficiales ? "Oficiales" : "Sondeos";
             StringBuilder sb = new StringBuilder();
 
@@ -349,7 +349,7 @@ namespace Elecciones.src.mensajes.builders
             string mode = oficiales ? "Oficiales" : "Sondeos";
             StringBuilder sb = new StringBuilder();
 
-            List<string> siglasNuevas = dtoNuevo.partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","")).ToList();
+            List<string> siglasNuevas = dtoNuevo.partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "")).ToList();
             string siglasYaDentro = siglas[indexCarrusel];
             int newIndex = siglasNuevas.IndexOf(siglasYaDentro);
             if (newIndex == -1) { newIndex = 0; siglasYaDentro = siglasNuevas.FirstOrDefault() ?? ""; }
@@ -397,7 +397,7 @@ namespace Elecciones.src.mensajes.builders
             signal.Append(EventBuild("Mayorias/LugarTxt1", "TEXT_STRING", dto.circunscripcionDTO?.nombre ?? "", 1) + "\n");
 
             var partidos = dto.partidos ?? new List<PartidoDTO>();
-            string topSigla = partidos.OrderByDescending(p => p.escanios).FirstOrDefault()?.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","") ?? "";
+            string topSigla = partidos.OrderByDescending(p => p.escanios).FirstOrDefault()?.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "") ?? "";
 
             try
             {
@@ -417,7 +417,7 @@ namespace Elecciones.src.mensajes.builders
             }
             catch { }
 
-            var siglasLocal = partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","")).ToList();
+            var siglasLocal = partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "")).ToList();
             for (int i = 0; i < siglasLocal.Count; i++)
             {
                 signal.Append(EventBuild($"Mapa_Mayorias/Fichas/{siglasLocal[i]}", "OBJ_DISPLACEMENT[2]", $"{i * -100}", 1) + "\n");
@@ -458,7 +458,7 @@ namespace Elecciones.src.mensajes.builders
             // sb.Append(Prepara("CARTON_PARTIDOS") + "\n");
 
             var partidos = dto.partidos ?? new List<PartidoDTO>();
-            var siglasLocal = partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","")).ToList();
+            var siglasLocal = partidos.Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "")).ToList();
             for (int i = 0; i < siglasLocal.Count; i++)
             {
                 int x = i < 7 ? 0 : 918;
@@ -468,7 +468,7 @@ namespace Elecciones.src.mensajes.builders
             }
             foreach (PartidoDTO par in dto.partidos)
             {
-                string siglasOK = par.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","");
+                string siglasOK = par.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "");
                 sb.Append(EventBuild($"Mayorias1/{siglasOK}/Partido_Escanos1", "TEXT_STRING", $"'{par.escanios}'", 1) + "\n");
                 sb.Append(EventBuild($"Mayorias1/{siglasOK}/Partido_Porcentaje1", "TEXT_STRING", $"'{par.porcentajeVoto}\\\\f<Light>%'", 1) + "\n");
                 NumberFormatInfo formato = new CultureInfo("es-ES").NumberFormat;
@@ -485,7 +485,7 @@ namespace Elecciones.src.mensajes.builders
             if (dto == null) return "";
             StringBuilder sb = new StringBuilder();
 
-            var siglas = (dto.partidos ?? new List<PartidoDTO>()).Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","")).ToList();
+            var siglas = (dto.partidos ?? new List<PartidoDTO>()).Select(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "")).ToList();
 
             for (int i = 0; i < siglas.Count; i++)
             {
@@ -496,7 +496,7 @@ namespace Elecciones.src.mensajes.builders
             }
             foreach (PartidoDTO par in dto.partidos)
             {
-                string siglasOK = par.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","");
+                string siglasOK = par.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "");
                 sb.Append(EventBuild($"Mayorias1/{siglasOK}/Partido_Escanos1", "TEXT_STRING", $"'{par.escanios}'", 1) + "\n");
                 sb.Append(EventBuild($"Mayorias1/{siglasOK}/Partido_Porcentaje1", "TEXT_STRING", $"'{par.porcentajeVoto}\\\\f<Light>%'", 1) + "\n");
                 NumberFormatInfo formato = new CultureInfo("es-ES").NumberFormat;
@@ -558,7 +558,7 @@ namespace Elecciones.src.mensajes.builders
             //     sb.Append(EventBuild($"Ultimo_Escano/Ultimo_Escano/{siguiente.siglas}", "OBJ_CULL", "0", 2, 0, 0.1));
             // }
             sb.Append(CartonesActualiza());
-            sb.Append(Entra("ULTIMO_ESCANO"));
+            sb.Append(Entra("UltimoEscanoN"));
             return sb.ToString();
         }
 
@@ -568,7 +568,7 @@ namespace Elecciones.src.mensajes.builders
             StringBuilder signal = new StringBuilder();
 
             int escaniosTotales = dto.circunscripcionDTO?.escaniosTotales ?? 82;
-            string siglasP = partido.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","");
+            string siglasP = partido.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "");
             int anchoPartido = (int)Math.Round((double)TAMANO_MAXIMO_FICHA / escaniosTotales * int.Parse(partido.escanios));
 
             string[] barrasIzq = { "Barra_Izq", "Barra_Izq1", "Barra_Izq2", "Barra_Izq3", "Barra_Izq4", "Barra_Izq5" };
@@ -656,12 +656,14 @@ namespace Elecciones.src.mensajes.builders
             var snapshotActual = ConstruyeSnapshotUltimoEscano(dto);
             if (ultimoEscanoSnapshotInicializado && !string.Equals(ultimoEscanoSnapshot, snapshotActual, StringComparison.Ordinal))
             {
-                sb.Append(EventRunBuild("UltimoEscanoSF/Cambio") + "\n");
+                sb.Append(EventRunBuild("UltimoEscanoN/Cambio") + "\n");
+            }
+            else
+            {
+                sb.Append(CartonesActualiza());
             }
             ultimoEscanoSnapshot = snapshotActual;
             ultimoEscanoSnapshotInicializado = true;
-
-            sb.Append(CartonesActualiza());
             return sb.ToString();
         }
 
@@ -680,7 +682,7 @@ namespace Elecciones.src.mensajes.builders
 
             foreach (var item in ultimoEscanoPartidos)
             {
-                var partidoNuevo = dtoNuevo.partidos.FirstOrDefault(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ","") == item.siglas);
+                var partidoNuevo = dtoNuevo.partidos.FirstOrDefault(p => p.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "") == item.siglas);
                 int nuevosEscanios = partidoNuevo?.escanios ?? 0;
                 int nuevoAncho = (int)Math.Round((double)TAMANO_MAXIMO_FICHA / escaniosTotales * nuevosEscanios);
 
@@ -731,7 +733,7 @@ namespace Elecciones.src.mensajes.builders
             siglasUltimoEscano = siglasLuchaEscano = "";
             ultimoEscanoSnapshot = "";
             ultimoEscanoSnapshotInicializado = false;
-            return Sale("ULTIMO_ESCANO");
+            return Sale("UltimoEscanoN");
         }
 
         private static string ConstruyeSnapshotUltimoEscano(BrainStormDTO dto)

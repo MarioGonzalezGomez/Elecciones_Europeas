@@ -52,23 +52,23 @@
 - [x] Implementar botonera extra web (ticker/video/rotulos) equivalente a `Botonera.xaml`.
 
 ## Fase 5 - Configuracion operativa web
-- [ ] Migrar configuraciones de `config.ini` relevantes a `appsettings` + UI de administracion.
-- [ ] Añadir configuracion de rutas y fuentes de video (hasta 6) con modo `Directo/Pregrabado`.
-- [ ] Añadir configuracion de horas operativas (`horaAvance*`, `horaParticipacion*`) y uso en UI.
-- [ ] Añadir gestion de activacion IPF/Prime y estado de conexion visible.
-- [ ] Evaluar si se necesita endpoint secundario IPF2 en Web y, si aplica, implementarlo.
+- [x] Migrar configuraciones de `config.ini` relevantes a `appsettings` + UI de administracion.
+- [x] Añadir configuracion de rutas y fuentes de video (hasta 6) con modo `Directo/Pregrabado`.
+- [x] Añadir configuracion de horas operativas (`horaAvance*`, `horaParticipacion*`) y uso en UI.
+- [x] Añadir gestion de activacion IPF/Prime y estado de conexion visible.
+- [x] Evaluar si se necesita endpoint secundario IPF2 en Web y, si aplica, implementarlo.
 
 ## Fase 6 - Actualizacion en vivo y concurrencia
-- [ ] Implementar escuchador de cambios de datos equivalente a `Escuchador` (polling o evento) para auto-actualizar cuando hay modulos en aire.
-- [ ] Definir modo manual vs autoactualizacion y controles para operador.
-- [ ] Hacer persistente/distribuido el lock de modulos (actualmente es en memoria de proceso).
-- [ ] Añadir auditoria de acciones por operador (quien, que, cuando, modulo, escena, payload).
+- [x] Implementar escuchador de cambios de datos equivalente a `Escuchador` (polling o evento) para auto-actualizar cuando hay modulos en aire.
+- [x] Definir modo manual vs autoactualizacion y controles para operador.
+- [x] Hacer persistente/distribuido el lock de modulos (actualmente es en memoria de proceso).
+- [x] Añadir auditoria de acciones por operador (quien, que, cuando, modulo, escena, payload).
 
 ## Fase 7 - Seguridad y operacion real
-- [ ] Sustituir identificacion por texto libre (`operatorId`) por autenticacion real (SSO/AD/OIDC o alternativa aprobada).
-- [ ] Endurecer autorizacion por rol/modulo/accion/comando.
+- [x] Sustituir identificacion por texto libre (`operatorId`) por autenticacion real (SSO/AD/OIDC o alternativa aprobada).
+- [x] Endurecer autorizacion por rol/modulo/accion/comando.
 - [x] Ocultar o desactivar paginas de plantilla (`Counter`, `Weather`) para entorno productivo.
-- [ ] Revisar manejo seguro de secretos (`Password` BD, endpoints) y estrategia de despliegue.
+- [x] Revisar manejo seguro de secretos (`Password` BD, endpoints) y estrategia de despliegue.
 
 ## Fase 8 - Calidad, pruebas y despliegue
 - [ ] Crear tests de regresion de composicion de senales comparando output web vs output legacy para casos canonicos.

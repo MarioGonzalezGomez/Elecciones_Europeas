@@ -540,6 +540,17 @@ namespace Elecciones.src.mensajes
         {
             c.EnviarMensaje(superfaldonBuilder.sfActualiza());
         }
+        public bool ultimoSuperCambia(BrainStormDTO dtoNuevo)
+        {
+            string signal = superfaldonBuilder.ultimoCambia(dtoNuevo);
+            if (string.IsNullOrWhiteSpace(signal))
+            {
+                return false;
+            }
+
+            c.EnviarMensaje(signal);
+            return true;
+        }
 
         public void ultimoSuperEntra()
         {

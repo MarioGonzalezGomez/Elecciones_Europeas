@@ -505,6 +505,11 @@ namespace Elecciones.src.controller
         {
             if (ipfActivo.Valor == 1) { ipf.ultimoSuperSale(); }
         }
+        public bool ultimoSuperCambia(BrainStormDTO dtoNuevo)
+        {
+            if (ipfActivo.Valor == 1) { return ipf.ultimoSuperCambia(dtoNuevo); }
+            return false;
+        }
 
         //SUPERFALDON
         public void superfaldonEntra(bool oficiales)

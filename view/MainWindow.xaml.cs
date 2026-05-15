@@ -437,10 +437,18 @@ namespace Elecciones
             {
                 graficos.ultimoActualiza(dto);
             }
-            graficos.CartonesActualiza();
+            else
+            {
+                graficos.CartonesActualiza();
+            }
         }
         private void UpdateSuperfaldones()
         {
+            if (sfUltimoDentro && graficos.ultimoSuperCambia(dto))
+            {
+                return;
+            }
+
             graficos.sfActualiza();
         }
 

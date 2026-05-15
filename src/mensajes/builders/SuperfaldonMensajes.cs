@@ -70,21 +70,21 @@ namespace Elecciones.src.mensajes.builders
 
         public string ultimoCambia(BrainStormDTO dto)
         {
+            return ultimoHayCambio(dto) ? EventRunBuild("UltimoEscanoSF/Cambio") : "";
+        }
+
+        public bool ultimoHayCambio(BrainStormDTO dto)
+        {
             if (dto == null)
             {
-                return "";
+                return false;
             }
 
             var snapshotActual = ConstruyeSnapshotUltimoEscano(dto);
-            if (ultimoEscanoSnapshotInicializado && !string.Equals(ultimoEscanoSnapshot, snapshotActual, StringComparison.Ordinal))
-            {
-                ultimoEscanoSnapshot = snapshotActual;
-                return EventRunBuild("UltimoEscanoSF/Cambio");
-            }
-
+            bool hayCambio = ultimoEscanoSnapshotInicializado && !string.Equals(ultimoEscanoSnapshot, snapshotActual, StringComparison.Ordinal);
             ultimoEscanoSnapshot = snapshotActual;
             ultimoEscanoSnapshotInicializado = true;
-            return "";
+            return hayCambio;
         }
 
         #endregion

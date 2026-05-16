@@ -518,9 +518,39 @@ namespace Elecciones.src.mensajes.builders
                 if (partidosExpandidos.Contains(partido.codigo))
                 {
                     // CÁLCULO DINÁMICO DE POSICIONES DE TEXTO (Empírico: 150 - widthOthers)
-                    double posEscanios = 150 - widthOthers;
-                    double posPorcentaje = posEscanios + 40;
-                    double posDiferencia = posEscanios + 4;
+                    string posVid = count >= 5 ? "-656" :
+                                    count == 4 ? "-566" :
+                                    count == 3 ? "-426" :
+                                    "-656";
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Vid", "OBJ_DISPLACEMENT[0]", posVid, 2, 0.5, 0) + "\n");
+
+                    double posEscanios;
+                    double posPorcentaje;
+                    double posDiferencia;
+                    if (count >= 5)
+                    {
+                        posEscanios = 150 - widthOthers;
+                        posPorcentaje = posEscanios + 40;
+                        posDiferencia = posEscanios + 4;
+                    }
+                    else if (count == 4)
+                    {
+                        posEscanios = 70;
+                        posPorcentaje = 70;
+                        posDiferencia = 70;
+                    }
+                    else if (count == 3)
+                    {
+                        posEscanios = 220;
+                        posPorcentaje = 220;
+                        posDiferencia = 220;
+                    }
+                    else
+                    {
+                        posEscanios = 150 - widthOthers;
+                        posPorcentaje = posEscanios + 40;
+                        posDiferencia = posEscanios + 4;
+                    }
 
                     //TEXTO DIRECTO: Siempre en 40 si está expandido
                     sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "40", 2, 0.5, 0) + "\n");
@@ -658,9 +688,39 @@ namespace Elecciones.src.mensajes.builders
                 if (partidosExpandidos.Contains(partido.codigo))
                 {
                     // CÁLCULO DINÁMICO DE POSICIONES DE TEXTO (Empírico: 150 - widthOthers)
-                    double posEscanios = 150 - widthOthers;
-                    double posPorcentaje = posEscanios + 40;
-                    double posDiferencia = posEscanios + 4;
+                    string posVid = count >= 5 ? "-656" :
+                                    count == 4 ? "-566" :
+                                    count == 3 ? "-426" :
+                                    "-656";
+                    sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/Vid", "OBJ_DISPLACEMENT[0]", posVid, 2, 0.5, 0) + "\n");
+
+                    double posEscanios;
+                    double posPorcentaje;
+                    double posDiferencia;
+                    if (count >= 5)
+                    {
+                        posEscanios = 150 - widthOthers;
+                        posPorcentaje = posEscanios + 40;
+                        posDiferencia = posEscanios + 4;
+                    }
+                    else if (count == 4)
+                    {
+                        posEscanios = 70;
+                        posPorcentaje = 70;
+                        posDiferencia = 70;
+                    }
+                    else if (count == 3)
+                    {
+                        posEscanios = 220;
+                        posPorcentaje = 220;
+                        posDiferencia = 220;
+                    }
+                    else
+                    {
+                        posEscanios = 150 - widthOthers;
+                        posPorcentaje = posEscanios + 40;
+                        posDiferencia = posEscanios + 4;
+                    }
 
                     //TEXTO DIRECTO
                     sb.Append(EventBuild($"Graficos/{tipo}/partidos/partido{sceneObjectId}/DirectoMascara/Directo", "OBJ_DISPLACEMENT[2]", "40", 2, 0.5, 0) + "\n");

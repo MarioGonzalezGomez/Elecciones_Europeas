@@ -535,15 +535,15 @@ namespace Elecciones.src.mensajes.builders
                     }
                     else if (count == 4)
                     {
-                        posEscanios = 70;
-                        posPorcentaje = 70;
-                        posDiferencia = 70;
+                        posEscanios = -262;
+                        posPorcentaje = -262;
+                        posDiferencia = -262;
                     }
                     else if (count == 3)
                     {
-                        posEscanios = 220;
-                        posPorcentaje = 220;
-                        posDiferencia = 220;
+                        posEscanios = -415;
+                        posPorcentaje = -415;
+                        posDiferencia = -415;
                     }
                     else
                     {

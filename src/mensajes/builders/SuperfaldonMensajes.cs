@@ -86,19 +86,19 @@ namespace Elecciones.src.mensajes.builders
             }
 
             ultimoEscanoCambioDetectado = false;
-            return EventRunBuild("UltimoEscanoSF/Entra");
+            return EventRunBuild("UltimoEscanoN/Entra");
         }
         public string ultimoSale()
         {
             ultimoEscanoSnapshot = "";
             ultimoEscanoSnapshotInicializado = false;
             ultimoEscanoCambioDetectado = false;
-            return EventRunBuild("UltimoEscanoSF/Sale");
+            return EventRunBuild("UltimoEscanoN/Sale");
         }
 
         public string ultimoCambia(BrainStormDTO dto)
         {
-            return ultimoHayCambio(dto) ? EventRunBuild("UltimoEscanoSF/Cambio") : "";
+            return ultimoHayCambio(dto) ? EventRunBuild("UltimoEscanoN/Cambio") : "";
         }
 
         public bool ultimoHayCambio(BrainStormDTO dto)

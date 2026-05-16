@@ -1605,7 +1605,7 @@ namespace Elecciones
                     {
                         // Formato legacy (VersionCarmen): orden por escanos/votos y filtrado por escanos > 0.
                         var dtoOld = CrearDtoOldParaCsv(dto);
-                        await dtoOld.ToCsv("BrainStorm", nombreSondeo);
+                        await dtoOld.ToCsv("BrainStorm", nombreSondeo, legacySinColumnaEscanios: true);
 
                         // Siempre generar tambien la version por codigo (equivalente a NEW).
                         var dtoCodigo = CrearDtoNewParaCsv(dto);

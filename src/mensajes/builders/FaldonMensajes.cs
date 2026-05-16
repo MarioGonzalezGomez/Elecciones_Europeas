@@ -475,15 +475,15 @@ namespace Elecciones.src.mensajes.builders
                 double scaleX = 1.0;
                 double scaleZ = 1.0;
 
-                if (usarExpansionDinamica && partidosExpandidos.Contains(partido.codigo))
+                if (partidosExpandidos.Contains(partido.codigo))
                 {
-                    currentWidth = minWidth; // Este es el ancho expandido (fijo)
+                    currentWidth = usarExpansionDinamica ? minWidth : widthOthers;
 
                     // Escala X: calculada dinámicamente para que el tamaño visual sea siempre minWidth
                     // La fórmula minWidth / widthOthers garantiza que:
                     // - baseWidth (widthOthers) * scaleX = minWidth (tamaño visual constante)
                     // Esto funciona igual para 1 o múltiples expandidos
-                    if (widthOthers > 0)
+                    if (usarExpansionDinamica && widthOthers > 0)
                     {
                         scaleX = minWidth / widthOthers;
                     }
@@ -515,7 +515,7 @@ namespace Elecciones.src.mensajes.builders
                 posicionAcumulada += currentWidth + margin;
 
                 // Ajustes visuales para TODOS los partidos expandidos (para mantener alineación al cambiar escala)
-                if (usarExpansionDinamica && partidosExpandidos.Contains(partido.codigo))
+                if (partidosExpandidos.Contains(partido.codigo))
                 {
                     // CÁLCULO DINÁMICO DE POSICIONES DE TEXTO (Empírico: 150 - widthOthers)
                     double posEscanios = 150 - widthOthers;
@@ -604,7 +604,10 @@ namespace Elecciones.src.mensajes.builders
             {
                 // Ninguno expandido: todos vuelven al tamaño normal
                 widthOthers = totalWidthAvailable / count;
-                sb.Append(EventRunBuild("Titular/Recuperar") + "\n");
+                if (numExpandidos == 0)
+                {
+                    sb.Append(EventRunBuild("Titular/Recuperar") + "\n");
+                }
             }
 
             // 5. Posicionamiento y escalado
@@ -619,11 +622,11 @@ namespace Elecciones.src.mensajes.builders
                 double scaleX = 1.0;
                 double scaleZ = 1.0;
 
-                if (usarExpansionDinamica && partidosExpandidos.Contains(partido.codigo))
+                if (partidosExpandidos.Contains(partido.codigo))
                 {
                     // Este partido sigue expandido
-                    currentWidth = minWidth;
-                    if (widthOthers > 0)
+                    currentWidth = usarExpansionDinamica ? minWidth : widthOthers;
+                    if (usarExpansionDinamica && widthOthers > 0)
                     {
                         scaleX = minWidth / widthOthers;
                     }
@@ -652,7 +655,7 @@ namespace Elecciones.src.mensajes.builders
                 posicionAcumulada += currentWidth + margin;
 
                 // Ajustes visuales para TODOS los partidos QUE QUEDAN expandidos
-                if (usarExpansionDinamica && partidosExpandidos.Contains(partido.codigo))
+                if (partidosExpandidos.Contains(partido.codigo))
                 {
                     // CÁLCULO DINÁMICO DE POSICIONES DE TEXTO (Empírico: 150 - widthOthers)
                     double posEscanios = 150 - widthOthers;

@@ -1565,6 +1565,32 @@ namespace Elecciones
             }
         }
 
+        private bool UsarFormatoBrainStormCsvOld()
+        {
+            string formato = configuration.GetValue("formatoBrainStormCsv");
+            return string.Equals(formato?.Trim(), "OLD", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private BrainStormDTO CrearDtoNewParaCsv(BrainStormDTO source)
+        {
+            var ordered = new BrainStormDTO(source);
+            ordered.partidos = ObtenerPartidosAlineadosParaCsv(source);
+            ordered.numPartidos = ordered.partidos.Count;
+            return ordered;
+        }
+
+        private BrainStormDTO CrearDtoOldParaCsv(BrainStormDTO source)
+        {
+            var legacy = new BrainStormDTO(source);
+            bool sourceOficiales = source.oficiales;
+            legacy.partidos = source.partidos
+                .Where(p => !string.IsNullOrWhiteSpace(p.codigo))
+                .Where(p => sourceOficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
+                .ToList();
+            legacy.numPartidos = legacy.partidos.Count;
+            return legacy;
+        }
+
         private async void EscribirFichero(bool desdeSedes = false)
         {
             if (dto != null)
@@ -1572,21 +1598,9 @@ namespace Elecciones
                 try
                 {
                     preparado = true;
-
-                    // Read ordering mode from config (non-boolean so it can be extended later)
-                    string ordenSetting = configuration.GetValue("ordenPartidos") ?? "0";
-
-                    // Local helper: create a new BrainStormDTO copy ordered by partido.codigo.
-                    // Uses the provided source (so we can pass an unfiltered DTO when needed).
-                    BrainStormDTO CreateOrderedDtoCopyFrom(BrainStormDTO source)
-                    {
-                        var ordered = new BrainStormDTO(source);
-                        ordered.partidos = ObtenerPartidosAlineadosParaCsv(source);
-                        ordered.numPartidos = ordered.partidos.Count;
-                        return ordered;
-                    }
-
-                    var dtoToWrite = CreateOrderedDtoCopyFrom(dto);
+                    var dtoToWrite = UsarFormatoBrainStormCsvOld()
+                        ? CrearDtoOldParaCsv(dto)
+                        : CrearDtoNewParaCsv(dto);
                     await dtoToWrite.ToCsv("BrainStorm", cmbSondeo.SelectedItem?.ToString() ?? "");
                 }
                 catch

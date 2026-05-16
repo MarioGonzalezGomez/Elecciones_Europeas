@@ -1598,10 +1598,30 @@ namespace Elecciones
                 try
                 {
                     preparado = true;
-                    var dtoToWrite = UsarFormatoBrainStormCsvOld()
-                        ? CrearDtoOldParaCsv(dto)
-                        : CrearDtoNewParaCsv(dto);
-                    await dtoToWrite.ToCsv("BrainStorm", cmbSondeo.SelectedItem?.ToString() ?? "");
+                    bool modoOld = UsarFormatoBrainStormCsvOld();
+                    string nombreSondeo = cmbSondeo.SelectedItem?.ToString() ?? "";
+
+                    if (modoOld)
+                    {
+                        // Formato legacy (VersionCarmen): orden por escanos/votos y filtrado por escanos > 0.
+                        var dtoOld = CrearDtoOldParaCsv(dto);
+                        await dtoOld.ToCsv("BrainStorm", nombreSondeo);
+
+                        // Siempre generar tambien la version por codigo (equivalente a NEW).
+                        var dtoCodigo = CrearDtoNewParaCsv(dto);
+                        await dtoCodigo.ToCsv("Brainstorm_Codigo", nombreSondeo);
+
+                        // En modo sondeo, generar copia adicional dedicada.
+                        if (!dto.oficiales)
+                        {
+                            await dtoCodigo.ToCsv("Brainstorm_Sondeo_Codigo", nombreSondeo);
+                        }
+                    }
+                    else
+                    {
+                        var dtoNew = CrearDtoNewParaCsv(dto);
+                        await dtoNew.ToCsv("BrainStorm", nombreSondeo);
+                    }
                 }
                 catch
                 {

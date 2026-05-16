@@ -437,6 +437,17 @@ namespace Elecciones
                 return;
             }
 
+            if (sfUltimoDentro)
+            {
+                if (graficos.ultimoSuperCambia(dto))
+                {
+                    return;
+                }
+
+                graficos.sfActualiza();
+                return;
+            }
+
             if (fichaDentro)
             {
                 graficos.fichaActualiza(oficiales, dtoAnterior, dto);
@@ -1777,6 +1788,7 @@ namespace Elecciones
                         break;
                     case "ÚLTIMO SUPERFALDÓN":
                         graficos.ultimoSuperEntra();
+                        sfUltimoDentro = true;
                         break;
 
                     default: break;
@@ -1891,6 +1903,7 @@ namespace Elecciones
                         break;
                     case "ÚLTIMO SUPERFALDÓN":
                         graficos.ultimoSuperSale();
+                        sfUltimoDentro = false;
                         break;
                     default: break;
                 }

@@ -71,7 +71,23 @@ namespace Elecciones.src.mensajes.builders
 
         #region Ultimo
 
-        public string ultimoEntra() => EventRunBuild("UltimoEscanoSF/Entra");
+        public string ultimoEntra()
+        {
+            var main = Application.Current.MainWindow as MainWindow;
+            if (main?.dto != null)
+            {
+                ultimoEscanoSnapshot = ConstruyeSnapshotUltimoEscano(main.dto);
+                ultimoEscanoSnapshotInicializado = true;
+            }
+            else
+            {
+                ultimoEscanoSnapshot = "";
+                ultimoEscanoSnapshotInicializado = false;
+            }
+
+            ultimoEscanoCambioDetectado = false;
+            return EventRunBuild("UltimoEscanoSF/Entra");
+        }
         public string ultimoSale()
         {
             ultimoEscanoSnapshot = "";

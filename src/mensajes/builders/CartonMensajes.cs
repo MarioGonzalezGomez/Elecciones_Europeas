@@ -532,6 +532,9 @@ namespace Elecciones.src.mensajes.builders
             var main = Application.Current.MainWindow as MainWindow;
             var con = main?.conexionActiva;
             StringBuilder sb = new StringBuilder();
+            ultimoEscanoSnapshot = ConstruyeSnapshotUltimoEscano(dto);
+            ultimoEscanoSnapshotInicializado = true;
+            ultimoEscanoCambioDetectado = false;
             // sb.Append(Prepara("ULTIMO_ESCANO"));
             // var provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dto.circunscripcionDTO.nombre);
             // //PARTE COLOR

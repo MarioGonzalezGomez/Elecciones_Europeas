@@ -48,6 +48,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         public BrainStormDTO(BrainStormDTO dto)
         {
             this.circunscripcionDTO = dto.circunscripcionDTO;
+            this.oficiales = dto.oficiales;
             this.numPartidos = dto.partidos.Where(par => (this.oficiales ? par.escanios : par.escaniosHastaSondeo) > 0).Count();
             this.partidos = dto.partidos;
             this.configuration = dto.configuration;

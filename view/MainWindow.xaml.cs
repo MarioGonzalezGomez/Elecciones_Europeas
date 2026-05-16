@@ -1625,6 +1625,8 @@ namespace Elecciones
                 .Where(p => !string.IsNullOrWhiteSpace(p.codigo))
                 .Where(p => sourceOficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
                 .ToList();
+            legacy.partidos.Sort(new PartidoDTOComparerUnified(sourceOficiales));
+            legacy.partidos.Reverse();
             legacy.numPartidos = legacy.partidos.Count;
             return legacy;
         }
@@ -1652,7 +1654,7 @@ namespace Elecciones
                         // En modo sondeo, generar copia adicional dedicada.
                         if (!dto.oficiales)
                         {
-                            await dtoCodigo.ToCsv("Brainstorm_Sondeo_Codigo", nombreSondeo, legacySinColumnaEscanios: true);
+                            await dtoOld.ToCsv("Brainstorm_Sondeo_Codigo", nombreSondeo, legacySinColumnaEscanios: true);
                         }
                     }
                     else

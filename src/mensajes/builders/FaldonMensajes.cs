@@ -421,6 +421,7 @@ namespace Elecciones.src.mensajes.builders
 
             int count = partidosActivos.Count;
             if (count == 0) return "";
+            bool usarExpansionDinamica = count > 4;
 
             // 4. Cálculos de ancho
             // pxTotales y margin definidos en la clase
@@ -434,7 +435,11 @@ namespace Elecciones.src.mensajes.builders
             // Lógica de anchos dinámica
             double widthOthers;
 
-            if (numExpandidos > 0)
+            if (!usarExpansionDinamica)
+            {
+                widthOthers = totalWidthAvailable / count;
+            }
+            else if (numExpandidos > 0)
             {
                 double widthRequiredForExpanded = numExpandidos * minWidth;
                 double remainingSpace = totalWidthAvailable - widthRequiredForExpanded;
@@ -470,7 +475,7 @@ namespace Elecciones.src.mensajes.builders
                 double scaleX = 1.0;
                 double scaleZ = 1.0;
 
-                if (partidosExpandidos.Contains(partido.codigo))
+                if (usarExpansionDinamica && partidosExpandidos.Contains(partido.codigo))
                 {
                     currentWidth = minWidth; // Este es el ancho expandido (fijo)
 
@@ -478,7 +483,7 @@ namespace Elecciones.src.mensajes.builders
                     // La fórmula minWidth / widthOthers garantiza que:
                     // - baseWidth (widthOthers) * scaleX = minWidth (tamaño visual constante)
                     // Esto funciona igual para 1 o múltiples expandidos
-                    if (widthOthers > 0 && count > 4)
+                    if (widthOthers > 0)
                     {
                         scaleX = minWidth / widthOthers;
                     }
@@ -510,7 +515,7 @@ namespace Elecciones.src.mensajes.builders
                 posicionAcumulada += currentWidth + margin;
 
                 // Ajustes visuales para TODOS los partidos expandidos (para mantener alineación al cambiar escala)
-                if (partidosExpandidos.Contains(partido.codigo))
+                if (usarExpansionDinamica && partidosExpandidos.Contains(partido.codigo))
                 {
                     // CÁLCULO DINÁMICO DE POSICIONES DE TEXTO (Empírico: 150 - widthOthers)
                     double posEscanios = 150 - widthOthers;
@@ -543,7 +548,7 @@ namespace Elecciones.src.mensajes.builders
             // Asumimos que el usuario manejará el escalado de las expandidas, 
             // así que establecemos el tamaño base para las "normales/reducidas".
             double baseWidth = (numExpandidos == count) ? minWidth : widthOthers;
-            if (count > 4)
+            if (usarExpansionDinamica)
             {
                 sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", baseWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
             }
@@ -578,6 +583,7 @@ namespace Elecciones.src.mensajes.builders
 
             int count = partidosActivos.Count;
             string tipo = dto.oficiales ? "Escrutinio" : "Sondeo";
+            bool usarExpansionDinamica = count > 4;
 
             // 4. Cálculos de ancho (igual que VideoIn, pero con el partido ya quitado de expandidos)
             double totalWidthAvailable = pxTotales - (margin * (count - 1));
@@ -587,7 +593,7 @@ namespace Elecciones.src.mensajes.builders
             int numExpandidos = partidosActivos.Count(p => partidosExpandidos.Contains(p.codigo));
 
             double widthOthers;
-            if (numExpandidos > 0)
+            if (usarExpansionDinamica && numExpandidos > 0)
             {
                 double widthRequiredForExpanded = numExpandidos * minWidth;
                 double remainingSpace = totalWidthAvailable - widthRequiredForExpanded;
@@ -613,11 +619,11 @@ namespace Elecciones.src.mensajes.builders
                 double scaleX = 1.0;
                 double scaleZ = 1.0;
 
-                if (partidosExpandidos.Contains(partido.codigo))
+                if (usarExpansionDinamica && partidosExpandidos.Contains(partido.codigo))
                 {
                     // Este partido sigue expandido
                     currentWidth = minWidth;
-                    if (widthOthers > 0 && count > 4)
+                    if (widthOthers > 0)
                     {
                         scaleX = minWidth / widthOthers;
                     }
@@ -646,7 +652,7 @@ namespace Elecciones.src.mensajes.builders
                 posicionAcumulada += currentWidth + margin;
 
                 // Ajustes visuales para TODOS los partidos QUE QUEDAN expandidos
-                if (partidosExpandidos.Contains(partido.codigo))
+                if (usarExpansionDinamica && partidosExpandidos.Contains(partido.codigo))
                 {
                     // CÁLCULO DINÁMICO DE POSICIONES DE TEXTO (Empírico: 150 - widthOthers)
                     double posEscanios = 150 - widthOthers;
@@ -688,7 +694,7 @@ namespace Elecciones.src.mensajes.builders
 
             // Tamaño base para fichas no expandidas
             double baseWidth = (numExpandidos == count) ? minWidth : widthOthers;
-            if (count > 4)
+            if (usarExpansionDinamica)
             {
                 sb.Append(EventBuild("fichaPartido", "PRIM_RECGLO_LEN[0]", baseWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), 2, 0.5, 0) + "\n");
             }

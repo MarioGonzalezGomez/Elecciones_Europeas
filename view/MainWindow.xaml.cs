@@ -1652,7 +1652,7 @@ namespace Elecciones
                         // En modo sondeo, generar copia adicional dedicada.
                         if (!dto.oficiales)
                         {
-                            await dtoCodigo.ToCsv("Brainstorm_Sondeo_Codigo", nombreSondeo);
+                            await dtoCodigo.ToCsv("Brainstorm_Sondeo_Codigo", nombreSondeo, legacySinColumnaEscanios: true);
                         }
                     }
                     else

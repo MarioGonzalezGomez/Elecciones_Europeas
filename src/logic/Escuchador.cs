@@ -184,11 +184,11 @@ namespace Elecciones.src.logic
 
             if (mainWindow.Dispatcher.CheckAccess())
             {
-                mainWindow.Update();
+                mainWindow.Update(false);
                 return;
             }
 
-            await mainWindow.Dispatcher.InvokeAsync(mainWindow.Update);
+            await mainWindow.Dispatcher.InvokeAsync(() => mainWindow.Update(false));
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using Elecciones.src.conexion;
 using Elecciones.src.model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,20 +12,37 @@ namespace Elecciones.src.repository
     public class MedioPartidoRepository
     {
         private ConexionEntityFramework conexion;
-        private static MedioPartidoRepository? instance;
+        public static MedioPartidoRepository? instance;
+        private static ConexionEntityFramework? _con;
 
         private MedioPartidoRepository(ConexionEntityFramework con)
         {
             this.conexion = con;
+            _con = con;
         }
 
         public static MedioPartidoRepository GetInstance(ConexionEntityFramework con)
         {
-            if (instance == null)
+            if (instance == null || NeedsRecreation(con))
             {
                 instance = new MedioPartidoRepository(con);
             }
             return instance;
+        }
+
+        private static bool NeedsRecreation(ConexionEntityFramework con)
+        {
+            if (_con == null)
+            {
+                return true;
+            }
+
+            if (_con._tipoConexion != con._tipoConexion)
+            {
+                return true;
+            }
+
+            return !string.Equals(_con._database, con._database, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -34,7 +52,7 @@ namespace Elecciones.src.repository
         {
             try
             {
-                return conexion.Set<MedioPartido>().ToList();
+                return conexion.Set<MedioPartido>().AsNoTracking().ToList();
             }
             catch (Exception ex)
             {
@@ -51,6 +69,7 @@ namespace Elecciones.src.repository
             try
             {
                 return conexion.Set<MedioPartido>()
+                    .AsNoTracking()
                     .Where(mp => mp.codMedio == codMedio && mp.codCircunscripcion == codCircunscripcion)
                     .ToList();
             }
@@ -69,6 +88,7 @@ namespace Elecciones.src.repository
             try
             {
                 return conexion.Set<MedioPartido>()
+                    .AsNoTracking()
                     .Where(mp => mp.codCircunscripcion == codCircunscripcion)
                     .Select(mp => mp.codMedio)
                     .Distinct()
@@ -89,6 +109,7 @@ namespace Elecciones.src.repository
             try
             {
                 return conexion.Set<MedioPartido>()
+                    .AsNoTracking()
                     .FirstOrDefault(mp => mp.codCircunscripcion == codCircunscripcion && 
                                          mp.codMedio == codMedio && 
                                          mp.codPartido == codPartido);
@@ -108,6 +129,7 @@ namespace Elecciones.src.repository
             try
             {
                 return conexion.Set<MedioPartido>()
+                    .AsNoTracking()
                     .Where(mp => mp.codMedio == codMedio && mp.codCircunscripcion == codCircunscripcion)
                     .OrderBy(mp => mp.codPartido)
                     .ToList();

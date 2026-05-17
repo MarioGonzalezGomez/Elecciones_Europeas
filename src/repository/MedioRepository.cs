@@ -1,5 +1,6 @@
 using Elecciones.src.conexion;
 using Elecciones.src.model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,20 +12,37 @@ namespace Elecciones.src.repository
     public class MedioRepository
     {
         private ConexionEntityFramework conexion;
-        private static MedioRepository? instance;
+        public static MedioRepository? instance;
+        private static ConexionEntityFramework? _con;
 
         private MedioRepository(ConexionEntityFramework con)
         {
             this.conexion = con;
+            _con = con;
         }
 
         public static MedioRepository GetInstance(ConexionEntityFramework con)
         {
-            if (instance == null)
+            if (instance == null || NeedsRecreation(con))
             {
                 instance = new MedioRepository(con);
             }
             return instance;
+        }
+
+        private static bool NeedsRecreation(ConexionEntityFramework con)
+        {
+            if (_con == null)
+            {
+                return true;
+            }
+
+            if (_con._tipoConexion != con._tipoConexion)
+            {
+                return true;
+            }
+
+            return !string.Equals(_con._database, con._database, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -34,7 +52,7 @@ namespace Elecciones.src.repository
         {
             try
             {
-                return conexion.Set<Medio>().ToList();
+                return conexion.Set<Medio>().AsNoTracking().ToList();
             }
             catch (Exception ex)
             {
@@ -50,7 +68,9 @@ namespace Elecciones.src.repository
         {
             try
             {
-                return conexion.Set<Medio>().FirstOrDefault(m => m.codigo == codigo);
+                return conexion.Set<Medio>()
+                    .AsNoTracking()
+                    .FirstOrDefault(m => m.codigo == codigo);
             }
             catch (Exception ex)
             {
@@ -67,6 +87,7 @@ namespace Elecciones.src.repository
             try
             {
                 return conexion.Set<Medio>()
+                    .AsNoTracking()
                     .OrderBy(m => m.codigo)
                     .ToList();
             }

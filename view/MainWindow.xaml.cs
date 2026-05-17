@@ -378,8 +378,14 @@ namespace Elecciones
             return string.Equals(GetSelectedGrafico(), "SEDES", StringComparison.Ordinal);
         }
 
-        public void Update()
+        public void Update(bool esActualizacionManual = false)
         {
+            // En modo sondeo solo permitimos refresco manual (boton Actualizar)
+            if (!oficiales && !esActualizacionManual)
+            {
+                return;
+            }
+
             string? elementoSeleccionado = GetSelectedCircunscripcionNombre() ?? GetSelectedAutonomiaNombre();
 
             if (!string.IsNullOrWhiteSpace(elementoSeleccionado))
@@ -1742,7 +1748,7 @@ namespace Elecciones
         {
             bool temp = actualizacionActiva;
             actualizacionActiva = true;
-            Update();
+            Update(true);
             // Actualizar siempre la lista de medios por si hay nuevos
             CargarMedios();
             actualizacionActiva = temp;

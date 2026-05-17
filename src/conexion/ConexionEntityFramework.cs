@@ -112,6 +112,8 @@ namespace Elecciones.src.conexion
             PartidoRepository.instance = null;
             CPRepository.instance = null;
             LiteralRepository.instance = null;
+            MedioRepository.instance = null;
+            MedioPartidoRepository.instance = null;
 
             // Invalidar Services
             CircunscripcionService.instance = null;

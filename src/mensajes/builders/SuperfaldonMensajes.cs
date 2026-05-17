@@ -142,8 +142,7 @@ namespace Elecciones.src.mensajes.builders
             {
                 return TipoCambioUltimoEscano.CambioArriba;
             }
-
-            if (cambioLucha)
+             if (cambioLucha)
             {
                 return TipoCambioUltimoEscano.CambioAbajo;
             }

@@ -682,13 +682,13 @@ namespace Elecciones.src.mensajes.builders
             ultimoEscanoCambioDetectado = cambioUltimo || cambioLucha;
             if (ultimoEscanoCambioDetectado)
             {
-                if (cambioUltimo)
+                if (cambioLucha)
                 {
-                    sb.Append(EventRunBuild("UltimoEscanoN/Cambio") + "\n");
+                    sb.Append(EventRunBuild("UltimoEscanoN/CambioAbajo") + "\n");
                 }
                 else
                 {
-                    sb.Append(EventRunBuild("UltimoEscanoN/CambioAbajo") + "\n");
+                    sb.Append(EventRunBuild("UltimoEscanoN/Cambio") + "\n");
                 }
             }
             else

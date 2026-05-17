@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using Elecciones.src.controller;
@@ -897,12 +898,10 @@ namespace Elecciones.src.mensajes.builders
                 .Select((s, i) => new { Sigla = s, Index = i })
                 .ToDictionary(x => x.Sigla, x => x.Index);
 
-            static string Esc(string s) => s?.Replace("+", "_").Replace("-", "_") ?? s;
-
             for (int idx = 0; idx < siglasPartidos.Count; idx++)
             {
                 var siglaRaw = siglasPartidos[idx];
-                var siglaObj = Esc(siglaRaw);
+                var siglaObj = NormalizeTickerTdSigla(siglaRaw);
 
                 // Determinar escala segun numero de partidos
                 string escala = n switch
@@ -937,7 +936,7 @@ namespace Elecciones.src.mensajes.builders
 
             foreach (var siglaRaw in siglasPartidos)
             {
-                var siglaObj = Esc(siglaRaw);
+                var siglaObj = NormalizeTickerTdSigla(siglaRaw);
 
                 if (siglasActivasSet.Contains(siglaRaw))
                 {
@@ -1001,8 +1000,6 @@ namespace Elecciones.src.mensajes.builders
             int nAnterior = partidosActuales?.Count ?? 0;
             int nNuevo = partidosActivos?.Count ?? 0;
 
-            static string Esc(string s) => s?.Replace("+", "_").Replace("-", "_") ?? s;
-
             var siglasQueSalen = siglasAnteriores.Except(siglasNuevas).ToList();
             var siglasQueEntran = siglasNuevas.Except(siglasAnteriores).ToList();
 
@@ -1023,7 +1020,7 @@ namespace Elecciones.src.mensajes.builders
                 for (int idx = 0; idx < siglasPartidos.Count; idx++)
                 {
                     var siglaRaw = siglasPartidos[idx];
-                    var siglaObj = Esc(siglaRaw);
+                    var siglaObj = NormalizeTickerTdSigla(siglaRaw);
 
                     if (newActiveIndex.TryGetValue(siglaRaw, out int newPosIndex) && newPosIndex >= 0 && newPosIndex < layoutNuevo.Positions.Length)
                     {
@@ -1072,9 +1069,9 @@ namespace Elecciones.src.mensajes.builders
                     else
                     {
                         int posicionNoActivo = posicionNoActivosBase + (offsetNoActivos * pasoNoActivos);
-                        signal += EventBuild($"Partidos/{Esc(siglaRaw)}", "OBJ_DISPLACEMENT[0]", $"{posicionNoActivo}", 2, 0.5, 0) + "\n";
-                        signal += EventBuild($"Partidos/{Esc(siglaRaw)}", "OBJ_CULL", "1", 2, 0.3, 0) + "\n";
-                        signal += EventBuild($"DatoTD/{Esc(siglaRaw)}", "MAP_INT_PAR", "0", 2, 0.5, 0) + "\n";
+                        signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{posicionNoActivo}", 2, 0.5, 0) + "\n";
+                        signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "1", 2, 0.3, 0) + "\n";
+                        signal += EventBuild($"DatoTD/{siglaObj}", "MAP_INT_PAR", "0", 2, 0.5, 0) + "\n";
                         offsetNoActivos++;
                     }
                 }
@@ -1094,7 +1091,7 @@ namespace Elecciones.src.mensajes.builders
                 for (int idx = 0; idx < siglasAnteriores.Count; idx++)
                 {
                     var siglaRaw = siglasAnteriores[idx];
-                    var siglaObj = Esc(siglaRaw);
+                    var siglaObj = NormalizeTickerTdSigla(siglaRaw);
 
                     if (newActiveIndex.TryGetValue(siglaRaw, out int newPosIndex))
                     {
@@ -1120,7 +1117,7 @@ namespace Elecciones.src.mensajes.builders
 
                 foreach (var siglaRaw in siglasQueSalen)
                 {
-                    var siglaObj = Esc(siglaRaw);
+                    var siglaObj = NormalizeTickerTdSigla(siglaRaw);
                     int posicionNoActivo = posicionNoActivosBase + (offsetNoActivos * pasoNoActivos);
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{posicionNoActivo}", 2, 0.5, 0) + "\n";
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "1", 2, 0.3, 0) + "\n";
@@ -1130,7 +1127,7 @@ namespace Elecciones.src.mensajes.builders
 
                 foreach (var siglaRaw in siglasQueEntran)
                 {
-                    var siglaObj = Esc(siglaRaw);
+                    var siglaObj = NormalizeTickerTdSigla(siglaRaw);
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "0", 1) + "\n";
 
                     if (newActiveIndex.TryGetValue(siglaRaw, out int newPosIndex) && newPosIndex >= 0)
@@ -1192,6 +1189,39 @@ namespace Elecciones.src.mensajes.builders
         private int GetTickerTDPasoNoActivos((int Size, int[] Positions, int LogoPos, int EscanosPos) layout)
         {
             return layout.Size + margin;
+        }
+
+        private static string NormalizeTickerTdSigla(string? siglaRaw)
+        {
+            if (string.IsNullOrWhiteSpace(siglaRaw))
+            {
+                return "_";
+            }
+
+            string decomposed = siglaRaw.Trim().Normalize(NormalizationForm.FormD);
+            StringBuilder normalized = new StringBuilder(decomposed.Length);
+
+            foreach (char ch in decomposed)
+            {
+                UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory(ch);
+                if (category is UnicodeCategory.NonSpacingMark
+                    or UnicodeCategory.SpacingCombiningMark
+                    or UnicodeCategory.EnclosingMark)
+                {
+                    continue;
+                }
+
+                if (char.IsLetterOrDigit(ch))
+                {
+                    normalized.Append(char.ToUpperInvariant(ch));
+                }
+                else
+                {
+                    normalized.Append('_');
+                }
+            }
+
+            return normalized.Length > 0 ? normalized.ToString() : "_";
         }
 
         #endregion

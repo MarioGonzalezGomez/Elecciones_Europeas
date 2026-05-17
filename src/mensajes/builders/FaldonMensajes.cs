@@ -881,12 +881,12 @@ namespace Elecciones.src.mensajes.builders
                     PartidoDTO temp = dto.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
                     int escanios = temp?.escanios ?? 0;
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "0", 2, 0.2, 0) + "\n";
-                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{escanios}'", 2, 0.5, 0) + "\n";
+                    signal += EventBuild($"DatoTD/{siglaObj}", "MAP_INT_PAR", $"'{escanios}'", 2, 0.5, 0) + "\n";
                 }
                 else
                 {
                     signal += Oculta_Desoculta(true, $"Partidos/{siglaObj}") + "\n";
-                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", "'0'", 2, 0.5, 0) + "\n";
+                    signal += EventBuild($"DatoTD/{siglaObj}", "MAP_INT_PAR", "'0'", 2, 0.5, 0) + "\n";
                 }
             }
 
@@ -1003,7 +1003,7 @@ namespace Elecciones.src.mensajes.builders
 
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
                         int escanios = temp?.escanios ?? 0;
-                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{escanios}'", 2, 0.5, 0) + "\n";
+                        signal += EventBuild($"DatoTD/{siglaObj}", "MAP_INT_PAR", $"'{escanios}'", 2, 0.5, 0) + "\n";
                         signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n";
                     }
                     else
@@ -1011,7 +1011,7 @@ namespace Elecciones.src.mensajes.builders
                         int posicionNoActivo = posicionNoActivosBase + (offsetNoActivos * pasoNoActivos);
                         signal += EventBuild($"Partidos/{Esc(siglaRaw)}", "OBJ_DISPLACEMENT[0]", $"{posicionNoActivo}", 2, 0.5, 0) + "\n";
                         signal += EventBuild($"Partidos/{Esc(siglaRaw)}", "OBJ_CULL", "1", 2, 0.3, 0) + "\n";
-                        signal += EventBuild($"Escaños/{Esc(siglaRaw)}", "TEXT_STRING", "'0'", 2, 0.5, 0) + "\n";
+                        signal += EventBuild($"DatoTD/{Esc(siglaRaw)}", "MAP_INT_PAR", "'0'", 2, 0.5, 0) + "\n";
                         offsetNoActivos++;
                     }
                 }
@@ -1051,7 +1051,7 @@ namespace Elecciones.src.mensajes.builders
 
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
                         int escanios = temp?.escanios ?? 0;
-                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{escanios}'", 2, 0.5, 0) + "\n";
+                        signal += EventBuild($"DatoTD/{siglaObj}", "MAP_INT_PAR", $"'{escanios}'", 2, 0.5, 0) + "\n";
                     }
                 }
 
@@ -1061,7 +1061,7 @@ namespace Elecciones.src.mensajes.builders
                     int posicionNoActivo = posicionNoActivosBase + (offsetNoActivos * pasoNoActivos);
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{posicionNoActivo}", 2, 0.5, 0) + "\n";
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "1", 2, 0.3, 0) + "\n";
-                    signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", "'0'", 2, 0.5, 0) + "\n";
+                    signal += EventBuild($"DatoTD/{siglaObj}", "MAP_INT_PAR", "'0'", 2, 0.5, 0) + "\n";
                     offsetNoActivos++;
                 }
 
@@ -1077,7 +1077,7 @@ namespace Elecciones.src.mensajes.builders
 
                         PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
                         int escanios = temp?.escanios ?? 0;
-                        signal += EventBuild($"Escaños/{siglaObj}", "TEXT_STRING", $"'{escanios}'", 2, 0.5, 0) + "\n";
+                        signal += EventBuild($"DatoTD/{siglaObj}", "MAP_INT_PAR", $"'{escanios}'", 2, 0.5, 0) + "\n";
                     }
                 }
             }

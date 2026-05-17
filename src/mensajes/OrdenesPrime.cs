@@ -10,7 +10,7 @@ namespace Elecciones.src.mensajes
 {
     internal class OrdenesPrime
     {
-        public static OrdenesPrime instance;
+        public static OrdenesPrime? instance;
         private PrimeMensajes builder;
         public ConexionGraficos c;
 

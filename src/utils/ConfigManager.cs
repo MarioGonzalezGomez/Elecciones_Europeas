@@ -8,7 +8,7 @@ namespace Elecciones.src.utils
 {
     public class ConfigManager
     {
-        private static ConfigManager instance;
+        private static ConfigManager? instance;
         private static readonly object _lock = new();
         private Dictionary<string, string> config;
         private string path;
@@ -36,7 +36,7 @@ namespace Elecciones.src.utils
             OnConnectionConfigChanged();
         }
 
-        private ConfigManager(string ruta)
+        private ConfigManager(string? ruta)
         {
             // If ruta is null/empty, use executable folder
             if (string.IsNullOrWhiteSpace(ruta))
@@ -49,7 +49,7 @@ namespace Elecciones.src.utils
             EnsureConfigExists();
         }
 
-        public static ConfigManager GetInstance(string ruta = null)
+        public static ConfigManager GetInstance(string? ruta = null)
         {
             lock (_lock)
             {

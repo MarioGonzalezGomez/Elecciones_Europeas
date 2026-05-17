@@ -84,7 +84,7 @@ namespace Elecciones.src.repository
         /// <summary>
         /// Obtiene un medio-partido específico por su clave compuesta
         /// </summary>
-        public MedioPartido FindByKey(string codCircunscripcion, string codMedio, string codPartido)
+        public MedioPartido? FindByKey(string codCircunscripcion, string codMedio, string codPartido)
         {
             try
             {

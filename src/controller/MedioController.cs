@@ -29,7 +29,7 @@ namespace Elecciones.src.controller
         /// <summary>
         /// Obtiene un medio específico por su código
         /// </summary>
-        public MedioDTO ObtenerMedioPorCodigo(string codigo)
+        public MedioDTO? ObtenerMedioPorCodigo(string codigo)
         {
             return service.GetMedioByCode(codigo);
         }

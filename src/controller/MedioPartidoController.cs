@@ -45,7 +45,7 @@ namespace Elecciones.src.controller
         /// <summary>
         /// Obtiene un dato específico de medio-partido
         /// </summary>
-        public MedioPartidoDTO ObtenerPorClave(string codCircunscripcion, string codMedio, string codPartido)
+        public MedioPartidoDTO? ObtenerPorClave(string codCircunscripcion, string codMedio, string codPartido)
         {
             return service.GetByKey(codCircunscripcion, codMedio, codPartido);
         }

@@ -1,6 +1,7 @@
 using Elecciones.src.conexion;
 using Elecciones.src.model.IPF;
 using Elecciones.src.service;
+using System;
 using System.Collections.Generic;
 
 
@@ -10,7 +11,7 @@ namespace Elecciones.src.controller
     {
         public static PartidoController? instance;
 
-        private PartidoService _service;
+        private readonly PartidoService _service;
         private static ConexionEntityFramework? _con;
 
         private PartidoController(ConexionEntityFramework con)
@@ -21,19 +22,27 @@ namespace Elecciones.src.controller
 
         public static PartidoController GetInstance(ConexionEntityFramework con)
         {
-            if (instance == null)
+            if (instance == null || NeedsRecreation(con))
             {
                 instance = new PartidoController(con);
             }
-            else if (_con._tipoConexion != con._tipoConexion)
-            {
-                instance = new PartidoController(con);
-            }
-            else if (!_con._database.Equals(con._database))
-            {
-                instance = new PartidoController(con);
-            }
+
             return instance;
+        }
+
+        private static bool NeedsRecreation(ConexionEntityFramework con)
+        {
+            if (_con == null)
+            {
+                return true;
+            }
+
+            if (_con._tipoConexion != con._tipoConexion)
+            {
+                return true;
+            }
+
+            return !string.Equals(_con._database, con._database, StringComparison.Ordinal);
         }
 
         public List<Partido> FindAll()

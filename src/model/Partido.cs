@@ -35,6 +35,11 @@ namespace Elecciones.src.model.IPF
         public Partido()
         {
             configuration = ConfigManager.GetInstance();
+            codigo = string.Empty;
+            codigoPadre = string.Empty;
+            siglas = string.Empty;
+            nombre = string.Empty;
+            candidato = string.Empty;
         }
         public Partido(string codigo, string codigoPadre, string siglas, string nombre, string candidato)
         {

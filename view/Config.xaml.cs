@@ -186,9 +186,8 @@ namespace Elecciones
         {
             if (main != null)
             {
-                bool activa = (bool)checkActualizacion.IsChecked;
-                main.escuchador.salir = !activa;
-                main.actualizacionActiva = activa;
+                bool activa = checkActualizacion.IsChecked == true;
+                main.SetActualizacionActiva(activa);
             }
         }
 
@@ -292,22 +291,23 @@ namespace Elecciones
             configuration.SetValue("puertoIPF", txtPuertoIPF.Text);
             configuration.SetValue("puertoPrime", txtPuertoPrime.Text);
 
-            configuration.SetValue("activoPrime", ((bool)checkPrime.IsChecked) ? "1" : "0");
-            configuration.SetValue("activoIPF", ((bool)checkIPF.IsChecked) ? "1" : "0");
-            configuration.SetValue("regional", ((bool)checkRegional.IsChecked) ? "1" : "0");
+            configuration.SetValue("activoPrime", checkPrime.IsChecked == true ? "1" : "0");
+            configuration.SetValue("activoIPF", checkIPF.IsChecked == true ? "1" : "0");
+            configuration.SetValue("regional", checkRegional.IsChecked == true ? "1" : "0");
 
             string conexion;
+            int slotConexion = Math.Clamp(cmbConexiones.SelectedIndex, 1, 3);
             if (cmbConexiones.SelectedIndex == 0)
             {
-                conexion = ((bool)radioPrincipal.IsChecked) ? "1" : ((bool)radioReserva.IsChecked) ? "2" : ((bool)radioLocal.IsChecked) ? "3" : configuration.GetValue("conexionDefault1");
+                conexion = radioPrincipal.IsChecked == true ? "1" : radioReserva.IsChecked == true ? "2" : radioLocal.IsChecked == true ? "3" : configuration.GetValue("conexionDefault1");
                 configuration.SetValue("conexionDefault1", conexion);
                 configuration.SetValue("conexionDefault2", conexion);
                 configuration.SetValue("conexionDefault3", conexion);
             }
             else
             {
-                conexion = ((bool)radioPrincipal.IsChecked) ? "1" : ((bool)radioReserva.IsChecked) ? "2" : ((bool)radioLocal.IsChecked) ? "3" : configuration.GetValue($"conexionDefault{cmbConexiones.SelectedIndex}");
-                configuration.SetValue($"conexionDefault{cmbConexiones.SelectedIndex}", conexion);
+                conexion = radioPrincipal.IsChecked == true ? "1" : radioReserva.IsChecked == true ? "2" : radioLocal.IsChecked == true ? "3" : configuration.GetValue($"conexionDefault{slotConexion}");
+                configuration.SetValue($"conexionDefault{slotConexion}", conexion);
             }
             RellenarComboBox();
             configuration.SaveConfig();

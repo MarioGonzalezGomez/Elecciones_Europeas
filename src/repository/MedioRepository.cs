@@ -46,7 +46,7 @@ namespace Elecciones.src.repository
         /// <summary>
         /// Obtiene un medio por su código
         /// </summary>
-        public Medio FindByCode(string codigo)
+        public Medio? FindByCode(string codigo)
         {
             try
             {

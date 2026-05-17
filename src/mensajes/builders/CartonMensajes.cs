@@ -34,8 +34,6 @@ namespace Elecciones.src.mensajes.builders
         private int anchoAcumuladoDch = 0;
         private int escaniosAcumuladosIzq = 0;
         private int escaniosAcumuladosDch = 0;
-        private string siglasUltimoEscano = "";
-        private string siglasLuchaEscano = "";
         private string ultimoEscanoSnapshot = "";
         private bool ultimoEscanoSnapshotInicializado = false;
         private bool ultimoEscanoCambioDetectado = false;
@@ -82,15 +80,15 @@ namespace Elecciones.src.mensajes.builders
                 var con = main?.conexionActiva;
                 Circunscripcion? circ = null;
 
-                if (!string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo))
+                if (con != null && !string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo))
                     circ = CircunscripcionController.GetInstance(con).FindById(dto.circunscripcionDTO.codigo);
-                if (circ == null && !string.IsNullOrEmpty(dto.circunscripcionDTO?.nombre))
+                if (con != null && circ == null && !string.IsNullOrEmpty(dto.circunscripcionDTO?.nombre))
                     circ = CircunscripcionController.GetInstance(con).FindByName(dto.circunscripcionDTO.nombre);
 
                 var nombreParaMap = circ?.nombre ?? dto.circunscripcionDTO?.nombre ?? "";
                 var codigoParaMap = circ?.codigo ?? dto.circunscripcionDTO?.codigo ?? "";
 
-                if (!string.IsNullOrEmpty(codigoParaMap) && codigoParaMap.EndsWith("00000"))
+                if (con != null && !string.IsNullOrEmpty(codigoParaMap) && codigoParaMap.EndsWith("00000"))
                 {
                     var provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(nombreParaMap);
                     if (provincias?.Count > 0)
@@ -124,15 +122,18 @@ namespace Elecciones.src.mensajes.builders
                 {
                     case 1:
                         leftTime = horaAv1Hist; rightTime = horaAv1;
-                        leftValue = circ?.avance1Hist ?? 0; rightValue = circ?.avance1 != 0 ? circ.avance1 : finalParticipation;
+                        leftValue = circ?.avance1Hist ?? 0;
+                        rightValue = (circ != null && circ.avance1 != 0) ? circ.avance1 : finalParticipation;
                         break;
                     case 2:
                         leftTime = horaAv2Hist; rightTime = horaAv2;
-                        leftValue = circ?.avance2Hist ?? 0; rightValue = circ?.avance2 != 0 ? circ.avance2 : finalParticipation;
+                        leftValue = circ?.avance2Hist ?? 0;
+                        rightValue = (circ != null && circ.avance2 != 0) ? circ.avance2 : finalParticipation;
                         break;
                     case 3:
                         leftTime = horaAv3Hist; rightTime = horaAv3;
-                        leftValue = circ?.avance3Hist ?? 0; rightValue = circ?.avance3 != 0 ? circ.avance3 : finalParticipation;
+                        leftValue = circ?.avance3Hist ?? 0;
+                        rightValue = (circ != null && circ.avance3 != 0) ? circ.avance3 : finalParticipation;
                         break;
                     default:
                         leftTime = horaFinalHist; rightTime = horaFinal;
@@ -175,7 +176,7 @@ namespace Elecciones.src.mensajes.builders
                 var main = Application.Current.MainWindow as MainWindow;
                 var con = main?.conexionActiva;
 
-                if (!string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo) && dto.circunscripcionDTO.codigo.EndsWith("00000"))
+                if (con != null && !string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo) && dto.circunscripcionDTO.codigo.EndsWith("00000"))
                 {
                     var provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dto.circunscripcionDTO.nombre);
                     if (provincias?.Count > 0)
@@ -199,6 +200,10 @@ namespace Elecciones.src.mensajes.builders
                 string horaFinalHist = configuration.GetValue("horaParticipacionHistorico") ?? "";
 
                 var cDto = dto.circunscripcionDTO;
+                if (cDto == null)
+                {
+                    return signal.ToString();
+                }
                 double leftValue = 0, rightValue = 0;
 
                 switch (avance)
@@ -267,7 +272,7 @@ namespace Elecciones.src.mensajes.builders
             {
                 var main = Application.Current.MainWindow as MainWindow;
                 var con = main?.conexionActiva;
-                if (!string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo) && dto.circunscripcionDTO.codigo.EndsWith("00000"))
+                if (con != null && !string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo) && dto.circunscripcionDTO.codigo.EndsWith("00000"))
                 {
                     var provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dto.circunscripcionDTO.nombre);
                     if (provincias?.Count > 0)
@@ -410,7 +415,7 @@ namespace Elecciones.src.mensajes.builders
             {
                 var main = Application.Current.MainWindow as MainWindow;
                 var con = main?.conexionActiva;
-                if (!string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo) && dto.circunscripcionDTO.codigo.EndsWith("00000"))
+                if (con != null && !string.IsNullOrEmpty(dto.circunscripcionDTO?.codigo) && dto.circunscripcionDTO.codigo.EndsWith("00000"))
                 {
                     var provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(dto.circunscripcionDTO.nombre);
                     if (provincias?.Count > 0)
@@ -473,7 +478,7 @@ namespace Elecciones.src.mensajes.builders
                 int z = i < 7 ? (-100 * i) : (100 - (100 * (i - 7)));
                 sb.Append(EventBuild($"Carton_Partidos/Fichas/{siglasLocal[i]}", "OBJ_DISPLACEMENT", $"({x},{y},{z})", 1) + "\n");
             }
-            foreach (PartidoDTO par in dto.partidos)
+            foreach (PartidoDTO par in partidos)
             {
                 string siglasOK = par.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "");
                 sb.Append(EventBuild($"Mayorias1/{siglasOK}/Partido_Escanos1", "TEXT_STRING", $"'{par.escanios}'", 1) + "\n");
@@ -501,7 +506,7 @@ namespace Elecciones.src.mensajes.builders
                 int z = i < 7 ? (-100 * i) : (100 - (100 * (i - 7)));
                 sb.Append(EventBuild($"Carton_Partidos/Fichas/{siglas[i]}", "OBJ_DISPLACEMENT", $"({x},{y},{z})", 2, 0.5, 0) + "\n");
             }
-            foreach (PartidoDTO par in dto.partidos)
+            foreach (PartidoDTO par in (dto.partidos ?? new List<PartidoDTO>()))
             {
                 string siglasOK = par.siglas.Replace("+", "_").Replace("-", "_").Replace(" ", "");
                 sb.Append(EventBuild($"Mayorias1/{siglasOK}/Partido_Escanos1", "TEXT_STRING", $"'{par.escanios}'", 1) + "\n");
@@ -751,7 +756,6 @@ namespace Elecciones.src.mensajes.builders
         {
             ultimoEscanoPartidos.Clear();
             anchoAcumuladoIzq = anchoAcumuladoDch = escaniosAcumuladosIzq = escaniosAcumuladosDch = 0;
-            siglasUltimoEscano = siglasLuchaEscano = "";
             ultimoEscanoSnapshot = "";
             ultimoEscanoSnapshotInicializado = false;
             ultimoEscanoCambioDetectado = false;

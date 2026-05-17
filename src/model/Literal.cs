@@ -13,13 +13,13 @@ namespace Elecciones.src.model.IPF
 {
     public class Literal
     {
-        public string codigo { get; set; }
-        public string castellano { get; set; }
-        public string catalan { get; set; }
-        public string vasco { get; set; }
-        public string gallego { get; set; }
-        public string valenciano { get; set; }
-        public string mallorquin { get; set; }
+        public string codigo { get; set; } = string.Empty;
+        public string castellano { get; set; } = string.Empty;
+        public string catalan { get; set; } = string.Empty;
+        public string vasco { get; set; } = string.Empty;
+        public string gallego { get; set; } = string.Empty;
+        public string valenciano { get; set; } = string.Empty;
+        public string mallorquin { get; set; } = string.Empty;
 
         ConfigManager configuration;
 

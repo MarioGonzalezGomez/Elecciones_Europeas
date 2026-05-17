@@ -24,13 +24,12 @@ namespace Elecciones
     /// </summary>
     public partial class Botonera : Window
     {
-        GraphicController gController;
-        ConfigManager configuration;
-        private MainWindow main;
+        GraphicController gController = null!;
+        ConfigManager configuration = null!;
+        private MainWindow? main;
 
         bool votosIn;
         bool histIn;
-        bool millonesIn;
 
         public bool tickerTDIn = false;
 
@@ -48,6 +47,11 @@ namespace Elecciones
             gController = GraphicController.GetInstance();
             configuration = ConfigManager.GetInstance();
             configuration.ReadConfig();
+        }
+
+        private MainWindow? GetMainWindow()
+        {
+            return Application.Current.MainWindow as MainWindow;
         }
 
         /// <summary>
@@ -96,7 +100,8 @@ namespace Elecciones
 
         private void btnEscanos_Click(object sender, RoutedEventArgs e)
         {
-            main = Application.Current.MainWindow as MainWindow;
+            main = GetMainWindow();
+            if (main == null) return;
             if (votosIn)
             {
                 gController.TickerVotosSale(main.oficiales);
@@ -111,13 +116,15 @@ namespace Elecciones
         }
         private void btnPorcentajeVoto_Click(object sender, RoutedEventArgs e)
         {
-            main = Application.Current.MainWindow as MainWindow;
+            main = GetMainWindow();
+            if (main == null) return;
             gController.TickerVotosEntra(main.oficiales);
             votosIn = true;
         }
         private void btnHistoricos_Click(object sender, RoutedEventArgs e)
         {
-            main = Application.Current.MainWindow as MainWindow;
+            main = GetMainWindow();
+            if (main == null) return;
             gController.TickerHistoricosEntra(main.oficiales);
             //gController.TickerHistoricosEntraInd();
             histIn = true;
@@ -140,7 +147,8 @@ namespace Elecciones
 
         private void btnVideoIn_Click(object sender, RoutedEventArgs e)
         {
-            main = Application.Current.MainWindow as MainWindow;
+            main = GetMainWindow();
+            if (main == null) return;
             if (main.partidoSeleccionado != null)
             {
                 gController.VideoIn(main.dto, main.partidoSeleccionado);
@@ -150,7 +158,8 @@ namespace Elecciones
         }
         private void btnVideoOut_Click(object sender, RoutedEventArgs e)
         {
-            main = Application.Current.MainWindow as MainWindow;
+            main = GetMainWindow();
+            if (main == null) return;
             if (main.partidoSeleccionado != null)
             {
                 gController.VideoOut(main.dto, main.partidoSeleccionado);
@@ -160,13 +169,15 @@ namespace Elecciones
 
         private void btnEntranTodos_Click(object sender, RoutedEventArgs e)
         {
-            main = Application.Current.MainWindow as MainWindow;
+            main = GetMainWindow();
+            if (main == null) return;
             gController.VideoInTodos(main.dto);
             // TODO: Implementar Entran Todos
         }
         private void btnSalenTodos_Click(object sender, RoutedEventArgs e)
         {
-            main = Application.Current.MainWindow as MainWindow;
+            main = GetMainWindow();
+            if (main == null) return;
             gController.VideoOutTodos(main.dto);
             // TODO: Implementar Salen Todos
         }
@@ -177,7 +188,8 @@ namespace Elecciones
 
         private void btnEntraTD_Click(object sender, RoutedEventArgs e)
         {
-            main = Application.Current.MainWindow as MainWindow;
+            main = GetMainWindow();
+            if (main == null) return;
             gController.TickerTDEntra(main.dto);
             gController.SubirRotulosPrimeTD();
             tickerTDIn = true;
@@ -191,13 +203,15 @@ namespace Elecciones
 
         private void btnEntraEspecial_Click(object sender, RoutedEventArgs e)
         {
-            main = Application.Current.MainWindow as MainWindow;
+            main = GetMainWindow();
+            if (main == null) return;
             gController.SubirRotulosPrimeEsp(2000);
             gController.TickerEntra(main.oficiales, main.dto);
         }
         private void btnSaleEspecial_Click(object sender, RoutedEventArgs e)
         {
-            main = Application.Current.MainWindow as MainWindow;
+            main = GetMainWindow();
+            if (main == null) return;
             gController.BajarRotulosPrimeEsp(1000);
             gController.TickerSale(main.oficiales, main.dto);
         }

@@ -1,9 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Elecciones.src.logic
 {
@@ -25,8 +21,8 @@ namespace Elecciones.src.logic
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event EventHandler CambioDeElecciones;
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public event EventHandler? CambioDeElecciones;
 
         protected virtual void OnPropertyChanged(string propertyName)
         {

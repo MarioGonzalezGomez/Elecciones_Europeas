@@ -132,9 +132,9 @@ namespace Elecciones.src.mensajes.builders
             return $"itemset('<{_bd}>{objeto}','{propiedad}');";
         }
 
-        protected string EventBuild(string objeto, string propiedad, string values, int tipoItem)
+        protected string EventBuild(string objeto, string propiedad, string? values, int tipoItem)
         {
-            return EventBuild(objeto, propiedad, (string?)values, tipoItem, 0.0, 0.0);
+            return EventBuild(objeto, propiedad, values, tipoItem, 0.0, 0.0);
         }
 
         protected string EventBuild(string objeto, string propiedad, int tipoItem)

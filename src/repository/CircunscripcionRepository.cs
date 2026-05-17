@@ -11,7 +11,7 @@ namespace Elecciones.src.repository
     {
         public static CircunscripcionRepository? instance;
 
-        private static ConexionEntityFramework _con;
+        private static ConexionEntityFramework? _con;
 
         private CircunscripcionRepository(ConexionEntityFramework con)
         {
@@ -20,42 +20,59 @@ namespace Elecciones.src.repository
 
         public static CircunscripcionRepository GetInstance(ConexionEntityFramework con)
         {
-            if (instance == null)
+            if (instance == null || NeedsRecreation(con))
             {
                 instance = new CircunscripcionRepository(con);
             }
-            else if (_con._tipoConexion != con._tipoConexion)
-            {
-                instance = new CircunscripcionRepository(con);
-            }
-            else if (!_con._database.Equals(con._database))
-            {
-                instance = new CircunscripcionRepository(con);
-            }
+
             return instance;
+        }
+
+        private static bool NeedsRecreation(ConexionEntityFramework con)
+        {
+            if (_con == null)
+            {
+                return true;
+            }
+
+            if (_con._tipoConexion != con._tipoConexion)
+            {
+                return true;
+            }
+
+            return !string.Equals(_con._database, con._database, StringComparison.Ordinal);
+        }
+
+        private static ConexionEntityFramework GetConnectionOrThrow()
+        {
+            return _con ?? throw new InvalidOperationException("CircunscripcionRepository no ha sido inicializado.");
         }
 
         public List<Circunscripcion> GetAll()
         {
-            return _con.Circunscripciones.ToList();
+            return GetConnectionOrThrow().Circunscripciones.ToList();
         }
 
         public List<Circunscripcion> GetAllFromBD()
         {
-            using (var newContext = new ConexionEntityFramework(_con._tipoConexion, _con.db))
+            ConexionEntityFramework con = GetConnectionOrThrow();
+            using (var newContext = new ConexionEntityFramework(con._tipoConexion, con.db))
             {
-                var values = newContext.Circunscripciones.ToList();
                 return newContext.Circunscripciones.ToList();
             }
         }
 
         public Circunscripcion GetById(string id)
         {
-            return _con.Circunscripciones.Find(id);
+            return GetConnectionOrThrow().Circunscripciones.Find(id)
+                ?? throw new KeyNotFoundException($"No se ha encontrado la circunscripción con id '{id}'.");
         }
+
         public Circunscripcion GetByName(string name)
         {
-            return _con.Circunscripciones.FirstOrDefault(p => p.nombre.Equals(name, StringComparison.OrdinalIgnoreCase));
+            return GetConnectionOrThrow().Circunscripciones
+                .FirstOrDefault(p => p.nombre.Equals(name, StringComparison.OrdinalIgnoreCase))
+                ?? throw new KeyNotFoundException($"No se ha encontrado la circunscripción '{name}'.");
         }
     }
 }

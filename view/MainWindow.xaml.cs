@@ -1,4 +1,4 @@
-using Elecciones.src.conexion;
+﻿using Elecciones.src.conexion;
 using Elecciones.src.controller;
 using Elecciones.src.logic;
 using Elecciones.src.mensajes;
@@ -34,29 +34,29 @@ namespace Elecciones
     /// </summary>
     public partial class MainWindow : Window
     {
-        List<Circunscripcion> CCAA;
-        ObservableCollection<string> circunscripcionNames;
-        ObservableCollection<CPDataDTO> listaDeDatos;
-        public ConexionEntityFramework conexionActiva;
+        List<Circunscripcion> CCAA = new();
+        ObservableCollection<string> circunscripcionNames = new();
+        ObservableCollection<CPDataDTO> listaDeDatos = new();
+        public ConexionEntityFramework conexionActiva = null!;
         private int avance;
-        public BrainStormDTO dto;
+        public BrainStormDTO dto = null!;
         bool preparado;
         public bool oficiales;
         bool regional;
-        private string autonomiasHeader;
+        private string autonomiasHeader = string.Empty;
 
         //Escuchador
-        public Escuchador escuchador;
-        //Bool para ver si mando actualización de datos o no
+        public Escuchador escuchador = null!;
+        //Bool para ver si mando actualizaciÃ³n de datos o no
         public bool actualizacionActiva;
 
         //1 Nacionales, 2 Autonomia X
         private int tipoElecciones;
 
         //0 Si utilizamos datos de la DB1, 1 de la DB2...
-        private ObservableInt eleccionSeleccionada;
+        private ObservableInt eleccionSeleccionada = null!;
 
-        //Si tenemos algún partido seleccionado con el que se deba hacer algo
+        //Si tenemos algÃºn partido seleccionado con el que se deba hacer algo
         public PartidoDTO? partidoSeleccionado;
 
         //Bool para hacer giro
@@ -69,35 +69,28 @@ namespace Elecciones
         bool ccaaDentro;
         bool mayoriasDentro;
         bool fichaDentro;
-        bool superfaldonDentro;
-        bool sfFichasDentro;
         public bool sfPactometroDentro;
-        bool sfMayoriasDentro;
-        bool sfBipartidismoDentro;
-        bool sfGanadorDentro;
         bool sfCarruselDentro;
-        bool sfEscrutadoDentro;
-        bool sfCCAADentro;
         bool sfUltimoDentro;
         string? sfCodigoSedeDesplegada;
         bool cartonPartidosDentro;
         public bool ultimoEscanoDentro;
         public bool ultimoSuperfaldonDentro => sfUltimoDentro;
 
-        //Estas conexiones serán null si no están activadas por Configuración
+        //Estas conexiones serÃ¡n null si no estÃ¡n activadas por ConfiguraciÃ³n
         OrdenesIPF? ipf;
         OrdenesPrime? prime;
-        GraphicController graficos;
+        GraphicController graficos = null!;
 
         //Ventanas adicionales
-        Botonera botonera;
-        public Pactos pactos;
+        Botonera botonera = null!;
+        public Pactos? pactos;
         public Config? config;
 
         //Manejar datos del fichero de configuracion
-        ConfigManager configuration;
+        ConfigManager configuration = null!;
 
-        //Diccionario para guardar los valores originales de escaños de sondeo
+        //Diccionario para guardar los valores originales de escaÃ±os de sondeo
         private Dictionary<string, (int desde, int hasta)> valoresOriginalesSondeo = new Dictionary<string, (int, int)>();
 
         public MainWindow()
@@ -135,15 +128,8 @@ namespace Elecciones
             ccaaDentro = false;
             mayoriasDentro = false;
             fichaDentro = false;
-            superfaldonDentro = false;
-            sfFichasDentro = false;
             sfPactometroDentro = false;
-            sfMayoriasDentro = false;
-            sfBipartidismoDentro = false;
-            sfGanadorDentro = false;
             sfCarruselDentro = false;
-            sfEscrutadoDentro = false;
-            sfCCAADentro = false;
             sfUltimoDentro = false;
             sfCodigoSedeDesplegada = null;
             cartonPartidosDentro = false;
@@ -214,13 +200,13 @@ namespace Elecciones
         {
             if (tipoElecciones == 1) // Elecciones generales
             {
-                // Cargar todas las autonomías (España ya está incluida al principio por el método FindAllAutonomias)
+                // Cargar todas las autonomÃ­as (EspaÃ±a ya estÃ¡ incluida al principio por el mÃ©todo FindAllAutonomias)
                 CCAA = CircunscripcionController.GetInstance(conexionActiva).FindAllAutonomias(eleccionSeleccionada.Valor + 1);
-                autonomiasHeader = "AUTONOMÍAS";
+                autonomiasHeader = "AUTONOMÃAS";
             }
-            else if (tipoElecciones == 2) // Elecciones autonómicas
+            else if (tipoElecciones == 2) // Elecciones autonÃ³micas
             {
-                // Cargar solo la autonomía correspondiente (codigoRegional + 5 ceros)
+                // Cargar solo la autonomÃ­a correspondiente (codigoRegional + 5 ceros)
                 string codigoRegional = configuration.GetValue($"codigoRegionalBD{eleccionSeleccionada.Valor + 1}");
                 string codigoAutonomia = $"{codigoRegional}00000";
                 Circunscripcion autonomia = CircunscripcionController.GetInstance(conexionActiva).FindById(codigoAutonomia);
@@ -229,7 +215,7 @@ namespace Elecciones
                 {
                     CCAA.Add(autonomia);
                 }
-                autonomiasHeader = "AUTONOMÍA";
+                autonomiasHeader = "AUTONOMÃA";
             }
         }
 
@@ -246,11 +232,11 @@ namespace Elecciones
         {
             try
             {
-                // Guardar la selección actual si existe
+                // Guardar la selecciÃ³n actual si existe
                 string? seleccionActual = cmbSondeo.SelectedItem?.ToString();
 
                 cmbSondeo.Items.Clear();
-                // Agregar opción RTVE como primera opción (valores originales)
+                // Agregar opciÃ³n RTVE como primera opciÃ³n (valores originales)
                 cmbSondeo.Items.Add("RTVE");
 
                 MedioController medioController = new MedioController(conexionActiva);
@@ -263,7 +249,7 @@ namespace Elecciones
 
                 if (cmbSondeo.Items.Count > 0)
                 {
-                    // Intentar restaurar la selección anterior
+                    // Intentar restaurar la selecciÃ³n anterior
                     if (!string.IsNullOrEmpty(seleccionActual) && cmbSondeo.Items.Contains(seleccionActual))
                     {
                         cmbSondeo.SelectedItem = seleccionActual;
@@ -280,8 +266,8 @@ namespace Elecciones
             }
         }
 
-        //Por ahora, se modifican manualmente, pero se podría implementar un modo de introducir
-        //los tipos de gráficos en la ventana de configuración Avanzada
+        //Por ahora, se modifican manualmente, pero se podrÃ­a implementar un modo de introducir
+        //los tipos de grÃ¡ficos en la ventana de configuraciÃ³n Avanzada
         public void InitializeListView()
         {
             graficosListView.Items.Clear();
@@ -290,25 +276,25 @@ namespace Elecciones
             switch (tablaPrincipal)
             {
                 case 1:
-                    graficosListView.Items.Add("CUENTA ATRÁS");
+                    graficosListView.Items.Add("CUENTA ATRÃS");
                     graficosListView.Items.Add("FICHAS");
                     graficosListView.Items.Add("SEDES");
                     break;
                 case 2:
-                    //graficosListView.Items.Add("PARTICIPACIÓN");
+                    //graficosListView.Items.Add("PARTICIPACIÃ“N");
                     //graficosListView.Items.Add("CCAA");
                     //graficosListView.Items.Add("FICHAS");
-                    //graficosListView.Items.Add("PACTÓMETRO");
-                    //graficosListView.Items.Add("MAYORÍAS");
+                    //graficosListView.Items.Add("PACTÃ“METRO");
+                    //graficosListView.Items.Add("MAYORÃAS");
                     //graficosListView.Items.Add("VS");
-                    graficosListView.Items.Add("CARTÓN PARTIDOS");
-                    graficosListView.Items.Add("ÚLTIMO ESCAÑO");
+                    graficosListView.Items.Add("CARTÃ“N PARTIDOS");
+                    graficosListView.Items.Add("ÃšLTIMO ESCAÃ‘O");
                     break;
                 case 3:
                     graficosListView.Items.Add("ESCRUTADO");
                     graficosListView.Items.Add("CARRUSEL");
                     graficosListView.Items.Add("CCAA");
-                    //graficosListView.Items.Add("PACTÓMETRO");
+                    //graficosListView.Items.Add("PACTÃ“METRO");
                     graficosListView.Items.Add("ULTIMO");
                     break;
                 case 4:
@@ -349,7 +335,7 @@ namespace Elecciones
                     Directory.CreateDirectory($"{rutaDatos}\\JSON");
                     Directory.CreateDirectory($"{rutaDatos}\\EXCEL");
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Manejo de errores en caso de que no se pueda crear el directorio
                     MessageBox.Show($"Se ha producido un error al intentar crear las carpetas para guardar los archivos de datos en {rutaDatos}.", "Error al crear carpetas para guardar los datos", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -359,21 +345,44 @@ namespace Elecciones
         private void IniciarEscuchadores()
         {
             escuchador = new Escuchador(conexionActiva);
+            escuchador.ActualizacionActiva = actualizacionActiva;
+            escuchador.Iniciar();
+        }
+
+        public void SetActualizacionActiva(bool activa)
+        {
+            actualizacionActiva = activa;
+            if (escuchador != null)
+            {
+                escuchador.ActualizacionActiva = activa;
+            }
+        }
+
+        private string? GetSelectedCircunscripcionNombre()
+        {
+            return circunscripcionesListView.SelectedItem?.ToString();
+        }
+
+        private string? GetSelectedAutonomiaNombre()
+        {
+            return autonomiasListView.SelectedItem?.ToString();
+        }
+
+        private string GetSelectedGrafico()
+        {
+            return graficosListView.SelectedValue?.ToString() ?? string.Empty;
+        }
+
+        private bool IsGraficoSedesSeleccionado()
+        {
+            return string.Equals(GetSelectedGrafico(), "SEDES", StringComparison.Ordinal);
         }
 
         public void Update()
         {
-            string elementoSeleccionado = "";
-            if (circunscripcionesListView.SelectedIndex != -1)
-            {
-                elementoSeleccionado = circunscripcionesListView.SelectedItem.ToString();
-            }
-            else if (autonomiasListView.SelectedIndex != -1)
-            {
-                elementoSeleccionado = autonomiasListView.SelectedItem.ToString();
-            }
+            string? elementoSeleccionado = GetSelectedCircunscripcionNombre() ?? GetSelectedAutonomiaNombre();
 
-            if (elementoSeleccionado != "")
+            if (!string.IsNullOrWhiteSpace(elementoSeleccionado))
             {
                 Circunscripcion seleccionada;
                 BrainStormDTO dtoAnterior;
@@ -394,14 +403,10 @@ namespace Elecciones
                     if (EsCabeceraCarton()) { UpdateCartones(dtoAnterior); }
                     if (EsCabeceraSuperfaldon()) { UpdateSuperfaldones(); }
 
-                    // Actualizar datos en la ventana de Pactos si está abierta
+                    // Actualizar datos en la ventana de Pactos si estÃ¡ abierta
                     if (pactos != null)
                     {
-                        string tipoGrafico = "";
-                        if (graficosListView.SelectedItem != null)
-                        {
-                            tipoGrafico = graficosListView.SelectedItem.ToString();
-                        }
+                        string tipoGrafico = GetSelectedGrafico();
                         pactos.ActualizarDatos(oficiales, tipoGrafico, avance, tipoElecciones);
                     }
 
@@ -528,7 +533,7 @@ namespace Elecciones
         //LOGICA CONFIG
         private void imgConfig_MouseEnter(object sender, MouseEventArgs e)
         {
-            // Cambiar la imagen a la versión azul cuando el ratón entra
+            // Cambiar la imagen a la versiÃ³n azul cuando el ratÃ³n entra
             imgConfig.Source = new BitmapImage(new Uri("/Elecciones;component/iconos/tuerca_pulsada.png", UriKind.Relative));
         }
         private void imgConfig_MouseLeave(object sender, MouseEventArgs e)
@@ -588,8 +593,8 @@ namespace Elecciones
         }
 
         /// <summary>
-        /// Actualiza el panel visible de la botonera extra según tablasGraficosPrincipal.
-        /// Llamado desde Config cuando cambia el combo de gráficos.
+        /// Actualiza el panel visible de la botonera extra segÃºn tablasGraficosPrincipal.
+        /// Llamado desde Config cuando cambia el combo de grÃ¡ficos.
         /// </summary>
         public void ActualizarBotoneraGrupo()
         {
@@ -621,8 +626,8 @@ namespace Elecciones
         }
 
         /// <summary>
-        /// Inicializa los controles de vídeo leyendo la configuración (si existe).
-        /// Guarda el estado inicial en el GraphicController para que el subsistema gráfico sepa la configuración.
+        /// Inicializa los controles de vÃ­deo leyendo la configuraciÃ³n (si existe).
+        /// Guarda el estado inicial en el GraphicController para que el subsistema grÃ¡fico sepa la configuraciÃ³n.
         /// </summary>
         private void InitializeVideoConfigUI()
         {
@@ -803,9 +808,9 @@ namespace Elecciones
             graficos.SondeoUOficial(oficiales);
             // AdaptarEntorno eliminado - funcionalidad ya no necesaria
             ActualizarDatosEnTabla();
-            if (circunscripcionesListView.SelectedItem != null || autonomiasListView.SelectedItem != null)
+            string? elementoSeleccionado = GetSelectedCircunscripcionNombre() ?? GetSelectedAutonomiaNombre();
+            if (!string.IsNullOrWhiteSpace(elementoSeleccionado))
             {
-                string elementoSeleccionado = circunscripcionesListView.SelectedItem != null ? circunscripcionesListView.SelectedItem.ToString() : autonomiasListView.SelectedItem.ToString();
                 Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
                 ObtenerDTO(elementoSeleccionado);
                 GestionarMedioSondeo();
@@ -814,11 +819,7 @@ namespace Elecciones
 
                 if (pactos != null)
                 {
-                    string tipoGrafico = "";
-                    if (graficosListView.SelectedItem != null)
-                    {
-                        tipoGrafico = graficosListView.SelectedItem.ToString();
-                    }
+                    string tipoGrafico = GetSelectedGrafico();
                     pactos.ActualizarDatos(oficiales, tipoGrafico, avance, tipoElecciones);
                 }
             }
@@ -829,7 +830,7 @@ namespace Elecciones
             Binding bindingCol4;
             if (oficiales)
             {
-                columna3.Header = "ESCAÑOS";
+                columna3.Header = "ESCAÃ‘OS";
                 bindingCol3 = new Binding(oficiales ? "escanios" : "escaniosHastaSondeo");
                 columna3.DisplayMemberBinding = bindingCol3;
 
@@ -850,7 +851,7 @@ namespace Elecciones
                 bindingCol4 = new Binding(oficiales ? "escanios" : "escaniosHastaSondeo");
                 columna4.DisplayMemberBinding = bindingCol4;
 
-                if (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"))
+                if (graficosListView.SelectedItem == null || !IsGraficoSedesSeleccionado())
                 {
                     columna6.Width = 0;
                     columna7.Width = 0;
@@ -860,13 +861,13 @@ namespace Elecciones
             ReajustarSizeTabla();
         }
 
-        private void CambioDeEleccionesHandler(object sender, EventArgs e)
+        private void CambioDeEleccionesHandler(object? sender, EventArgs e)
         {
             CambioDeElecciones();
         }
         private void CambioDeElecciones()
         {
-            // Forzar recreación de controllers/services/repos con la nueva conexión.
+            // Forzar recreaciÃ³n de controllers/services/repos con la nueva conexiÃ³n.
             ConexionEntityFramework.InvalidateAllSingletons();
 
             conexionActiva.CloseConection();
@@ -923,22 +924,26 @@ namespace Elecciones
         }
         private void ActualizarPorAvance()
         {
-            string elementoSeleccionado;
-            if (circunscripcionesListView.SelectedItem != null)
+            string? circSeleccionada = GetSelectedCircunscripcionNombre();
+            if (!string.IsNullOrWhiteSpace(circSeleccionada))
             {
-                elementoSeleccionado = circunscripcionesListView.SelectedItem.ToString();
-                Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"));
+                Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(circSeleccionada);
+                bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !IsGraficoSedesSeleccionado());
                 dto = ObtenerDTO(seleccionada.nombre);
                 GestionarMedioSondeo();
                 ActualizarInfoInterfaz(seleccionada, dto);
                 preparado = false;
             }
-            else if (autonomiasListView.SelectedItem != null)
+            else
             {
-                elementoSeleccionado = autonomiasListView.SelectedItem.ToString();
-                Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !string.Equals(graficosListView.SelectedValue, "SEDES"));
+                string? autonomiaSeleccionada = GetSelectedAutonomiaNombre();
+                if (string.IsNullOrWhiteSpace(autonomiaSeleccionada))
+                {
+                    return;
+                }
+
+                Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(autonomiaSeleccionada);
+                bool filtroSedes = !sedeDentro && (graficosListView.SelectedItem == null || !IsGraficoSedesSeleccionado());
                 dto = ObtenerDTO(seleccionada.nombre);
                 GestionarMedioSondeo();
                 ActualizarInfoInterfaz(seleccionada, dto);
@@ -963,32 +968,33 @@ namespace Elecciones
         {
             preparado = false;
             datosListView.SelectedItem = null;
-            if (autonomiasListView.SelectedItem != null)
+
+            string? elementoSeleccionado = GetSelectedAutonomiaNombre();
+            if (string.IsNullOrWhiteSpace(elementoSeleccionado))
             {
-                //AÑADIR CIRCUNSCRIPCIONES SI LAS TIENE
-                string elementoSeleccionado = autonomiasListView.SelectedItem.ToString();
-                List<Circunscripcion> circunscripcionesSeleccionadas;
-                if (regional)
-                {
-                    circunscripcionesSeleccionadas = CircunscripcionController.GetInstance(conexionActiva).FindAllCircunscripcionesByNameAutonomiaRegional(elementoSeleccionado).ToList();
-                }
-                else
-                {
-                    circunscripcionesSeleccionadas = CircunscripcionController.GetInstance(conexionActiva).FindAllCircunscripcionesByNameAutonomia(elementoSeleccionado).ToList();
-                }
-
-                circunscripcionNames.Clear();
-                circunscripcionesSeleccionadas.ForEach(cir =>
-                {
-                    circunscripcionNames.Add(cir.nombre);
-                });
-
-                //PONER LA INFORMACIÓN EN LA INTERFAZ
-                Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                ObtenerDTO(elementoSeleccionado);
-                GestionarMedioSondeo();
-                ActualizarInfoInterfaz(seleccionada, dto);
+                return;
             }
+
+            List<Circunscripcion> circunscripcionesSeleccionadas;
+            if (regional)
+            {
+                circunscripcionesSeleccionadas = CircunscripcionController.GetInstance(conexionActiva).FindAllCircunscripcionesByNameAutonomiaRegional(elementoSeleccionado).ToList();
+            }
+            else
+            {
+                circunscripcionesSeleccionadas = CircunscripcionController.GetInstance(conexionActiva).FindAllCircunscripcionesByNameAutonomia(elementoSeleccionado).ToList();
+            }
+
+            circunscripcionNames.Clear();
+            circunscripcionesSeleccionadas.ForEach(cir =>
+            {
+                circunscripcionNames.Add(cir.nombre);
+            });
+
+            Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
+            ObtenerDTO(elementoSeleccionado);
+            GestionarMedioSondeo();
+            ActualizarInfoInterfaz(seleccionada, dto);
         }
         private void circunscripcionesListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -998,20 +1004,22 @@ namespace Elecciones
         {
             datosListView.SelectedItem = null;
             preparado = false;
-            if (circunscripcionesListView.SelectedItem != null)
+
+            string? elementoSeleccionado = GetSelectedCircunscripcionNombre();
+            if (string.IsNullOrWhiteSpace(elementoSeleccionado))
             {
-                string elementoSeleccionado = circunscripcionesListView.SelectedItem.ToString();
-                autonomiasListView.SelectedItem = null;
-
-                //PONER LA INFORMACIÓN EN LA INTERFAZ
-                Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
-                dto = ObtenerDTO(elementoSeleccionado);
-
-                // Aplicar el medio actualmente seleccionado al nuevo DTO
-                GestionarMedioSondeo();
-
-                ActualizarInfoInterfaz(seleccionada, dto);
+                return;
             }
+
+            autonomiasListView.SelectedItem = null;
+
+            Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(elementoSeleccionado);
+            dto = ObtenerDTO(elementoSeleccionado);
+
+            // Aplicar el medio actualmente seleccionado al nuevo DTO
+            GestionarMedioSondeo();
+
+            ActualizarInfoInterfaz(seleccionada, dto);
         }
         private void ActualizarInfoInterfaz(Circunscripcion seleccionada, BrainStormDTO dto)
         {
@@ -1035,13 +1043,13 @@ namespace Elecciones
                 _ => seleccionada.participacionHist.ToString()
             };
 
-            // Usar la misma lógica de filtrado que en ActualizarInfoInterfaz(BrainStormDTO dto)
+            // Usar la misma lÃ³gica de filtrado que en ActualizarInfoInterfaz(BrainStormDTO dto)
             listaDeDatos.Clear();
 
-            // Obtener el gráfico seleccionado
+            // Obtener el grÃ¡fico seleccionado
             string graficoSeleccionado = graficosListView.SelectedItem?.ToString() ?? "";
 
-            // Obtener los datos filtrados según el gráfico y el estado (oficiales/sondeo)
+            // Obtener los datos filtrados segÃºn el grÃ¡fico y el estado (oficiales/sondeo)
             List<CPDataDTO> cpdatas = ObtenerDatosParaTabla(graficoSeleccionado, dto);
 
             if (partidoSeleccionado != null)
@@ -1054,10 +1062,10 @@ namespace Elecciones
         {
             listaDeDatos.Clear();
 
-            // Obtener el gráfico seleccionado
+            // Obtener el grÃ¡fico seleccionado
             string graficoSeleccionado = graficosListView.SelectedItem?.ToString() ?? "";
 
-            // Obtener los datos filtrados según el gráfico y el estado (oficiales/sondeo)
+            // Obtener los datos filtrados segÃºn el grÃ¡fico y el estado (oficiales/sondeo)
             List<CPDataDTO> cpdatas = ObtenerDatosParaTabla(graficoSeleccionado, dto);
 
             if (partidoSeleccionado != null)
@@ -1068,7 +1076,7 @@ namespace Elecciones
         }
 
         /// <summary>
-        /// Obtiene los datos a mostrar en la tabla según el gráfico seleccionado y el estado (oficiales/sondeo)
+        /// Obtiene los datos a mostrar en la tabla segÃºn el grÃ¡fico seleccionado y el estado (oficiales/sondeo)
         /// </summary>
         private List<CPDataDTO> ObtenerDatosParaTabla(string graficoSeleccionado, BrainStormDTO dto)
         {
@@ -1076,19 +1084,19 @@ namespace Elecciones
 
             return graficoSeleccionado switch
             {
-                "CUENTA ATRÁS" => new List<CPDataDTO>(), // No mostrar datos
+                "CUENTA ATRÃS" => new List<CPDataDTO>(), // No mostrar datos
                 "FICHAS" => FiltrarDatosParaFichas(allCPDatas),
                 "SEDES" => FiltrarDatosParaSedes(allCPDatas),
-                "CARTÓN PARTIDOS" => FiltrarDatosParaCartonPartidos(allCPDatas),
-                "ÚLTIMO ESCAÑO" => FiltrarDatosParaUltimoEscano(allCPDatas, dto),
+                "CARTÃ“N PARTIDOS" => FiltrarDatosParaCartonPartidos(allCPDatas),
+                "ÃšLTIMO ESCAÃ‘O" => FiltrarDatosParaUltimoEscano(allCPDatas, dto),
                 _ => allCPDatas // Por defecto, mostrar todos los datos
             };
         }
 
         /// <summary>
-        /// Filtra datos para el gráfico "FICHAS"
-        /// - Sondeo: Siglas, Escaños desde Sondeo, Escaños hasta sondeo, Escaños históricos (solo con al menos 1 escaño en Sondeo)
-        /// - Oficial: Siglas, Escaños, %voto, Escaños hist, Diferencia de escaños (solo con al menos 1 escaño Oficial)
+        /// Filtra datos para el grÃ¡fico "FICHAS"
+        /// - Sondeo: Siglas, EscaÃ±os desde Sondeo, EscaÃ±os hasta sondeo, EscaÃ±os histÃ³ricos (solo con al menos 1 escaÃ±o en Sondeo)
+        /// - Oficial: Siglas, EscaÃ±os, %voto, EscaÃ±os hist, Diferencia de escaÃ±os (solo con al menos 1 escaÃ±o Oficial)
         /// </summary>
         private List<CPDataDTO> FiltrarDatosParaFichas(List<CPDataDTO> allCPDatas)
         {
@@ -1096,12 +1104,12 @@ namespace Elecciones
 
             if (oficiales)
             {
-                // Filtrar solo partidos con al menos 1 escaño en datos oficiales
+                // Filtrar solo partidos con al menos 1 escaÃ±o en datos oficiales
                 filtrados = allCPDatas.Where(p => int.TryParse(p.escanios, out int esc) && esc > 0).ToList();
             }
             else
             {
-                // Filtrar solo partidos con al menos 1 escaño en sondeo
+                // Filtrar solo partidos con al menos 1 escaÃ±o en sondeo
                 filtrados = allCPDatas.Where(p => int.TryParse(p.escaniosHastaSondeo, out int esc) && esc > 0).ToList();
                 // Ordenar usando CPDataComparerSondeo (orden descendente por escaniosHastaSondeo > escaniosDesdeSondeo)
                 filtrados.Sort((a, b) => -new CPDataComparerSondeo().Compare(a, b));
@@ -1111,10 +1119,10 @@ namespace Elecciones
         }
 
         /// <summary>
-        /// Filtra datos para el gráfico "SEDES"
+        /// Filtra datos para el grÃ¡fico "SEDES"
         /// - Muestra todos los partidos ordenados por id
-        /// - Si no es oficial (oficiales==false), devuelve lista vacía
-        /// - Datos mostrados: Siglas, Escaños, %voto, número de Votantes, diferencia de votantes
+        /// - Si no es oficial (oficiales==false), devuelve lista vacÃ­a
+        /// - Datos mostrados: Siglas, EscaÃ±os, %voto, nÃºmero de Votantes, diferencia de votantes
         /// </summary>
         private List<CPDataDTO> FiltrarDatosParaSedes(List<CPDataDTO> allCPDatas)
         {
@@ -1124,20 +1132,20 @@ namespace Elecciones
                 return new List<CPDataDTO>();
             }
 
-            // Ya están ordenados por id, simplemente devolver todos
+            // Ya estÃ¡n ordenados por id, simplemente devolver todos
             return allCPDatas;
         }
 
         /// <summary>
-        /// Filtra datos para el gráfico "CARTÓN PARTIDOS"
-        /// - Solo existe para datos oficiales (devuelve lista vacía en sondeo)
-        /// - Muestra todos los partidos (incluso los sin representación)
-        /// - Datos mostrados: Siglas, Escaños, %voto, Votantes
-        /// - Ordenado por CPDataComparer (más escaños > más %voto > más votantes)
+        /// Filtra datos para el grÃ¡fico "CARTÃ“N PARTIDOS"
+        /// - Solo existe para datos oficiales (devuelve lista vacÃ­a en sondeo)
+        /// - Muestra todos los partidos (incluso los sin representaciÃ³n)
+        /// - Datos mostrados: Siglas, EscaÃ±os, %voto, Votantes
+        /// - Ordenado por CPDataComparer (mÃ¡s escaÃ±os > mÃ¡s %voto > mÃ¡s votantes)
         /// </summary>
         private List<CPDataDTO> FiltrarDatosParaCartonPartidos(List<CPDataDTO> allCPDatas)
         {
-            // CARTÓN PARTIDOS solo existe para datos oficiales
+            // CARTÃ“N PARTIDOS solo existe para datos oficiales
             if (!oficiales)
             {
                 return new List<CPDataDTO>();
@@ -1150,15 +1158,15 @@ namespace Elecciones
         }
 
         /// <summary>
-        /// Filtra datos para el gráfico "ÚLTIMO ESCAÑO"
-        /// - Solo existe para datos oficiales (devuelve lista vacía en sondeo)
-        /// - Muestra solo los dos partidos que disputan el último escaño
+        /// Filtra datos para el grÃ¡fico "ÃšLTIMO ESCAÃ‘O"
+        /// - Solo existe para datos oficiales (devuelve lista vacÃ­a en sondeo)
+        /// - Muestra solo los dos partidos que disputan el Ãºltimo escaÃ±o
         /// - Datos mostrados: Siglas, Restos
         /// - Orden: primero el partido con esUltimoEscano=1, luego el de luchaUltimoEscano=1
         /// </summary>
         private List<CPDataDTO> FiltrarDatosParaUltimoEscano(List<CPDataDTO> allCPDatas, BrainStormDTO dto)
         {
-            // ÚLTIMO ESCAÑO solo existe para datos oficiales
+            // ÃšLTIMO ESCAÃ‘O solo existe para datos oficiales
             if (!oficiales || dto == null)
             {
                 return new List<CPDataDTO>();
@@ -1166,25 +1174,25 @@ namespace Elecciones
 
             List<CPDataDTO> ultimoEscano = new List<CPDataDTO>();
 
-            // Buscar el partido que tiene el último escaño
-            PartidoDTO partidoUltimo = dto.partidos.Find(p => p.esUltimoEscano == 1);
-            // Buscar el partido que lucha por el último escaño
-            PartidoDTO partidoLucha = dto.partidos.Find(p => p.luchaUltimoEscano == 1);
+            // Buscar el partido que tiene el Ãºltimo escaÃ±o
+            PartidoDTO? partidoUltimo = dto.partidos.Find(p => p.esUltimoEscano == 1);
+            // Buscar el partido que lucha por el Ãºltimo escaÃ±o
+            PartidoDTO? partidoLucha = dto.partidos.Find(p => p.luchaUltimoEscano == 1);
 
-            // Agregar el partido con el último escaño primero
+            // Agregar el partido con el Ãºltimo escaÃ±o primero
             if (partidoUltimo != null)
             {
-                CPDataDTO cpDataUltimo = allCPDatas.FirstOrDefault(c => c.codigo == partidoUltimo.codigo);
+                CPDataDTO? cpDataUltimo = allCPDatas.FirstOrDefault(c => c.codigo == partidoUltimo.codigo);
                 if (cpDataUltimo != null)
                 {
                     ultimoEscano.Add(cpDataUltimo);
                 }
             }
 
-            // Agregar el partido que lucha por el último escaño
+            // Agregar el partido que lucha por el Ãºltimo escaÃ±o
             if (partidoLucha != null)
             {
-                CPDataDTO cpDataLucha = allCPDatas.FirstOrDefault(c => c.codigo == partidoLucha.codigo);
+                CPDataDTO? cpDataLucha = allCPDatas.FirstOrDefault(c => c.codigo == partidoLucha.codigo);
                 if (cpDataLucha != null)
                 {
                     ultimoEscano.Add(cpDataLucha);
@@ -1201,7 +1209,13 @@ namespace Elecciones
         {
             if (graficosListView.SelectedIndex != -1)
             {
-                AdaptarTablaDatos(graficosListView.SelectedValue.ToString());
+                string tipoGrafico = GetSelectedGrafico();
+                if (string.IsNullOrWhiteSpace(tipoGrafico))
+                {
+                    return;
+                }
+
+                AdaptarTablaDatos(tipoGrafico);
                 if (dto != null) { ActualizarInfoInterfaz(dto); }
             }
         }
@@ -1209,8 +1223,8 @@ namespace Elecciones
         {
             switch (tipoGrafico)
             {
-                case "CUENTA ATRÁS":
-                    // Ocultar la lista de datos al mostrar la cuenta atrás
+                case "CUENTA ATRÃS":
+                    // Ocultar la lista de datos al mostrar la cuenta atrÃ¡s
                     datosListView.Visibility = Visibility.Collapsed;
                     break;
 
@@ -1218,13 +1232,13 @@ namespace Elecciones
                     // Restaurar visibilidad
                     datosListView.Visibility = Visibility.Visible;
 
-                    // Ocultar columna Código
+                    // Ocultar columna CÃ³digo
                     columna1.Width = 0;
 
                     if (oficiales)
                     {
-                        // Oficial: Siglas, Escaños, %voto, Escaños hist, Diferencia de escaños
-                        columna3.Header = "ESCAÑOS";
+                        // Oficial: Siglas, EscaÃ±os, %voto, EscaÃ±os hist, Diferencia de escaÃ±os
+                        columna3.Header = "ESCAÃ‘OS";
                         columna3.DisplayMemberBinding = new Binding("escanios");
 
                         columna4.Header = "% VOTO";
@@ -1241,7 +1255,7 @@ namespace Elecciones
                     }
                     else
                     {
-                        // Sondeo: Siglas, Escaños desde Sondeo, Escaños hasta sondeo, Escaños históricos
+                        // Sondeo: Siglas, EscaÃ±os desde Sondeo, EscaÃ±os hasta sondeo, EscaÃ±os histÃ³ricos
                         columna3.Header = "ESC. DESDE";
                         columna3.DisplayMemberBinding = new Binding("escaniosDesdeSondeo");
 
@@ -1264,16 +1278,16 @@ namespace Elecciones
                     break;
 
                 case "SEDES":
-                    // Restaurar visibilidad al volver de "CUENTA ATRÁS"
+                    // Restaurar visibilidad al volver de "CUENTA ATRÃS"
                     datosListView.Visibility = Visibility.Visible;
 
-                    // Ocultar columna Código
+                    // Ocultar columna CÃ³digo
                     columna1.Width = 0;
 
                     if (oficiales)
                     {
-                        // Mostrar: Siglas, Escaños, %voto, número de Votantes, diferencia de votantes
-                        columna3.Header = "ESCAÑOS";
+                        // Mostrar: Siglas, EscaÃ±os, %voto, nÃºmero de Votantes, diferencia de votantes
+                        columna3.Header = "ESCAÃ‘OS";
                         columna3.DisplayMemberBinding = new Binding("escanios");
 
                         columna4.Header = "% VOTO";
@@ -1302,17 +1316,17 @@ namespace Elecciones
                     }
                     break;
 
-                case "CARTÓN PARTIDOS":
+                case "CARTÃ“N PARTIDOS":
                     // Restaurar visibilidad
                     datosListView.Visibility = Visibility.Visible;
 
-                    // Ocultar columna Código
+                    // Ocultar columna CÃ³digo
                     columna1.Width = 0;
 
                     if (oficiales)
                     {
-                        // Oficial: Siglas, Escaños, %voto, Votantes
-                        columna3.Header = "ESCAÑOS";
+                        // Oficial: Siglas, EscaÃ±os, %voto, Votantes
+                        columna3.Header = "ESCAÃ‘OS";
                         columna3.DisplayMemberBinding = new Binding("escanios");
 
                         columna4.Header = "% VOTO";
@@ -1340,11 +1354,11 @@ namespace Elecciones
                     }
                     break;
 
-                case "ÚLTIMO ESCAÑO":
+                case "ÃšLTIMO ESCAÃ‘O":
                     // Restaurar visibilidad
                     datosListView.Visibility = Visibility.Visible;
 
-                    // Ocultar columna Código
+                    // Ocultar columna CÃ³digo
                     columna1.Width = 0;
 
                     if (oficiales)
@@ -1373,7 +1387,7 @@ namespace Elecciones
                     break;
 
                 case "INDEPENDENTISMO":
-                    // Restaurar visibilidad al volver de "CUENTA ATRÁS"
+                    // Restaurar visibilidad al volver de "CUENTA ATRÃS"
                     datosListView.Visibility = Visibility.Visible;
                     ActualizarDatosEnTabla();
                     if (dto != null)
@@ -1385,7 +1399,7 @@ namespace Elecciones
                     break;
 
                 default:
-                    // Restaurar visibilidad al volver de "CUENTA ATRÁS"
+                    // Restaurar visibilidad al volver de "CUENTA ATRÃS"
                     datosListView.Visibility = Visibility.Visible;
                     ActualizarDatosEnTabla();
                     if (dto != null)
@@ -1397,7 +1411,7 @@ namespace Elecciones
                     break;
             }
 
-            // Ajustar tamaño de columnas al final de AdaptarTablaDatos
+            // Ajustar tamaÃ±o de columnas al final de AdaptarTablaDatos
             ReajustarSizeTabla();
         }
         private void ReajustarSizeTabla()
@@ -1416,7 +1430,7 @@ namespace Elecciones
             if (columnasVisibles.Count == 0 || datosListView.ActualWidth <= 0)
                 return;
 
-            // Obtener el ancho total disponible considerando márgenes
+            // Obtener el ancho total disponible considerando mÃ¡rgenes
             double anchoTotal = datosListView.ActualWidth;
 
             // Dividir el ancho total entre las columnas visibles para ocupar todo el espacio
@@ -1490,12 +1504,12 @@ namespace Elecciones
         private BrainStormDTO ObtenerDTO(string circunscripcion)
         {
             // Always fetch unfiltered DTO (SinFiltrar) which contains all parties
-            // ordered by the comparers but without filtering by escaños > 0
+            // ordered by the comparers but without filtering by escaÃ±os > 0
             dto = oficiales
                 ? BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionOficialSinFiltrar(circunscripcion, avance, tipoElecciones)
                 : BrainStormController.GetInstance(conexionActiva).FindByNameCircunscripcionSondeoSinFiltrar(circunscripcion, avance, tipoElecciones);
 
-            // Guardar los valores originales de escaños de sondeo
+            // Guardar los valores originales de escaÃ±os de sondeo
             GuardarValoresOriginalesSondeo(dto);
 
             // Asegurar el orden correcto de los partidos
@@ -1505,7 +1519,7 @@ namespace Elecciones
                 dto.partidos.Reverse();
             }
 
-            return dto;
+            return dto ?? throw new InvalidOperationException("No se ha podido construir el DTO de BrainStorm.");
         }
 
         private void GuardarValoresOriginalesSondeo(BrainStormDTO dtoActual)
@@ -1514,7 +1528,7 @@ namespace Elecciones
             {
                 foreach (var partido in dtoActual.partidos)
                 {
-                    // Guardar los valores originales con una clave única por partido en esta circunscripción
+                    // Guardar los valores originales con una clave Ãºnica por partido en esta circunscripciÃ³n
                     string clave = $"{dtoActual.circunscripcionDTO.codigo}_{partido.codigo}";
                     valoresOriginalesSondeo[clave] = (partido.escaniosDesdeSondeo, partido.escaniosHastaSondeo);
                 }
@@ -1528,7 +1542,7 @@ namespace Elecciones
                 .OrderBy(p => p.codigo)
                 .ToList();
 
-            // Si estamos ya en la circunscripción general, no hay que rellenar huecos.
+            // Si estamos ya en la circunscripciÃ³n general, no hay que rellenar huecos.
             if (source.circunscripcionDTO.codigo.EndsWith("00000"))
             {
                 return actuales;
@@ -1581,12 +1595,12 @@ namespace Elecciones
                     }
                     else
                     {
-                        // Partido ausente en esta circunscripción: se deja hueco en el CSV.
+                        // Partido ausente en esta circunscripciÃ³n: se deja hueco en el CSV.
                         alineados.Add(new PartidoDTO());
                     }
                 }
 
-                // Si aparece algún partido fuera de plantilla, se conserva al final para no perder datos.
+                // Si aparece algÃºn partido fuera de plantilla, se conserva al final para no perder datos.
                 foreach (PartidoDTO partidoActual in actuales)
                 {
                     if (!codigosPlantilla.Contains(partidoActual.codigo))
@@ -1676,7 +1690,7 @@ namespace Elecciones
 
                 if (graficos.primeActivo.Valor == 1)
                 {
-                    // La reasignación de dto aquí se ha eliminado porque sobreescribía los valores
+                    // La reasignaciÃ³n de dto aquÃ­ se ha eliminado porque sobreescribÃ­a los valores
                     // de sondeo aplicados por GestionarMedioSondeo(). 
                     // await EscribirJsonPrimeAsync();
                 }
@@ -1700,8 +1714,6 @@ namespace Elecciones
             tickerDentro = false;
             sedeDentro = false;
             sfCarruselDentro = false;
-            sfEscrutadoDentro = false;
-            sfCCAADentro = false;
             sfUltimoDentro = false;
             sfCodigoSedeDesplegada = null;
             if (pactos != null) { pactos.pactoDentro = false; }
@@ -1741,7 +1753,7 @@ namespace Elecciones
             {
                 if (pactos == null)
                 {
-                    // Obtener el tipo de gráfico actual
+                    // Obtener el tipo de grÃ¡fico actual
                     string tipoGrafico = graficosListView.SelectedItem?.ToString() ?? "";
                     pactos = new Pactos(dto, oficiales, tipoGrafico);
                     pactos.Show();
@@ -1750,18 +1762,19 @@ namespace Elecciones
             }
             else
             {
-                MessageBox.Show($"Seleccione alguna circunscripción para ver su pestaña de pactos", "Circunscipción no seleccionada", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Seleccione alguna circunscripciÃ³n para ver su pestaÃ±a de pactos", "CircunscipciÃ³n no seleccionada", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        //LOGICA PARA LOS TIPOS DE GRÁFICOS DISTINTOS
+        //LOGICA PARA LOS TIPOS DE GRÃFICOS DISTINTOS
         private void EntraFaldon()
         {
             if (dto != null && graficosListView.SelectedIndex != -1)
             {
-                switch (graficosListView.SelectedValue.ToString())
+                string tipoGrafico = GetSelectedGrafico();
+                switch (tipoGrafico)
                 {
-                    case "CUENTA ATRÁS":
+                    case "CUENTA ATRÃS":
                         int segundos = CalcularSegundosHastaHora();
                         // if (segundos > 0)
                         // {
@@ -1807,9 +1820,10 @@ namespace Elecciones
         {
             if (dto != null && graficosListView.SelectedIndex != -1)
             {
-                switch (graficosListView.SelectedValue.ToString())
+                string tipoGrafico = GetSelectedGrafico();
+                switch (tipoGrafico)
                 {
-                    case "PARTICIPACIÓN":
+                    case "PARTICIPACIÃ“N":
                         if (participacionDentro) { graficos.participacionEncadena(dto, avance); }
                         else
                         {
@@ -1818,6 +1832,11 @@ namespace Elecciones
                         }
                         break;
                     case "FICHAS":
+                        if (partidoSeleccionado == null)
+                        {
+                            break;
+                        }
+
                         if (fichaDentro) { graficos.fichaEncadena(oficiales, dto, partidoSeleccionado); }
                         else
                         {
@@ -1825,7 +1844,7 @@ namespace Elecciones
                             fichaDentro = true;
                         }
                         break;
-                    case "MAYORÍAS":
+                    case "MAYORÃAS":
                         if (mayoriasDentro) { graficos.mayoriasEncadena(dto); }
                         else
                         {
@@ -1837,18 +1856,17 @@ namespace Elecciones
                         if (ccaaDentro) { graficos.ccaaEncadena(); }
                         else { graficos.ccaaEntra(dto); }
                         break;
-                    case "SUPERFALDÓN":
+                    case "SUPERFALDÃ“N":
                         graficos.superfaldonEntra(oficiales);
-                        superfaldonDentro = true;
                         break;
                     case "VS":
                         //graficos.superfaldonEntra();
                         break;
-                    case "CARTÓN PARTIDOS":
+                    case "CARTÃ“N PARTIDOS":
                         graficos.cartonPartidosEntra(dto);
                         cartonPartidosDentro = true;
                         break;
-                    case "ÚLTIMO ESCAÑO":
+                    case "ÃšLTIMO ESCAÃ‘O":
                         if (ultimoEscanoDentro)
                         {
                             // Use a copy as "previous" if we don't have an explicit previous DTO in this context.
@@ -1860,7 +1878,7 @@ namespace Elecciones
                             ultimoEscanoDentro = true;
                         }
                         break;
-                    case "ÚLTIMO SUPERFALDÓN":
+                    case "ÃšLTIMO SUPERFALDÃ“N":
                         graficos.ultimoSuperEntra();
                         sfUltimoDentro = true;
                         break;
@@ -1873,11 +1891,11 @@ namespace Elecciones
         {
             if (dto != null && graficosListView.SelectedIndex != -1)
             {
-                switch (graficosListView.SelectedValue.ToString())
+                string tipoGrafico = GetSelectedGrafico();
+                switch (tipoGrafico)
                 {
                     case "ESCRUTADO":
                         graficos.sfEscrutadoEntra();
-                        sfEscrutadoDentro = true;
                         break;
                     case "CARRUSEL":
                         graficos.superfaldonEntra(oficiales);
@@ -1885,7 +1903,6 @@ namespace Elecciones
                         break;
                     case "CCAA":
                         graficos.sfCCAAEntra();
-                        sfCCAADentro = true;
                         break;
                     case "ULTIMO":
                         graficos.ultimoSuperEntra();
@@ -1901,9 +1918,10 @@ namespace Elecciones
         {
             if (graficosListView.SelectedIndex != -1)
             {
-                switch (graficosListView.SelectedValue.ToString())
+                string tipoGrafico = GetSelectedGrafico();
+                switch (tipoGrafico)
                 {
-                    case "CUENTA ATRÁS":
+                    case "CUENTA ATRÃS":
                         graficos.SaleReloj();
                         graficos.BajarRotulosPrimeEsp();
                         break;
@@ -1942,9 +1960,10 @@ namespace Elecciones
         {
             if (graficosListView.SelectedIndex != -1)
             {
-                switch (graficosListView.SelectedValue.ToString())
+                string tipoGrafico = GetSelectedGrafico();
+                switch (tipoGrafico)
                 {
-                    case "PARTICIPACIÓN":
+                    case "PARTICIPACIÃ“N":
                         graficos.participacionSale();
                         participacionDentro = false;
                         break;
@@ -1952,7 +1971,7 @@ namespace Elecciones
                         graficos.ccaaSale();
                         ccaaDentro = false;
                         break;
-                    case "MAYORÍAS":
+                    case "MAYORÃAS":
                         graficos.mayoriasSale();
                         mayoriasDentro = false;
                         break;
@@ -1960,22 +1979,21 @@ namespace Elecciones
                         graficos.fichaSale(oficiales);
                         fichaDentro = false;
                         break;
-                    case "SUPERFALDÓN":
+                    case "SUPERFALDÃ“N":
                         graficos.superfaldonSale(oficiales);
-                        superfaldonDentro = false;
                         break;
                     case "VS":
                         // graficos.superfaldonEntra();
                         break;
-                    case "CARTÓN PARTIDOS":
+                    case "CARTÃ“N PARTIDOS":
                         graficos.cartonPartidosSale();
                         cartonPartidosDentro = false;
                         break;
-                    case "ÚLTIMO ESCAÑO":
+                    case "ÃšLTIMO ESCAÃ‘O":
                         graficos.ultimoSale();
                         ultimoEscanoDentro = false;
                         break;
-                    case "ÚLTIMO SUPERFALDÓN":
+                    case "ÃšLTIMO SUPERFALDÃ“N":
                         graficos.ultimoSuperSale();
                         sfUltimoDentro = false;
                         break;
@@ -1987,11 +2005,11 @@ namespace Elecciones
         {
             if (graficosListView.SelectedIndex != -1)
             {
-                switch (graficosListView.SelectedValue.ToString())
+                string tipoGrafico = GetSelectedGrafico();
+                switch (tipoGrafico)
                 {
                     case "ESCRUTADO":
                         graficos.sfEscrutadoSale();
-                        sfEscrutadoDentro = false;
                         break;
                     case "CARRUSEL":
                         graficos.superfaldonSale(oficiales);
@@ -2004,7 +2022,6 @@ namespace Elecciones
                         break;
                     case "CCAA":
                         graficos.sfCCAASale();
-                        sfCCAADentro = false;
                         break;
                     case "ULTIMO":
                         graficos.ultimoSuperSale();
@@ -2017,12 +2034,9 @@ namespace Elecciones
         }
 
 
-        // EVENTOS DE CONFIGURACIÓN AVANZADA
-        private bool primerosResultadosActivo = true;
-        private bool sondeoAnimadoActivo = true;
+        // EVENTOS DE CONFIGURACIÃ“N AVANZADA
         private void chkPrimerosResultados_Checked(object sender, RoutedEventArgs e)
         {
-            primerosResultadosActivo = true;
             if (graficos != null)
             {
                 graficos.PrimerosResultados(true);
@@ -2031,7 +2045,6 @@ namespace Elecciones
         }
         private void chkPrimerosResultados_Unchecked(object sender, RoutedEventArgs e)
         {
-            primerosResultadosActivo = false;
             if (graficos != null)
             {
                 graficos.PrimerosResultados(false);
@@ -2039,7 +2052,6 @@ namespace Elecciones
         }
         private void chkSondeoAnimado_Checked(object sender, RoutedEventArgs e)
         {
-            sondeoAnimadoActivo = true;
             if (graficos != null)
             {
                 graficos.AnimacionSondeo(true);
@@ -2047,7 +2059,6 @@ namespace Elecciones
         }
         private void chkSondeoAnimado_Unchecked(object sender, RoutedEventArgs e)
         {
-            sondeoAnimadoActivo = false;
             if (graficos != null)
             {
                 graficos.AnimacionSondeo(false);
@@ -2068,7 +2079,7 @@ namespace Elecciones
                 var ahora = DateTime.Now;
                 var destino = ahora.Date.Add(horaDestino.TimeOfDay);
 
-                // Si la hora ya pasó hoy, cuenta para mañana
+                // Si la hora ya pasÃ³ hoy, cuenta para maÃ±ana
                 if (destino <= ahora)
                     destino = destino.AddDays(1);
 
@@ -2082,6 +2093,8 @@ namespace Elecciones
         //LOGICA DE CIERRE DE VENTANA
         private void WindowClosing(object? sender, CancelEventArgs e)
         {
+            escuchador?.Detener();
+
             if (botonera != null)
             {
                 botonera.Close();
@@ -2102,20 +2115,20 @@ namespace Elecciones
             {
                 if (cmbSondeo.SelectedIndex >= 0 && dto != null)
                 {
-                    string descripcionSondeo = cmbSondeo.SelectedItem?.ToString();
+                    string? descripcionSondeo = cmbSondeo.SelectedItem?.ToString();
                     if (!string.IsNullOrEmpty(descripcionSondeo))
                     {
                         if (descripcionSondeo == "RTVE")
                         {
-                            // Restaurar los valores originales de escaños de sondeo
+                            // Restaurar los valores originales de escaÃ±os de sondeo
                             RestaurarValoresOriginalesSondeo();
                         }
                         else
                         {
-                            // Obtener el código del medio a partir de la descripción
+                            // Obtener el cÃ³digo del medio a partir de la descripciÃ³n
                             MedioController medioController = new MedioController(conexionActiva);
                             List<src.model.DTO.MedioDTO> medios = medioController.ObtenerMediosConDescripcion();
-                            src.model.DTO.MedioDTO medioSeleccionado = medios.FirstOrDefault(m => m.descripcion == descripcionSondeo);
+                            src.model.DTO.MedioDTO? medioSeleccionado = medios.FirstOrDefault(m => m.descripcion == descripcionSondeo);
 
                             if (medioSeleccionado != null)
                             {
@@ -2127,21 +2140,24 @@ namespace Elecciones
                         // Si estamos en modo sondeo, actualizar la interfaz
                         if (!oficiales)
                         {
-                            // Determinar si estamos en una circunscripción o autonomía
+                            // Determinar si estamos en una circunscripciÃ³n o autonomÃ­a
                             if (circunscripcionesListView.SelectedItem != null)
                             {
-                                // Estamos en una circunscripción específica
-                                string circunscripcionSeleccionada = circunscripcionesListView.SelectedItem.ToString();
-                                Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(circunscripcionSeleccionada);
-                                ActualizarInfoInterfaz(seleccionada, dto);
+                                // Estamos en una circunscripciÃ³n especÃ­fica
+                                string? circunscripcionSeleccionada = GetSelectedCircunscripcionNombre();
+                                if (!string.IsNullOrWhiteSpace(circunscripcionSeleccionada))
+                                {
+                                    Circunscripcion seleccionada = CircunscripcionController.GetInstance(conexionActiva).FindByName(circunscripcionSeleccionada);
+                                    ActualizarInfoInterfaz(seleccionada, dto);
+                                }
                             }
                             else if (autonomiasListView.SelectedItem != null)
                             {
-                                // Estamos en una autonomía
+                                // Estamos en una autonomÃ­a
                                 ActualizarInfoInterfaz(dto);
                             }
 
-                            // Si hay un gráfico y circunscripción seleccionados, exportar el CSV
+                            // Si hay un grÃ¡fico y circunscripciÃ³n seleccionados, exportar el CSV
                             if (graficosListView.SelectedItem != null && (circunscripcionesListView.SelectedItem != null || autonomiasListView.SelectedItem != null))
                             {
                                 EscribirFichero();
@@ -2162,7 +2178,7 @@ namespace Elecciones
             {
                 foreach (var partido in dto.partidos)
                 {
-                    // Buscar los valores originales con la clave única
+                    // Buscar los valores originales con la clave Ãºnica
                     string clave = $"{dto.circunscripcionDTO.codigo}_{partido.codigo}";
                     if (valoresOriginalesSondeo.TryGetValue(clave, out var valores))
                     {
@@ -2178,7 +2194,12 @@ namespace Elecciones
         {
             if (cmbSondeo.SelectedItem != null && !oficiales)
             {
-                string medioSeleccionado = cmbSondeo.SelectedItem.ToString();
+                string? medioSeleccionado = cmbSondeo.SelectedItem?.ToString();
+                if (string.IsNullOrWhiteSpace(medioSeleccionado))
+                {
+                    return;
+                }
+
                 if (medioSeleccionado == "RTVE")
                 {
                     RestaurarValoresOriginalesSondeo();
@@ -2187,7 +2208,7 @@ namespace Elecciones
                 {
                     MedioController medioController = new MedioController(conexionActiva);
                     List<src.model.DTO.MedioDTO> medios = medioController.ObtenerMediosConDescripcion();
-                    src.model.DTO.MedioDTO medio = medios.FirstOrDefault(m => m.descripcion == medioSeleccionado);
+                    src.model.DTO.MedioDTO? medio = medios.FirstOrDefault(m => m.descripcion == medioSeleccionado);
                     if (medio != null)
                     {
                         ActualizarDatosConMedio(medio.codigo);
@@ -2202,10 +2223,10 @@ namespace Elecciones
             {
                 MedioPartidoController medioPartidoController = new MedioPartidoController(conexionActiva);
 
-                // Para cada partido en el DTO, actualizar los escaños de sondeo
+                // Para cada partido en el DTO, actualizar los escaÃ±os de sondeo
                 foreach (var partido in dto.partidos)
                 {
-                    // Obtener el código de circunscripción del DTO
+                    // Obtener el cÃ³digo de circunscripciÃ³n del DTO
                     string codCircunscripcion = dto.circunscripcionDTO.codigo;
 
                     // Obtener los datos del MedioPartido
@@ -2213,7 +2234,7 @@ namespace Elecciones
 
                     if (medioPartido != null)
                     {
-                        // Actualizar los valores de escaños de sondeo
+                        // Actualizar los valores de escaÃ±os de sondeo
                         partido.escaniosDesdeSondeo = medioPartido.escaniosDesde;
                         partido.escaniosHastaSondeo = medioPartido.escaniosHasta;
                     }
@@ -2233,3 +2254,5 @@ namespace Elecciones
         }
     }
 }
+
+

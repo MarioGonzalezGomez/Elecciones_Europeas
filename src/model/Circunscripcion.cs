@@ -32,6 +32,11 @@ namespace Elecciones.src.model.IPF
         public Circunscripcion()
         {
             configuration = ConfigManager.GetInstance();
+            codigo = string.Empty;
+            comunidad = string.Empty;
+            provincia = string.Empty;
+            municipio = string.Empty;
+            nombre = string.Empty;
         }
 
         public override string? ToString()

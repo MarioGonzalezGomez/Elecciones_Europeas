@@ -70,6 +70,8 @@ namespace Elecciones.src.model.IPF
         public CircunscripcionPartido()
         {
             configuration = ConfigManager.GetInstance();
+            codCircunscripcion = string.Empty;
+            codPartido = string.Empty;
         }
 
         public override string ToString()

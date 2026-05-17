@@ -13,7 +13,7 @@ namespace Elecciones.src.model
 {
     public class PactoArco
     {
-        public string codigo { set; get; }
+        public string codigo { set; get; } = string.Empty;
         public double anchoDesde { set; get; }
         public double anchoHasta { set; get; }
         public double posicionDesde { set; get; }

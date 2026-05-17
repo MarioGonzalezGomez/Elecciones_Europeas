@@ -38,7 +38,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
             this.oficiales = oficiales;
             foreach (var partido in cps)
             {
-                PartidoDTO dto = PartidoDTO.FromCP(partido, oficiales, con);
+                PartidoDTO? dto = PartidoDTO.FromCP(partido, oficiales, con);
                 // dto.codigo = dto.codigo.StartsWith("09") ? $"00{dto.codigo.Substring(2)}" : dto.codigo;
                 if (dto != null) { partidos.Add(dto); }
 

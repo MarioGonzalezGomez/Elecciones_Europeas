@@ -33,7 +33,7 @@ namespace Elecciones.src.repository
 
         public Literal GetById(string id)
         {
-            return _con.Literales.Find(id);
+            return _con.Literales.Find(id)!;
         }
     }
 

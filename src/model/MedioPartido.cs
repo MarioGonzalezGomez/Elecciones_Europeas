@@ -8,9 +8,9 @@ namespace Elecciones.src.model
 {
     public class MedioPartido
     {
-        public string codCircunscripcion { get; set; }
-        public string codMedio { get; set; }
-        public string codPartido { get; set; }
+        public string codCircunscripcion { get; set; } = string.Empty;
+        public string codMedio { get; set; } = string.Empty;
+        public string codPartido { get; set; } = string.Empty;
         public int escaniosDesde { get; set; }
         public int escaniosHasta { get; set; }
         public decimal votos { get; set; }

@@ -14,7 +14,7 @@ namespace Elecciones.src.controller
     {
         public static CircunscripcionController? instance;
 
-        private CircunscripcionService _service;
+        private readonly CircunscripcionService _service;
         private static ConexionEntityFramework? _con;
 
         private CircunscripcionController(ConexionEntityFramework con)
@@ -25,19 +25,27 @@ namespace Elecciones.src.controller
 
         public static CircunscripcionController GetInstance(ConexionEntityFramework con)
         {
-            if (instance == null)
+            if (instance == null || NeedsRecreation(con))
             {
                 instance = new CircunscripcionController(con);
             }
-            else if (_con._tipoConexion != con._tipoConexion)
-            {
-                instance = new CircunscripcionController(con);
-            }
-            else if (!_con._database.Equals(con._database))
-            {
-                instance = new CircunscripcionController(con);
-            }
+
             return instance;
+        }
+
+        private static bool NeedsRecreation(ConexionEntityFramework con)
+        {
+            if (_con == null)
+            {
+                return true;
+            }
+
+            if (_con._tipoConexion != con._tipoConexion)
+            {
+                return true;
+            }
+
+            return !string.Equals(_con._database, con._database, StringComparison.Ordinal);
         }
 
         public List<Circunscripcion> FindAll()

@@ -27,7 +27,11 @@ namespace Elecciones.src.service
             try
             {
                 List<MedioPartido> medioPartidos = repository.GetAll();
-                return medioPartidos.Select(mp => MedioPartidoDTO.FromMedioPartido(mp)).ToList();
+                return medioPartidos
+                    .Select(MedioPartidoDTO.FromMedioPartido)
+                    .Where(mp => mp != null)
+                    .Cast<MedioPartidoDTO>()
+                    .ToList();
             }
             catch (Exception ex)
             {
@@ -44,7 +48,11 @@ namespace Elecciones.src.service
             try
             {
                 List<MedioPartido> medioPartidos = repository.GetByMedioAndCircunscripcion(codMedio, codCircunscripcion);
-                return medioPartidos.Select(mp => MedioPartidoDTO.FromMedioPartido(mp)).ToList();
+                return medioPartidos
+                    .Select(MedioPartidoDTO.FromMedioPartido)
+                    .Where(mp => mp != null)
+                    .Cast<MedioPartidoDTO>()
+                    .ToList();
             }
             catch (Exception ex)
             {
@@ -72,11 +80,11 @@ namespace Elecciones.src.service
         /// <summary>
         /// Obtiene un dato específico de medio-partido
         /// </summary>
-        public MedioPartidoDTO GetByKey(string codCircunscripcion, string codMedio, string codPartido)
+        public MedioPartidoDTO? GetByKey(string codCircunscripcion, string codMedio, string codPartido)
         {
             try
             {
-                MedioPartido medioPartido = repository.FindByKey(codCircunscripcion, codMedio, codPartido);
+                MedioPartido? medioPartido = repository.FindByKey(codCircunscripcion, codMedio, codPartido);
                 return medioPartido != null ? MedioPartidoDTO.FromMedioPartido(medioPartido) : null;
             }
             catch (Exception ex)
@@ -94,7 +102,11 @@ namespace Elecciones.src.service
             try
             {
                 List<MedioPartido> medioPartidos = repository.GetPartidosByMedioAndCircunscripcion(codMedio, codCircunscripcion);
-                return medioPartidos.Select(mp => MedioPartidoDTO.FromMedioPartido(mp)).ToList();
+                return medioPartidos
+                    .Select(MedioPartidoDTO.FromMedioPartido)
+                    .Where(mp => mp != null)
+                    .Cast<MedioPartidoDTO>()
+                    .ToList();
             }
             catch (Exception ex)
             {

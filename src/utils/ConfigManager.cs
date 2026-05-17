@@ -219,6 +219,11 @@ namespace Elecciones.src.utils
                     defaultContent.AppendLine("horaAvance3Historico=");
                     defaultContent.AppendLine("horaParticipacionHistorico=");
                     defaultContent.AppendLine();
+                    defaultContent.AppendLine("# Formato de exportacion de BrainStorm CSV:");
+                    defaultContent.AppendLine("# NEW => orden por codigo de partido y conserva todos los partidos");
+                    defaultContent.AppendLine("# OLD => orden por escanos/votos y elimina partidos sin escanos");
+                    defaultContent.AppendLine("formatoBrainStormCsv=NEW");
+                    defaultContent.AppendLine();
 
                     File.WriteAllText(path, defaultContent.ToString());
                 }
@@ -236,7 +241,8 @@ namespace Elecciones.src.utils
                     {"horaAvance1Historico", "" },
                     {"horaAvance2Historico", "" },
                     {"horaAvance3Historico", "" },
-                    { "horaParticipacionHistorico", "" }
+                    { "horaParticipacionHistorico", "" },
+                    { "formatoBrainStormCsv", "NEW" }
                 };
 
                 foreach (var kv in defaults)

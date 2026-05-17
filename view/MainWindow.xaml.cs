@@ -25,6 +25,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Win32;
+using System.Globalization;
 
 namespace Elecciones
 {
@@ -388,9 +389,9 @@ namespace Elecciones
                     // Always fetch the unfiltered DTO containing all parties ordered by codigo
                     dto = ObtenerDTO(elementoSeleccionado);
 
-                    if (string.Equals(graficosHeader.Header, "FALDÓN")) { UpdateFaldones(dtoAnterior); }
+                    if (EsCabeceraFaldon()) { UpdateFaldones(dtoAnterior); }
                     //Add cambios por actualizacion en vivo en cartones
-                    if (string.Equals(graficosHeader.Header, "CARTÓN")) { UpdateCartones(dtoAnterior); }
+                    if (EsCabeceraCarton()) { UpdateCartones(dtoAnterior); }
                     if (EsCabeceraSuperfaldon()) { UpdateSuperfaldones(); }
 
                     // Actualizar datos en la ventana de Pactos si está abierta
@@ -419,7 +420,7 @@ namespace Elecciones
                 GestionarMedioSondeo();
                 graficos.TickerActualiza(dto);
             }
-            if (botonera.tickerTDIn)
+            if (botonera?.tickerTDIn == true)
             {
                 graficos.TickerTDActualiza(dtoAnterior, dto);
             }
@@ -471,8 +472,42 @@ namespace Elecciones
         public bool EsCabeceraSuperfaldon()
         {
             string cabecera = graficosHeader?.Header?.ToString() ?? "";
-            return string.Equals(cabecera, "SUPERFALDÓN", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(cabecera, "SUPERFADÓN", StringComparison.OrdinalIgnoreCase);
+            string normalizada = NormalizarCabecera(cabecera);
+            return normalizada == "SUPERFALDON"
+                || normalizada == "SUPERFADON";
+        }
+
+        public bool EsCabeceraFaldon()
+        {
+            string cabecera = graficosHeader?.Header?.ToString() ?? "";
+            return NormalizarCabecera(cabecera) == "FALDON";
+        }
+
+        public bool EsCabeceraCarton()
+        {
+            string cabecera = graficosHeader?.Header?.ToString() ?? "";
+            return NormalizarCabecera(cabecera) == "CARTON";
+        }
+
+        private static string NormalizarCabecera(string texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+            {
+                return string.Empty;
+            }
+
+            string descompuesto = texto.Trim().Normalize(NormalizationForm.FormD);
+            StringBuilder sb = new StringBuilder(descompuesto.Length);
+            foreach (char c in descompuesto)
+            {
+                UnicodeCategory categoria = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (categoria != UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+
+            return sb.ToString().Normalize(NormalizationForm.FormC).ToUpperInvariant();
         }
 
         private bool CompararOrden(BrainStormDTO anterior, BrainStormDTO actual)
@@ -831,6 +866,9 @@ namespace Elecciones
         }
         private void CambioDeElecciones()
         {
+            // Forzar recreación de controllers/services/repos con la nueva conexión.
+            ConexionEntityFramework.InvalidateAllSingletons();
+
             conexionActiva.CloseConection();
             conexionActiva.Dispose();
             conexionActiva = new ConexionEntityFramework(int.Parse(configuration.GetValue($"conexionDefault{eleccionSeleccionada.Valor + 1}")), eleccionSeleccionada.Valor + 1);
@@ -843,7 +881,7 @@ namespace Elecciones
             listaDeDatos.Clear();
             EscribirConexiones();
             DesplegarCircunscripciones();
-            escuchador.IniciarEscuchador(conexionActiva);
+            escuchador.ActualizarConexion(conexionActiva);
             bool europa = eleccionSeleccionada.Valor == 1;
             graficos.CambioElecciones(europa);
             autonomiasListView.SelectedIndex = 0;
@@ -1565,6 +1603,34 @@ namespace Elecciones
             }
         }
 
+        private bool UsarFormatoBrainStormCsvOld()
+        {
+            string formato = configuration.GetValue("formatoBrainStormCsv");
+            return string.Equals(formato?.Trim(), "OLD", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private BrainStormDTO CrearDtoNewParaCsv(BrainStormDTO source)
+        {
+            var ordered = new BrainStormDTO(source);
+            ordered.partidos = ObtenerPartidosAlineadosParaCsv(source);
+            ordered.numPartidos = ordered.partidos.Count;
+            return ordered;
+        }
+
+        private BrainStormDTO CrearDtoOldParaCsv(BrainStormDTO source)
+        {
+            var legacy = new BrainStormDTO(source);
+            bool sourceOficiales = source.oficiales;
+            legacy.partidos = source.partidos
+                .Where(p => !string.IsNullOrWhiteSpace(p.codigo))
+                .Where(p => sourceOficiales ? p.escanios > 0 : p.escaniosHastaSondeo > 0)
+                .ToList();
+            legacy.partidos.Sort(new PartidoDTOComparerUnified(sourceOficiales));
+            legacy.partidos.Reverse();
+            legacy.numPartidos = legacy.partidos.Count;
+            return legacy;
+        }
+
         private async void EscribirFichero(bool desdeSedes = false)
         {
             if (dto != null)
@@ -1572,22 +1638,30 @@ namespace Elecciones
                 try
                 {
                     preparado = true;
+                    bool modoOld = UsarFormatoBrainStormCsvOld();
+                    string nombreSondeo = cmbSondeo.SelectedItem?.ToString() ?? "";
 
-                    // Read ordering mode from config (non-boolean so it can be extended later)
-                    string ordenSetting = configuration.GetValue("ordenPartidos") ?? "0";
-
-                    // Local helper: create a new BrainStormDTO copy ordered by partido.codigo.
-                    // Uses the provided source (so we can pass an unfiltered DTO when needed).
-                    BrainStormDTO CreateOrderedDtoCopyFrom(BrainStormDTO source)
+                    if (modoOld)
                     {
-                        var ordered = new BrainStormDTO(source);
-                        ordered.partidos = ObtenerPartidosAlineadosParaCsv(source);
-                        ordered.numPartidos = ordered.partidos.Count;
-                        return ordered;
-                    }
+                        // Formato legacy (VersionCarmen): orden por escanos/votos y filtrado por escanos > 0.
+                        var dtoOld = CrearDtoOldParaCsv(dto);
+                        await dtoOld.ToCsv("BrainStorm", nombreSondeo, legacySinColumnaEscanios: true);
 
-                    var dtoToWrite = CreateOrderedDtoCopyFrom(dto);
-                    await dtoToWrite.ToCsv("BrainStorm", cmbSondeo.SelectedItem?.ToString() ?? "");
+                        // Siempre generar tambien la version por codigo (equivalente a NEW).
+                        var dtoCodigo = CrearDtoNewParaCsv(dto);
+                        await dtoCodigo.ToCsv("Brainstorm_Codigo", nombreSondeo);
+
+                        // En modo sondeo, generar copia adicional dedicada.
+                        if (!dto.oficiales)
+                        {
+                            await dtoOld.ToCsv("Brainstorm_Sondeo_Codigo", nombreSondeo, legacySinColumnaEscanios: true);
+                        }
+                    }
+                    else
+                    {
+                        var dtoNew = CrearDtoNewParaCsv(dto);
+                        await dtoNew.ToCsv("BrainStorm", nombreSondeo);
+                    }
                 }
                 catch
                 {
@@ -1639,8 +1713,8 @@ namespace Elecciones
         private void btnEntra_Click(object sender, RoutedEventArgs e)
         {
             if (!preparado) { EscribirFichero(); }
-            if (string.Equals(graficosHeader.Header, "FALDÓN")) { EntraFaldon(); }
-            if (string.Equals(graficosHeader.Header, "CARTÓN")) { EntraCarton(); }
+            if (EsCabeceraFaldon()) { EntraFaldon(); }
+            if (EsCabeceraCarton()) { EntraCarton(); }
             if (EsCabeceraSuperfaldon()) { EntraSuperfaldon(); }
             if (string.Equals(graficosHeader.Header, "PANTALLA")) { EntraSuperfaldon(); }
             if (string.Equals(graficosHeader.Header, "REALIDAD AUMENTADA")) { EntraSuperfaldon(); }
@@ -1648,8 +1722,8 @@ namespace Elecciones
         }
         private void btnSale_Click(object sender, RoutedEventArgs e)
         {
-            if (string.Equals(graficosHeader.Header, "FALDÓN")) { SaleFaldon(); }
-            if (string.Equals(graficosHeader.Header, "CARTÓN")) { SaleCarton(); }
+            if (EsCabeceraFaldon()) { SaleFaldon(); }
+            if (EsCabeceraCarton()) { SaleCarton(); }
             if (EsCabeceraSuperfaldon()) { SaleSuperfaldon(); }
         }
         private void btnActualiza_Click(object sender, RoutedEventArgs e)

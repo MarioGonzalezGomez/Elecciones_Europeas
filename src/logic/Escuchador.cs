@@ -13,8 +13,8 @@ namespace Elecciones.src.logic
 {
     public class Escuchador
     {
-        private static List<Circunscripcion> circunscripciones;
-        private CircunscripcionController cirController;
+        private static List<Circunscripcion> circunscripciones = new();
+        private CircunscripcionController? cirController;
         public bool salir { get; set; }
 
         public Escuchador(conexion.ConexionEntityFramework conexionActiva)
@@ -28,6 +28,12 @@ namespace Elecciones.src.logic
             {
                 try
                 {
+                    if (cirController == null)
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(2));
+                        continue;
+                    }
+
                     List<double> escrutados = circunscripciones.Select(cir => cir.escrutado).ToList();
                     List<Circunscripcion> circunscripcionesNew = cirController.FindAllFromBD();
                     List<double> escrutadosNew = circunscripcionesNew.Select(cir => cir.escrutado).ToList();
@@ -44,8 +50,9 @@ namespace Elecciones.src.logic
                 catch (Exception ex)
                 {
                     Console.WriteLine($"El escuchador ha sufrido un error, es posible que no se detecten los cambios en vivo \n{ex}");
-                   // MessageBox.Show($"El escuchador ha sufrido un error, es posible que no se detecten los cambios en vivo \n{ex}", "Error BDD", MessageBoxButton.OK, MessageBoxImage.Error);
-                    break;
+                    // Error transitorio (p.ej. cambio de conexión en caliente): reintentar sin matar el escuchador.
+                    await Task.Delay(TimeSpan.FromSeconds(2));
+                    continue;
                 }
 
             }

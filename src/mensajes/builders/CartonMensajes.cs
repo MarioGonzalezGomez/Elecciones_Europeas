@@ -673,11 +673,23 @@ namespace Elecciones.src.mensajes.builders
             // }
             //
             var snapshotActual = ConstruyeSnapshotUltimoEscano(dto);
-            bool hayCambio = ultimoEscanoSnapshotInicializado && !string.Equals(ultimoEscanoSnapshot, snapshotActual, StringComparison.Ordinal);
-            ultimoEscanoCambioDetectado = hayCambio;
-            if (hayCambio)
+            var (ultimoAnterior, luchaAnterior) = DescomponeSnapshotUltimoEscano(ultimoEscanoSnapshot);
+            var (ultimoActual, luchaActual) = DescomponeSnapshotUltimoEscano(snapshotActual);
+
+            bool cambioUltimo = ultimoEscanoSnapshotInicializado && !string.Equals(ultimoAnterior, ultimoActual, StringComparison.Ordinal);
+            bool cambioLucha = ultimoEscanoSnapshotInicializado && !string.Equals(luchaAnterior, luchaActual, StringComparison.Ordinal);
+
+            ultimoEscanoCambioDetectado = cambioUltimo || cambioLucha;
+            if (ultimoEscanoCambioDetectado)
             {
-                sb.Append(EventRunBuild("UltimoEscanoN/Cambio") + "\n");
+                if (cambioUltimo)
+                {
+                    sb.Append(EventRunBuild("UltimoEscanoN/Cambio") + "\n");
+                }
+                else
+                {
+                    sb.Append(EventRunBuild("UltimoEscanoN/CambioAbajo") + "\n");
+                }
             }
             else
             {
@@ -801,6 +813,24 @@ namespace Elecciones.src.mensajes.builders
                 .ToList();
 
             return $"U:{string.Join(",", ultimo)}|L:{string.Join(",", lucha)}";
+        }
+
+        private static (string Ultimo, string Lucha) DescomponeSnapshotUltimoEscano(string snapshot)
+        {
+            if (string.IsNullOrWhiteSpace(snapshot))
+            {
+                return ("", "");
+            }
+
+            int separador = snapshot.IndexOf("|L:", StringComparison.Ordinal);
+            if (!snapshot.StartsWith("U:", StringComparison.Ordinal) || separador < 0)
+            {
+                return (snapshot, "");
+            }
+
+            string ultimo = snapshot.Substring(2, separador - 2);
+            string lucha = snapshot.Substring(separador + 3);
+            return (ultimo, lucha);
         }
 
 

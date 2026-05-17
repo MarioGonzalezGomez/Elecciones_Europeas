@@ -10,6 +10,13 @@ namespace Elecciones.src.mensajes.builders
     /// </summary>
     internal class SuperfaldonMensajes : IPFMensajesBase
     {
+        private enum TipoCambioUltimoEscano
+        {
+            Ninguno,
+            CambioArriba,
+            CambioAbajo
+        }
+
         private static SuperfaldonMensajes? instance;
         private string ultimoEscanoSnapshot = "";
         private bool ultimoEscanoSnapshotInicializado = false;
@@ -98,22 +105,50 @@ namespace Elecciones.src.mensajes.builders
 
         public string ultimoCambia(BrainStormDTO dto)
         {
-            return ultimoHayCambio(dto) ? EventRunBuild("UltimoEscanoN/Cambio") : "";
+            var tipoCambio = EvaluarCambioUltimoEscano(dto);
+            return tipoCambio switch
+            {
+                TipoCambioUltimoEscano.CambioArriba => EventRunBuild("UltimoEscanoN/Cambio"),
+                TipoCambioUltimoEscano.CambioAbajo => EventRunBuild("UltimoEscanoN/CambioAbajo"),
+                _ => ""
+            };
         }
 
         public bool ultimoHayCambio(BrainStormDTO dto)
         {
+            return EvaluarCambioUltimoEscano(dto) != TipoCambioUltimoEscano.Ninguno;
+        }
+
+        private TipoCambioUltimoEscano EvaluarCambioUltimoEscano(BrainStormDTO dto)
+        {
             if (dto == null)
             {
-                return false;
+                ultimoEscanoCambioDetectado = false;
+                return TipoCambioUltimoEscano.Ninguno;
             }
 
             var snapshotActual = ConstruyeSnapshotUltimoEscano(dto);
-            bool hayCambio = ultimoEscanoSnapshotInicializado && !string.Equals(ultimoEscanoSnapshot, snapshotActual, StringComparison.Ordinal);
-            ultimoEscanoCambioDetectado = hayCambio;
+            var (ultimoAnterior, luchaAnterior) = DescomponeSnapshotUltimoEscano(ultimoEscanoSnapshot);
+            var (ultimoActual, luchaActual) = DescomponeSnapshotUltimoEscano(snapshotActual);
+
+            bool cambioUltimo = ultimoEscanoSnapshotInicializado && !string.Equals(ultimoAnterior, ultimoActual, StringComparison.Ordinal);
+            bool cambioLucha = ultimoEscanoSnapshotInicializado && !string.Equals(luchaAnterior, luchaActual, StringComparison.Ordinal);
+
+            ultimoEscanoCambioDetectado = cambioUltimo || cambioLucha;
             ultimoEscanoSnapshot = snapshotActual;
             ultimoEscanoSnapshotInicializado = true;
-            return hayCambio;
+
+            if (cambioUltimo)
+            {
+                return TipoCambioUltimoEscano.CambioArriba;
+            }
+
+            if (cambioLucha)
+            {
+                return TipoCambioUltimoEscano.CambioAbajo;
+            }
+
+            return TipoCambioUltimoEscano.Ninguno;
         }
 
         #endregion
@@ -350,6 +385,24 @@ namespace Elecciones.src.mensajes.builders
                 .ToList();
 
             return $"U:{string.Join(",", ultimo)}|L:{string.Join(",", lucha)}";
+        }
+
+        private static (string Ultimo, string Lucha) DescomponeSnapshotUltimoEscano(string snapshot)
+        {
+            if (string.IsNullOrWhiteSpace(snapshot))
+            {
+                return ("", "");
+            }
+
+            int separador = snapshot.IndexOf("|L:", StringComparison.Ordinal);
+            if (!snapshot.StartsWith("U:", StringComparison.Ordinal) || separador < 0)
+            {
+                return (snapshot, "");
+            }
+
+            string ultimo = snapshot.Substring(2, separador - 2);
+            string lucha = snapshot.Substring(separador + 3);
+            return (ultimo, lucha);
         }
 
         #endregion

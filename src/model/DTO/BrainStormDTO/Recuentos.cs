@@ -14,21 +14,24 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
 {
     public class Recuentos
     {
-        public string CIRCUNSCRIPCION { get; set; }
-        public string CODIGO_CIRCUNSCRIPCION { get; set; }
+        public string CIRCUNSCRIPCION { get; set; } = string.Empty;
+        public string CODIGO_CIRCUNSCRIPCION { get; set; } = string.Empty;
         public int ESCANOS { get; set; }
         public double ESCRUTADO { get; set; }
         public double PARTICIPACION { get; set; }
         public double PARTICIPACION_HISTORICO { get; set; }
         public int PARTIDOS_TOTALES { get; set; }
         public int PARTIDOS_CON_ESCANO { get; set; }
-        public List<Recuento> RECUENTOS { get; set; }
+        public List<Recuento> RECUENTOS { get; set; } = new List<Recuento>();
 
         ConfigManager configuration;
 
         public Recuentos()
         {
             configuration = ConfigManager.GetInstance();
+            CIRCUNSCRIPCION = string.Empty;
+            CODIGO_CIRCUNSCRIPCION = string.Empty;
+            RECUENTOS = new List<Recuento>();
         }
 
         public Recuentos(string cIRCUNSCRIPCION, string cODIGO, int eSCANOS, double eSCRUTADO, double pARTICIPACION, double pARTICIPACION_HISTORICO, int pARTIDOS_TOTALES, int pARTIDOS_CON_ESCANO, List<Recuento> recuentos)
@@ -50,6 +53,10 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         {
             List<Recuentos> recuentos = new List<Recuentos>();
             Circunscripcion circunscripcionCentral = CircunscripcionController.GetInstance(con).FindById($"{configuration.GetValue("codigoRegional")}00000");
+            if (circunscripcionCentral == null)
+            {
+                return recuentos;
+            }
             Recuentos central = GetRecuento(oficiales, avanceActual, eleccion, circunscripcionCentral.nombre, con);
             recuentos.Add(central);
             List<Circunscripcion> provincias = CircunscripcionController.GetInstance(con).FindAllCircunscripcionesByNameAutonomia(circunscripcionCentral.nombre);
@@ -64,6 +71,10 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         {
             Recuentos recuentos = new Recuentos();
             BrainStormDTO bsDto = oficiales ? BrainStormController.GetInstance(con).FindByNameCircunscripcionOficialSinFiltrar(circunscripcion, avanceActual, eleccion) : BrainStormController.GetInstance(con).FindByNameCircunscripcionSondeoSinFiltrar(circunscripcion, avanceActual, eleccion);
+            if (bsDto == null)
+            {
+                return recuentos;
+            }
             Recuento r = new Recuento();
             List<Recuento> recuentolist = r.FromBrainstormDTO(bsDto, con);
             recuentos.CIRCUNSCRIPCION = bsDto.circunscripcionDTO.nombre;

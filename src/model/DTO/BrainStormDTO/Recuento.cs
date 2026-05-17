@@ -16,10 +16,10 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
 {
     public class Recuento
     {
-        public string BLOQUE { get; set; }
-        public string PARTIDO { get; set; }
-        public string SIGLA_OFICIAL { get; set; }
-        public string CODIGO { get; set; }
+        public string BLOQUE { get; set; } = string.Empty;
+        public string PARTIDO { get; set; } = string.Empty;
+        public string SIGLA_OFICIAL { get; set; } = string.Empty;
+        public string CODIGO { get; set; } = string.Empty;
         public int ORDEN { get; set; }
         public int ESCANOS_DESDE { get; set; }
         public int ESCANOS_HASTA { get; set; }
@@ -35,6 +35,10 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         public Recuento()
         {
             configuration = ConfigManager.GetInstance();
+            BLOQUE = string.Empty;
+            PARTIDO = string.Empty;
+            SIGLA_OFICIAL = string.Empty;
+            CODIGO = string.Empty;
         }
 
         public Recuento(string bloque, string nombre, string siglas, string codigo, int orden, int escanosDesde, int escanosHasta, int difEscanos, double porcetajeVoto, int votantes, int difVotantes, char tendenciaVotos)

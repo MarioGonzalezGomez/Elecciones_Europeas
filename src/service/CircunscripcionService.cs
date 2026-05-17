@@ -2,6 +2,7 @@ using Elecciones.src.conexion;
 using Elecciones.src.controller;
 using Elecciones.src.model.IPF;
 using Elecciones.src.repository;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,7 +12,7 @@ namespace Elecciones.src.service
     {
         public static CircunscripcionService? instance;
 
-        private CircunscripcionRepository _rep;
+        private readonly CircunscripcionRepository _rep;
         private static ConexionEntityFramework? _con;
 
         private CircunscripcionService(ConexionEntityFramework con)
@@ -22,19 +23,27 @@ namespace Elecciones.src.service
 
         public static CircunscripcionService GetInstance(ConexionEntityFramework con)
         {
-            if (instance == null)
+            if (instance == null || NeedsRecreation(con))
             {
                 instance = new CircunscripcionService(con);
             }
-            else if (_con._tipoConexion != con._tipoConexion)
-            {
-                instance = new CircunscripcionService(con);
-            }
-            else if (!_con._database.Equals(con._database))
-            {
-                instance = new CircunscripcionService(con);
-            }
+
             return instance;
+        }
+
+        private static bool NeedsRecreation(ConexionEntityFramework con)
+        {
+            if (_con == null)
+            {
+                return true;
+            }
+
+            if (_con._tipoConexion != con._tipoConexion)
+            {
+                return true;
+            }
+
+            return !string.Equals(_con._database, con._database, StringComparison.Ordinal);
         }
 
         public List<Circunscripcion> FindAll()

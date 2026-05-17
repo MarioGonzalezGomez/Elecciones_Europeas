@@ -27,7 +27,11 @@ namespace Elecciones.src.service
             try
             {
                 List<Medio> medios = repository.GetAll();
-                return medios.Select(m => MedioDTO.FromMedio(m)).ToList();
+                return medios
+                    .Select(MedioDTO.FromMedio)
+                    .Where(m => m != null)
+                    .Cast<MedioDTO>()
+                    .ToList();
             }
             catch (Exception ex)
             {
@@ -39,11 +43,11 @@ namespace Elecciones.src.service
         /// <summary>
         /// Obtiene un medio por su código
         /// </summary>
-        public MedioDTO GetMedioByCode(string codigo)
+        public MedioDTO? GetMedioByCode(string codigo)
         {
             try
             {
-                Medio medio = repository.FindByCode(codigo);
+                Medio? medio = repository.FindByCode(codigo);
                 return medio != null ? MedioDTO.FromMedio(medio) : null;
             }
             catch (Exception ex)
@@ -61,7 +65,11 @@ namespace Elecciones.src.service
             try
             {
                 List<Medio> medios = repository.GetAllWithDescription();
-                return medios.Select(m => MedioDTO.FromMedio(m)).ToList();
+                return medios
+                    .Select(MedioDTO.FromMedio)
+                    .Where(m => m != null)
+                    .Cast<MedioDTO>()
+                    .ToList();
             }
             catch (Exception ex)
             {

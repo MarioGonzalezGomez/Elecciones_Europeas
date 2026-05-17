@@ -1,11 +1,11 @@
-using Elecciones.src.conexion;
+ï»¿using Elecciones.src.conexion;
 using Elecciones.src.controller;
 using Elecciones.src.logic.comparators;
 using Elecciones.src.model.IPF;
 using Elecciones.src.repository;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
 
 namespace Elecciones.src.service
 {
@@ -13,30 +13,38 @@ namespace Elecciones.src.service
     {
         public static CPService? instance;
 
-        private CPRepository _rep;
+        private readonly CPRepository _rep;
         private static ConexionEntityFramework? _con;
 
         private CPService(ConexionEntityFramework con)
         {
             _con = con;
-            this._rep = CPRepository.GetInstance(con);
+            _rep = CPRepository.GetInstance(con);
         }
 
         public static CPService GetInstance(ConexionEntityFramework con)
         {
-            if (instance == null)
+            if (instance == null || NeedsRecreation(con))
             {
                 instance = new CPService(con);
             }
-            else if (_con._tipoConexion != con._tipoConexion)
-            {
-                instance = new CPService(con);
-            }
-            else if (!_con._database.Equals(con._database))
-            {
-                instance = new CPService(con);
-            }
+
             return instance;
+        }
+
+        private static bool NeedsRecreation(ConexionEntityFramework con)
+        {
+            if (_con == null)
+            {
+                return true;
+            }
+
+            if (_con._tipoConexion != con._tipoConexion)
+            {
+                return true;
+            }
+
+            return !string.Equals(_con._database, con._database, StringComparison.Ordinal);
         }
 
         public List<CircunscripcionPartido> FindAll()
@@ -44,7 +52,7 @@ namespace Elecciones.src.service
             return _rep.GetAll();
         }
 
-        //Datos de los partidos más votados en cada autonomía
+        //Datos de los partidos mas votados en cada autonomia
         public List<CircunscripcionPartido> FindMasVotadosAutonomiasOficial()
         {
             return FindAll()
@@ -54,6 +62,7 @@ namespace Elecciones.src.service
                 .Select(group => group.OrderByDescending(cp => cp, new CPComparerOficial()).First())
                 .ToList();
         }
+
         public List<CircunscripcionPartido> FindMasVotadosAutonomiasSondeo()
         {
             return FindAll()
@@ -63,7 +72,8 @@ namespace Elecciones.src.service
                 .Select(group => group.OrderByDescending(cp => cp, new CPComparerSondeo()).First())
                 .ToList();
         }
-        //Datos de los partidos más votados en cada provincia de una autonomía determinada
+
+        //Datos de los partidos mas votados en cada provincia de una autonomia determinada
         public List<CircunscripcionPartido> FindMasVotadosProvinciasOficial(string codAutonomia)
         {
             return FindAll()
@@ -73,6 +83,7 @@ namespace Elecciones.src.service
                 .Select(group => group.OrderByDescending(cp => cp, new CPComparerOficial()).First())
                 .ToList();
         }
+
         public List<CircunscripcionPartido> FindMasVotadosProvinciasSondeo(string codAutonomia)
         {
             return FindAll()
@@ -83,17 +94,17 @@ namespace Elecciones.src.service
                 .ToList();
         }
 
-
         public CircunscripcionPartido FindById(Clave id)
         {
             return _rep.GetById(id);
         }
 
-        //Datos de todos los partidos con representación en una circunscipción
+        //Datos de todos los partidos con representacion en una circunscripcion
         private List<CircunscripcionPartido> FindByIdCircunscripcion(string cod)
         {
             return FindAll().Where(cp => cp.codCircunscripcion == cod).ToList();
         }
+
         public List<CircunscripcionPartido> FindByIdCircunscripcionOficial(string cod)
         {
             return FindByIdCircunscripcion(cod)
@@ -101,6 +112,7 @@ namespace Elecciones.src.service
                  .OrderByDescending(cp => cp, new CPComparerOficial())
                  .ToList();
         }
+
         public List<CircunscripcionPartido> FindByIdCircunscripcionSondeo(string cod)
         {
             return FindByIdCircunscripcion(cod)
@@ -108,12 +120,14 @@ namespace Elecciones.src.service
                  .OrderByDescending(cp => cp, new CPComparerSondeo())
                  .ToList();
         }
+
         public List<CircunscripcionPartido> FindByIdCircunscripcionOficialSinFiltrar(string cod)
         {
             return FindByIdCircunscripcion(cod)
                  .OrderByDescending(cp => cp, new CPComparerOficial())
                  .ToList();
         }
+
         public List<CircunscripcionPartido> FindByIdCircunscripcionSondeoSinFiltrar(string cod)
         {
             return FindByIdCircunscripcion(cod)
@@ -126,7 +140,7 @@ namespace Elecciones.src.service
             return FindAll().Where(cp => cp.codPartido == cod).ToList();
         }
 
-        //Datos de un partido en las distintas autonomías
+        //Datos de un partido en las distintas autonomias
         public List<CircunscripcionPartido> FindPartidoPorAutonomiasOficial(string codPartido)
         {
             return FindByIdPartido(codPartido)
@@ -135,6 +149,7 @@ namespace Elecciones.src.service
                 .OrderByDescending(cp => cp, new CPComparerOficial())
                 .ToList();
         }
+
         public List<CircunscripcionPartido> FindPartidoPorAutonomiasSondeo(string codPartido)
         {
             return FindByIdPartido(codPartido)
@@ -143,7 +158,8 @@ namespace Elecciones.src.service
                 .OrderByDescending(cp => cp, new CPComparerSondeo())
                 .ToList();
         }
-        //Datos de un partido en las provincias de una autonomía dada
+
+        //Datos de un partido en las provincias de una autonomia dada
         public List<CircunscripcionPartido> FindPartidoPorProvinciasOficial(string codAutonomia, string codPartido)
         {
             return FindByIdPartido(codPartido)
@@ -152,6 +168,7 @@ namespace Elecciones.src.service
                 .OrderByDescending(cp => cp, new CPComparerOficial())
                 .ToList();
         }
+
         public List<CircunscripcionPartido> FindPartidoPorProvinciasSondeo(string codAutonomia, string codPartido)
         {
             return FindByIdPartido(codPartido)

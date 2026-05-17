@@ -15,23 +15,23 @@ namespace Elecciones.src.model.IPF.DTO
         public string codigo
         {
             get; set;
-        }
+        } = string.Empty;
         public string padre
         {
             get; set;
-        }
+        } = string.Empty;
         public string siglas
         {
             get; set;
-        }
+        } = string.Empty;
         public string literalPartido
         {
             get; set;
-        }
+        } = string.Empty;
         public string candidato
         {
             get; set;
-        }
+        } = string.Empty;
         public int escanios
         {
             get; set;
@@ -63,14 +63,24 @@ namespace Elecciones.src.model.IPF.DTO
         public string tendencia
         {
             get; set;
-        }
+        } = string.Empty;
 
         ConfigManager configuration;
 
         public SedesDTO(CircunscripcionPartido cp, bool oficiales, ConexionEntityFramework con)
         {
             configuration = ConfigManager.GetInstance();
-            SedesDTO dto = FromCP(cp, oficiales, con);
+            SedesDTO? dto = FromCP(cp, oficiales, con);
+            if (dto == null)
+            {
+                codigo = string.Empty;
+                padre = string.Empty;
+                siglas = string.Empty;
+                literalPartido = string.Empty;
+                candidato = string.Empty;
+                tendencia = string.Empty;
+                return;
+            }
             this.codigo = dto.codigo;
             this.padre = dto.padre;
             this.siglas = dto.siglas;
@@ -89,12 +99,22 @@ namespace Elecciones.src.model.IPF.DTO
         private SedesDTO()
         {
             configuration = ConfigManager.GetInstance();
+            codigo = string.Empty;
+            padre = string.Empty;
+            siglas = string.Empty;
+            literalPartido = string.Empty;
+            candidato = string.Empty;
+            tendencia = string.Empty;
         }
 
-        public static SedesDTO FromCP(CircunscripcionPartido cp, bool oficiales, ConexionEntityFramework con)
+        public static SedesDTO? FromCP(CircunscripcionPartido cp, bool oficiales, ConexionEntityFramework con)
         {
             SedesDTO dto = new SedesDTO();
             Partido partido = PartidoController.GetInstance(con).FindById(cp.codPartido);
+            if (partido == null)
+            {
+                return null;
+            }
             dto.codigo = cp.codPartido;
             dto.padre = partido.codigoPadre;
             dto.siglas = partido.siglas;

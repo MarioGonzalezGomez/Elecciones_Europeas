@@ -15,21 +15,21 @@ namespace Elecciones.src.viewmodel
         private readonly ConfigManager _configuration;
         private readonly INotificationService _notificationService;
         private readonly ILoggerService _loggerService;
-        private ConexionEntityFramework _conexionActiva;
+        private ConexionEntityFramework _conexionActiva = null!;
 
         public ObservableCollection<string> CircunscripcionNames { get; set; }
         public ObservableCollection<CPDataDTO> ListaDeDatos { get; set; }
         public ObservableCollection<string> AutonomiasNames { get; set; }
         public ObservableCollection<string> GraficosOptions { get; set; }
         
-        private string _graficosHeader;
+        private string _graficosHeader = string.Empty;
         public string GraficosHeader
         {
             get => _graficosHeader;
             set => SetProperty(ref _graficosHeader, value);
         }
 
-        private List<Circunscripcion> CCAA;
+        private List<Circunscripcion> CCAA = new();
         public ObservableInt EleccionSeleccionada { get; set; }
 
         private bool _actualizacionActiva;
@@ -39,9 +39,6 @@ namespace Elecciones.src.viewmodel
             set => SetProperty(ref _actualizacionActiva, value);
         }
 
-        private int _avance;
-        private bool _preparado;
-        private bool _oficiales;
         private bool _regional;
         private int _tipoElecciones;
 
@@ -67,9 +64,6 @@ namespace Elecciones.src.viewmodel
         {
             _configuration.ReadConfig();
             ActualizacionActiva = true;
-            _avance = 1;
-            _preparado = false;
-            _oficiales = false;
             
             _tipoElecciones = int.Parse(_configuration.GetValue("tipoElecciones"));
             EleccionSeleccionada.CambioDeElecciones += (s, e) => CambioDeElecciones();

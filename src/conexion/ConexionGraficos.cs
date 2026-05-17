@@ -16,15 +16,15 @@ namespace Elecciones.src.conexion
         private static ConexionGraficos? instanceIPF;
         private static ConexionGraficos? instancePrime;
         private static ConexionGraficos? instance;
-        private Socket client;
-        private string _ip;
+        private Socket? client;
+        private string _ip = string.Empty;
         private int _port;
-        private string _programaGrafico;  // Track connection type for auto-reconnect
+        private string _programaGrafico = string.Empty;  // Track connection type for auto-reconnect
         public bool conectado = false;
 
-        ConfigManager configuration;
-        private INotificationService _notificationService;
-        private ILoggerService _loggerService;
+        ConfigManager configuration = null!;
+        private INotificationService _notificationService = null!;
+        private ILoggerService _loggerService = null!;
 
         private ConexionGraficos(string programaGrafico)
         {
@@ -131,6 +131,11 @@ namespace Elecciones.src.conexion
                     AbrirConexion(_programaGrafico);
                 }
                 
+                if (client == null)
+                {
+                    return;
+                }
+
                 byte[] bytes = Encoding.UTF8.GetBytes(mensaje);
                 client.Send(bytes);
                 Console.WriteLine($"{mensaje}");
@@ -144,7 +149,7 @@ namespace Elecciones.src.conexion
                 try
                 {
                     AbrirConexion(_programaGrafico);
-                    if (conectado)
+                    if (conectado && client != null)
                     {
                         byte[] bytes = Encoding.UTF8.GetBytes(mensaje);
                         client.Send(bytes);
@@ -164,6 +169,11 @@ namespace Elecciones.src.conexion
         {
             try
             {
+                if (client == null)
+                {
+                    return string.Empty;
+                }
+
                 byte[] solicitudBuffer = Encoding.UTF8.GetBytes(solicitud);
                 client.Send(solicitudBuffer);
 
@@ -186,13 +196,13 @@ namespace Elecciones.src.conexion
                 {
                     _notificationService.ShowError($"Error al recibir mensaje itemget desde IPF: {ex.Message}", "Error Itemget");
                 }
-                return null;
+                return string.Empty;
             }
             catch (Exception ex)
             {
                 _loggerService.LogError("Exception in RecibirMensaje", ex);
                 _notificationService.ShowError($"Error al recibir mensaje itemget desde IPF: {ex}", "Error Itemget");
-                return null;
+                return string.Empty;
             }
         }
 
@@ -219,17 +229,26 @@ namespace Elecciones.src.conexion
         {
             if (String.Equals(programaGrafico, "prime", StringComparison.OrdinalIgnoreCase))
             {
-                instancePrime.client.Close();
+                if (instancePrime?.client != null)
+                {
+                    instancePrime.client.Close();
+                }
                 instancePrime = null;
             }
             else if (String.Equals(programaGrafico, "ipf", StringComparison.OrdinalIgnoreCase))
             {
-                instanceIPF.client.Close();
+                if (instanceIPF?.client != null)
+                {
+                    instanceIPF.client.Close();
+                }
                 instanceIPF = null;
             }
             else
             {
-                client.Close();
+                if (client != null)
+                {
+                    client.Close();
+                }
                 instance = null;
             }
         }

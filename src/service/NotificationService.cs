@@ -4,7 +4,7 @@ namespace Elecciones.src.service
 {
     public class NotificationService : INotificationService
     {
-        private static NotificationService _instance;
+        private static NotificationService? _instance;
 
         public static NotificationService GetInstance()
         {

@@ -14,11 +14,11 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         public string codigo
         {
             get; set;
-        }
+        } = string.Empty;
         public string nombre
         {
             get; set;
-        }
+        } = string.Empty;
         public double escrutado
         {
             get; set;
@@ -58,7 +58,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         public string anioUltimasElecciones
         {
             get; set;
-        }
+        } = string.Empty;
 
         private CircunscripcionDTO(string codigo, string nombre, double escrutado, int escaniosTotales, int numVotantesTotales, int numVotantesFaltan)
         {
@@ -75,7 +75,7 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
             CircunscripcionDTO dto = new CircunscripcionDTO(c.codigo, c.nombre, c.escrutado, c.escanios, c.votantes, c.votantesFaltan);
             dto.mayoria = (dto.escaniosTotales / 2) + 1;
             dto.numAvance = avanceActual;
-            Circunscripcion padre = tipoElecciones == 1
+            Circunscripcion? padre = tipoElecciones == 1
             ? CircunscripcionController.GetInstance(con).FindById("9900000")
             : CircunscripcionController.GetInstance(con).FindById(c.comunidad + "00000");
 
@@ -88,22 +88,22 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
                 case 1:
                     participacion = c.avance1;
                     participacionHistorica = c.avance1Hist;
-                    participacionMedia = padre.avance1;
+                    participacionMedia = padre?.avance1 ?? 0.0;
                     break;
                 case 2:
                     participacion = c.avance2;
                     participacionHistorica = c.avance2Hist;
-                    participacionMedia = padre.avance2;
+                    participacionMedia = padre?.avance2 ?? 0.0;
                     break;
                 case 3:
                     participacion = c.avance3;
                     participacionHistorica = c.avance3Hist;
-                    participacionMedia = padre.avance3;
+                    participacionMedia = padre?.avance3 ?? 0.0;
                     break;
                 case 4:
                     participacion = c.participacionFinal;
                     participacionHistorica = c.participacionHist;
-                    participacionMedia = padre.participacionFinal;
+                    participacionMedia = padre?.participacionFinal ?? 0.0;
                     break;
             }
 

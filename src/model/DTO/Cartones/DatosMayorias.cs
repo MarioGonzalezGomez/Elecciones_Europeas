@@ -33,12 +33,13 @@ namespace Elecciones.src.model.DTO.Cartones
             string json = JsonSerializer.Serialize(this, options);
             await File.WriteAllTextAsync(fileName, json);
         }
-        public async Task ToCsv()
+        public Task ToCsv()
         {
             string fileName = $"{configuration.GetValue("rutaArchivos")}\\CSV\\DatosMayorias.csv";
             //    string csv = $"Circunscripción;Partido;Escaños Desde;Hasta;Diferencia;Tendencia;Históricos\n";
             // csv += $"{this.circunscripcion};{this.partido};{this.escanosDesde};{this.escanosHasta};{this.diferencia};{this.tendencia};{this.escanosHistoricos}\n";
             //  await File.WriteAllTextAsync(fileName, csv);
+            return Task.CompletedTask;
         }
     }
 }

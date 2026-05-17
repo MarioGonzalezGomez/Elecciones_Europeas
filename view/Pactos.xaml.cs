@@ -1,4 +1,4 @@
-using Elecciones.src.controller;
+﻿using Elecciones.src.controller;
 using Elecciones.src.logic;
 using Elecciones.src.model;
 using Elecciones.src.model.DTO.BrainStormDTO;
@@ -7,8 +7,6 @@ using Elecciones.src.model.IPF.DTO;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing.Drawing2D;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,31 +29,31 @@ namespace Elecciones
     /// </summary>
     public partial class Pactos : Window
     {
-        private BrainStormDTO dto;
+        private BrainStormDTO dto = null!;
         private bool oficiales;
         private int mayoriaAbsoluta;
         private double totalIzq;
         private double totalDer;
-        private List<CPDataDTO> partidosTotales;
-        private ObservableCollection<CPDataDTO> partidosDisponibles;
-        private ObservableCollection<CPDataDTO> partidosDentroIzq;
-        private ObservableCollection<CPDataDTO> partidosDentroDer;
-        private GraphicController graficos;
+        private List<CPDataDTO> partidosTotales = new();
+        private ObservableCollection<CPDataDTO> partidosDisponibles = new();
+        private ObservableCollection<CPDataDTO> partidosDentroIzq = new();
+        private ObservableCollection<CPDataDTO> partidosDentroDer = new();
+        private GraphicController graficos = null!;
         private bool preparado;
         /// <summary>
-        /// Circunscripción original del pacto - se mantiene fija durante toda la sesión
+        /// CircunscripciÃ³n original del pacto - se mantiene fija durante toda la sesiÃ³n
         /// </summary>
-        private string circunscripcionOriginal;
+        private string circunscripcionOriginal = string.Empty;
 
         public bool pactoDentro;
 
-        ConfigManager config;
+        ConfigManager config = null!;
 
         public Pactos(BrainStormDTO dto, bool oficiales)
         {
             this.dto = dto;
             this.oficiales = oficiales;
-            // Guardar la circunscripción original del pacto ANTES de InitializeVariables
+            // Guardar la circunscripciÃ³n original del pacto ANTES de InitializeVariables
             this.circunscripcionOriginal = dto.circunscripcionDTO.nombre;
             InitializeComponent();
             InitializeVariables();
@@ -67,15 +65,15 @@ namespace Elecciones
 
         public Pactos(BrainStormDTO dto, bool oficiales, string tipoGraficoActual) : this(dto, oficiales)
         {
-            // Si el tipo de gráfico es "ÚLTIMO ESCAÑO", automatizar la entrada
-            if (string.Equals(tipoGraficoActual, "ÚLTIMO ESCAÑO", StringComparison.OrdinalIgnoreCase))
+            // Si el tipo de grÃ¡fico es "ÃšLTIMO ESCAÃ‘O", automatizar la entrada
+            if (string.Equals(tipoGraficoActual, "ÃšLTIMO ESCAÃ‘O", StringComparison.OrdinalIgnoreCase))
             {
                 this.Loaded += (s, e) => AutoEntrarEnPacto();
             }
         }
 
         /// <summary>
-        /// Automatiza la entrada en el pacto simulando el click en el botón "ENTRA"
+        /// Automatiza la entrada en el pacto simulando el click en el botÃ³n "ENTRA"
         /// </summary>
         private void AutoEntrarEnPacto()
         {
@@ -89,7 +87,6 @@ namespace Elecciones
 
         private void InitializeVariables()
         {
-            var main = Application.Current.MainWindow as MainWindow;
             totalIzq = 0;
             totalDer = 0;
             mayoriaAbsoluta = dto.circunscripcionDTO.mayoria;
@@ -104,12 +101,54 @@ namespace Elecciones
             config = ConfigManager.GetInstance();
         }
 
+        private MainWindow? GetMainWindow()
+        {
+            return Application.Current.MainWindow as MainWindow;
+        }
+
+        private PartidoDTO? FindPartidoPorCodigo(string codigoPartido)
+        {
+            return dto.partidos.FirstOrDefault(par => par.codigo.Equals(codigoPartido, StringComparison.Ordinal));
+        }
+
+        private void EnviarPartidoEntraGrafico(CPDataDTO seleccionado, bool izquierda)
+        {
+            MainWindow? main = GetMainWindow();
+
+            if (main?.ultimoEscanoDentro == true)
+            {
+                graficos.ultimoEntraPartido(dto, seleccionado, izquierda);
+                return;
+            }
+
+            PartidoDTO? pSeleccionado = FindPartidoPorCodigo(seleccionado.codigo);
+            if (pSeleccionado == null)
+            {
+                return;
+            }
+
+            if (main?.sfPactometroDentro == true)
+            {
+                graficos.sfPactometroPartidoEntra(dto, pSeleccionado, izquierda);
+                return;
+            }
+
+            if (izquierda)
+            {
+                graficos.pactosEntraIzquierda(dto, pSeleccionado);
+            }
+            else
+            {
+                graficos.pactosEntraDerecha(dto, pSeleccionado);
+            }
+        }
+
         private void InitializeInfo()
         {
             lblCircunscripcion.Content = dto.circunscripcionDTO.nombre;
-            lblMayoria.Content = $"Mayoría absoluta: {mayoriaAbsoluta}";
-            lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
-            lblEscaniosDer.Content = $"Total escaños: {totalDer}";
+            lblMayoria.Content = $"MayorÃ­a absoluta: {mayoriaAbsoluta}";
+            lblEscaniosIzq.Content = $"Total escaÃ±os: {totalIzq}";
+            lblEscaniosDer.Content = $"Total escaÃ±os: {totalDer}";
             CargarPartidos();
             partidosIzqListView.ItemsSource = partidosDisponibles;
             partidosDerListView.ItemsSource = partidosDisponibles;
@@ -121,24 +160,24 @@ namespace Elecciones
         {
             if (oficiales)
             {
-                escDesdeIzq.Header = "ESCAÑOS";
+                escDesdeIzq.Header = "ESCAÃ‘OS";
                 Binding binding1 = new Binding("escanios");
                 escDesdeIzq.DisplayMemberBinding = binding1;
                 escHastaIzq.Header = "% VOTO";
                 Binding binding2 = new Binding("porcentajeVoto");
                 escHastaIzq.DisplayMemberBinding = binding2;
 
-                escDesdeDentroIzq.Header = "ESCAÑOS";
+                escDesdeDentroIzq.Header = "ESCAÃ‘OS";
                 escDesdeDentroIzq.DisplayMemberBinding = binding1;
                 escHastaDentroIzq.Header = "% VOTO";
                 escHastaDentroIzq.DisplayMemberBinding = binding2;
 
-                escDesdeDentroDer.Header = "ESCAÑOS";
+                escDesdeDentroDer.Header = "ESCAÃ‘OS";
                 escDesdeDentroDer.DisplayMemberBinding = binding1;
                 escHastaDentroDer.Header = "% VOTO";
                 escHastaDentroDer.DisplayMemberBinding = binding2;
 
-                escDesdeDer.Header = "ESCAÑOS";
+                escDesdeDer.Header = "ESCAÃ‘OS";
                 escDesdeDer.DisplayMemberBinding = binding1;
                 escHastaDer.Header = "% VOTO";
                 escHastaDer.DisplayMemberBinding = binding2;
@@ -180,14 +219,14 @@ namespace Elecciones
         private void CargarPartidos()
         {
             List<CPDataDTO> cpdatas = CPDataDTO.FromBSDto(dto);
-            // Filtrar solo los partidos que tienen al menos 1 escaño
+            // Filtrar solo los partidos que tienen al menos 1 escaÃ±o
             List<CPDataDTO> partidosFiltrados = FiltrarPartidosConEscanios(cpdatas);
             partidosFiltrados.ForEach(partidosDisponibles.Add);
             partidosTotales = partidosDisponibles.ToList();
         }
 
         /// <summary>
-        /// Filtra los partidos para mostrar solo aquellos que tienen al menos 1 escaño
+        /// Filtra los partidos para mostrar solo aquellos que tienen al menos 1 escaÃ±o
         /// </summary>
         private List<CPDataDTO> FiltrarPartidosConEscanios(List<CPDataDTO> partidos)
         {
@@ -213,7 +252,7 @@ namespace Elecciones
                 return int.TryParse(partido.escanios, out int escanios) ? escanios : 0;
             }
 
-            // En sondeo usamos "hasta" para mostrar un total con valor útil.
+            // En sondeo usamos "hasta" para mostrar un total con valor Ãºtil.
             return int.TryParse(partido.escaniosHastaSondeo, out int hasta) ? hasta : 0;
         }
 
@@ -228,13 +267,13 @@ namespace Elecciones
 
         /// <summary>
         /// Actualiza los datos del pacto en vivo manteniendo los partidos en sus listas correspondientes.
-        /// Este método preserva la posición de los partidos en las listas (partidosDentroIzq, partidosDentroDer)
-        /// mientras actualiza sus datos numéricos (escaños, votantes, porcentajes, etc.)
-        /// IMPORTANTE: Solo actualiza si los datos corresponden a la circunscripción original del pacto
+        /// Este mÃ©todo preserva la posiciÃ³n de los partidos en las listas (partidosDentroIzq, partidosDentroDer)
+        /// mientras actualiza sus datos numÃ©ricos (escaÃ±os, votantes, porcentajes, etc.)
+        /// IMPORTANTE: Solo actualiza si los datos corresponden a la circunscripciÃ³n original del pacto
         /// </summary>
-        /// <param name="dtoActualizado">DTO con los datos actualizados de la circunscripción</param>
+        /// <param name="dtoActualizado">DTO con los datos actualizados de la circunscripciÃ³n</param>
         /// <param name="oficiales">Indica si los datos son oficiales o sondeo</param>
-        /// <param name="tipoGrafico">Tipo de gráfico que está actualmente en emisión (PACTÓMETRO, MAYORÍAS, CARTÓN PARTIDOS, ÚLTIMO ESCAÑO, etc.)</param>
+        /// <param name="tipoGrafico">Tipo de grÃ¡fico que estÃ¡ actualmente en emisiÃ³n (PACTÃ“METRO, MAYORÃAS, CARTÃ“N PARTIDOS, ÃšLTIMO ESCAÃ‘O, etc.)</param>
         public void ActualizaPacto(BrainStormDTO dtoActualizado, bool oficiales, string tipoGrafico)
         {
 
@@ -252,7 +291,7 @@ namespace Elecciones
             List<CPDataDTO> cpdatasNuevas = CPDataDTO.FromBSDto(dto);
             List<CPDataDTO> cpdatasNuevasFiltradas = FiltrarPartidosConEscanios(cpdatasNuevas);
 
-            // Actualizar los datos de los partidos preservando su posición en las listas
+            // Actualizar los datos de los partidos preservando su posiciÃ³n en las listas
             ActualizarPartidosEnLista(partidosDentroIzq, cpdatasNuevasFiltradas);
             ActualizarPartidosEnLista(partidosDentroDer, cpdatasNuevasFiltradas);
             ActualizarPartidosEnLista(partidosDisponibles, cpdatasNuevasFiltradas);
@@ -269,16 +308,16 @@ namespace Elecciones
                 totalDer += GetEscaniosParaTotal(partido);
             }
 
-            lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
-            lblEscaniosDer.Content = $"Total escaños: {totalDer}";
-            lblMayoria.Content = $"Mayoría absoluta: {mayoriaAbsoluta}";
+            lblEscaniosIzq.Content = $"Total escaÃ±os: {totalIzq}";
+            lblEscaniosDer.Content = $"Total escaÃ±os: {totalDer}";
+            lblMayoria.Content = $"MayorÃ­a absoluta: {mayoriaAbsoluta}";
 
-            // Disparar el método para actualizar señales gráficas
+            // Disparar el mÃ©todo para actualizar seÃ±ales grÃ¡ficas
             ActualizarSenalesGraficas(dtoActualizado, tipoGrafico);
         }
 
         /// <summary>
-        /// Actualiza los datos de los partidos en una lista observable, preservando su posición
+        /// Actualiza los datos de los partidos en una lista observable, preservando su posiciÃ³n
         /// Actualiza las propiedades del objeto en lugar de reemplazarlo, para que la UI se refresque correctamente
         /// </summary>
         private void ActualizarPartidosEnLista(ObservableCollection<CPDataDTO> lista, List<CPDataDTO> datosNuevos)
@@ -286,7 +325,7 @@ namespace Elecciones
             for (int i = 0; i < lista.Count; i++)
             {
                 CPDataDTO partidoActual = lista[i];
-                CPDataDTO datosActualizados = datosNuevos.FirstOrDefault(p => p.codigo == partidoActual.codigo);
+                CPDataDTO? datosActualizados = datosNuevos.FirstOrDefault(p => p.codigo == partidoActual.codigo);
 
                 if (datosActualizados != null)
                 {
@@ -297,18 +336,18 @@ namespace Elecciones
         }
 
         /// <summary>
-        /// Método de entrada para actualizar los datos desde el exterior.
-        /// Realiza su propia captura de datos utilizando el controlador y la circunscripción original.
+        /// MÃ©todo de entrada para actualizar los datos desde el exterior.
+        /// Realiza su propia captura de datos utilizando el controlador y la circunscripciÃ³n original.
         /// </summary>
         public void ActualizarDatos(bool oficiales, string tipoGrafico, int avance, int tipoElecciones)
         {
-            var main = Application.Current.MainWindow as MainWindow;
+            MainWindow? main = GetMainWindow();
             if (main == null || main.conexionActiva == null) return;
 
             try
             {
                 BrainStormController controller = BrainStormController.GetInstance(main.conexionActiva);
-                BrainStormDTO dtoActualizado = null;
+                BrainStormDTO? dtoActualizado = null;
 
                 if (oficiales)
                 {
@@ -339,19 +378,19 @@ namespace Elecciones
         }
 
         /// <summary>
-        /// Método que dispara señales gráficas según el tipo de pacto en emisión.
-        /// Se ejecuta automáticamente cuando hay una actualización de datos en vivo.
-        /// Mantiene los datos sincronizados con la pantalla gráfica según el tipo de pacto.
+        /// MÃ©todo que dispara seÃ±ales grÃ¡ficas segÃºn el tipo de pacto en emisiÃ³n.
+        /// Se ejecuta automÃ¡ticamente cuando hay una actualizaciÃ³n de datos en vivo.
+        /// Mantiene los datos sincronizados con la pantalla grÃ¡fica segÃºn el tipo de pacto.
         /// </summary>
-        /// <param name="dtoActualizado">DTO con la información actualizada de la circunscripción</param>
-        /// <param name="tipoGrafico">Tipo de gráfico que está actualmente en emisión (ej: "PACTÓMETRO", "MAYORÍAS", etc.)</param>
+        /// <param name="dtoActualizado">DTO con la informaciÃ³n actualizada de la circunscripciÃ³n</param>
+        /// <param name="tipoGrafico">Tipo de grÃ¡fico que estÃ¡ actualmente en emisiÃ³n (ej: "PACTÃ“METRO", "MAYORÃAS", etc.)</param>
         private void ActualizarSenalesGraficas(BrainStormDTO dtoActualizado, string tipoGrafico)
         {
             graficos.pactometroActualiza(dtoActualizado, tipoGrafico);
         }
 
         /// <summary>
-        /// Obtiene el nombre de la circunscripción actual del pacto
+        /// Obtiene el nombre de la circunscripciÃ³n actual del pacto
         /// </summary>
         public string GetCircunscripcionActual()
         {
@@ -370,31 +409,13 @@ namespace Elecciones
         {
             if (partidosIzqListView.SelectedItem != null)
             {
-                var main = Application.Current.MainWindow as MainWindow;
                 CPDataDTO seleccionado = (CPDataDTO)partidosIzqListView.SelectedItem;
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalIzq += GetEscaniosParaTotal(seleccionado);
-                lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
+                lblEscaniosIzq.Content = $"Total escaÃ±os: {totalIzq}";
                 preparado = false;
-                //Mandar mensaje de despliegue individualizado IZQ
-                if (main.ultimoEscanoDentro)
-                {
-                    graficos.ultimoEntraPartido(dto, seleccionado, true);
-                }
-                else if (main.sfPactometroDentro)
-                {
-                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    if (pseleccionado != null)
-                    {
-                        graficos.sfPactometroPartidoEntra(dto, pseleccionado, true);
-                    }
-                }
-                else
-                {
-                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    graficos.pactosEntraIzquierda(dto, pseleccionado);
-                }
+                EnviarPartidoEntraGrafico(seleccionado, true);
             }
         }
 
@@ -402,60 +423,24 @@ namespace Elecciones
         {
             if (partidosIzqListView.SelectedItem != null)
             {
-                var main = Application.Current.MainWindow as MainWindow;
                 CPDataDTO seleccionado = (CPDataDTO)partidosIzqListView.SelectedItem;
                 partidosDentroIzq.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalIzq += GetEscaniosParaTotal(seleccionado);
-                lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
-                //Mandar mensaje de despliegue individualizado IZQ
-                if (main.ultimoEscanoDentro)
-                {
-                    graficos.ultimoEntraPartido(dto, seleccionado, true);
-                }
-                else if (main.sfPactometroDentro)
-                {
-                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    if (pseleccionado != null)
-                    {
-                        graficos.sfPactometroPartidoEntra(dto, pseleccionado, true);
-                    }
-                }
-                else
-                {
-                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    graficos.pactosEntraIzquierda(dto, pseleccionado);
-                }
+                lblEscaniosIzq.Content = $"Total escaÃ±os: {totalIzq}";
+                EnviarPartidoEntraGrafico(seleccionado, true);
             }
         }
         private void partidosDerListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (partidosDerListView.SelectedItem != null)
             {
-                var main = Application.Current.MainWindow as MainWindow;
                 CPDataDTO seleccionado = (CPDataDTO)partidosDerListView.SelectedItem;
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalDer += GetEscaniosParaTotal(seleccionado);
-                lblEscaniosDer.Content = $"Total escaños: {totalDer}";
-                //Mandar mensaje de despliegue individualizado DER
-                if (main.ultimoEscanoDentro)
-                {
-                    graficos.ultimoEntraPartido(dto, seleccionado, false);
-                }
-                else if (main.sfPactometroDentro)
-                {
-                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    if (pseleccionado != null)
-                    {
-                        graficos.sfPactometroPartidoEntra(dto, pseleccionado, false);
-                    }
-                }
-                else
-                {
-                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    graficos.pactosEntraDerecha(dto, pseleccionado);
-                }
+                lblEscaniosDer.Content = $"Total escaÃ±os: {totalDer}";
+                EnviarPartidoEntraGrafico(seleccionado, false);
             }
         }
 
@@ -467,7 +452,7 @@ namespace Elecciones
                 partidosDentroIzq.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalIzq -= GetEscaniosParaTotal(seleccionado);
-                lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
+                lblEscaniosIzq.Content = $"Total escaÃ±os: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 graficos.pactosSaleIzquierda();
@@ -482,7 +467,7 @@ namespace Elecciones
                 partidosDentroDer.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalDer -= GetEscaniosParaTotal(seleccionado);
-                lblEscaniosDer.Content = $"Total escaños: {totalDer}";
+                lblEscaniosDer.Content = $"Total escaÃ±os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 graficos.pactosSaleDerecha();
@@ -516,7 +501,7 @@ namespace Elecciones
                 partidosDentroIzq.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalIzq -= GetEscaniosParaTotal(seleccionado);
-                lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
+                lblEscaniosIzq.Content = $"Total escaÃ±os: {totalIzq}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 graficos.pactosSaleIzquierda();
@@ -561,30 +546,12 @@ namespace Elecciones
         {
             if (partidosDerListView.SelectedItem != null)
             {
-                var main = Application.Current.MainWindow as MainWindow;
                 CPDataDTO seleccionado = (CPDataDTO)partidosDerListView.SelectedItem;
                 partidosDentroDer.Add(seleccionado);
                 partidosDisponibles.Remove(seleccionado);
                 totalDer += GetEscaniosParaTotal(seleccionado);
-                lblEscaniosDer.Content = $"Total escaños: {totalDer}";
-                //Mandar mensaje de despliegue individualizado DER
-                if (main.ultimoEscanoDentro)
-                {
-                    graficos.ultimoEntraPartido(dto, seleccionado, false);
-                }
-                else if (main.sfPactometroDentro)
-                {
-                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    if (pseleccionado != null)
-                    {
-                        graficos.sfPactometroPartidoEntra(dto, pseleccionado, false);
-                    }
-                }
-                else
-                {
-                    PartidoDTO pseleccionado = dto.partidos.FirstOrDefault(par => par.codigo.Equals(seleccionado.codigo));
-                    graficos.pactosEntraDerecha(dto, pseleccionado);
-                }
+                lblEscaniosDer.Content = $"Total escaÃ±os: {totalDer}";
+                EnviarPartidoEntraGrafico(seleccionado, false);
             }
         }
 
@@ -604,7 +571,7 @@ namespace Elecciones
                 partidosDentroDer.Remove(seleccionado);
                 partidosDisponibles.Add(seleccionado);
                 totalDer -= GetEscaniosParaTotal(seleccionado);
-                lblEscaniosDer.Content = $"Total escaños: {totalDer}";
+                lblEscaniosDer.Content = $"Total escaÃ±os: {totalDer}";
                 //Mandar mensaje de despliegue individualizado DER
                 int index = partidosTotales.IndexOf(seleccionado);
                 graficos.pactosSaleDerecha();
@@ -621,8 +588,8 @@ namespace Elecciones
             CargarPartidos();
             totalIzq = 0;
             totalDer = 0;
-            lblEscaniosIzq.Content = $"Total escaños: {totalIzq}";
-            lblEscaniosDer.Content = $"Total escaños: {totalDer}";
+            lblEscaniosIzq.Content = $"Total escaÃ±os: {totalIzq}";
+            lblEscaniosDer.Content = $"Total escaÃ±os: {totalDer}";
             //HARDCODED, esto mejorar para que sea adaptable al tipo de grafico actual
             if (main != null && main.EsCabeceraSuperfaldon())
             {
@@ -676,7 +643,7 @@ namespace Elecciones
         }
 
         //Este metodo tambien deselecciona los partidos, para poder elegir el siguiente
-        private async void EscribirPacto()
+        private void EscribirPacto()
         {
             //  if (partidosIzqListView.SelectedIndex != -1)
             //  {
@@ -692,8 +659,11 @@ namespace Elecciones
 
         private void WindowClosing(object? sender, CancelEventArgs e)
         {
-            var window = Application.Current.MainWindow as MainWindow;
-            window.pactos = null;
+            MainWindow? window = GetMainWindow();
+            if (window != null)
+            {
+                window.pactos = null;
+            }
         }
 
 

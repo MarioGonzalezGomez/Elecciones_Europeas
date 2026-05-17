@@ -8,8 +8,8 @@ namespace Elecciones.src.model
 {
     public class Medio
     {
-        public string codigo { get; set; }
-        public string descripcion { get; set; }
+        public string codigo { get; set; } = string.Empty;
+        public string descripcion { get; set; } = string.Empty;
         public int comparar { get; set; }
 
         public Medio() { }

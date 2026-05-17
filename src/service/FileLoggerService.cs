@@ -5,7 +5,7 @@ namespace Elecciones.src.service
 {
     public class FileLoggerService : ILoggerService
     {
-        private static FileLoggerService _instance;
+        private static FileLoggerService? _instance;
         private readonly string _logPath;
 
         private FileLoggerService()
@@ -28,7 +28,7 @@ namespace Elecciones.src.service
             return _instance;
         }
 
-        public void LogError(string message, Exception ex = null)
+        public void LogError(string message, Exception? ex = null)
         {
             string logMessage = $"[ERROR] {DateTime.Now:HH:mm:ss} - {message}";
             if (ex != null)

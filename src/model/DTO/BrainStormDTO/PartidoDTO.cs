@@ -16,19 +16,19 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         public string codigo
         {
             get; set;
-        }
+        } = string.Empty;
         public string padre
         {
             get; set;
-        }
+        } = string.Empty;
         public string siglas
         {
             get; set;
-        }
+        } = string.Empty;
         public string candidato
         {
             get; set;
-        }
+        } = string.Empty;
         public int escanios
         {
             get; set;
@@ -68,11 +68,11 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
         public string tendencia
         {
             get; set;
-        }
+        } = string.Empty;
         public string nombre
         {
             get; set;
-        }
+        } = string.Empty;
         public int esUltimoEscano
         {
             get; set;
@@ -95,10 +95,15 @@ namespace Elecciones.src.model.DTO.BrainStormDTO
 
         public PartidoDTO()
         {
-
+            codigo = string.Empty;
+            padre = string.Empty;
+            siglas = string.Empty;
+            candidato = string.Empty;
+            tendencia = string.Empty;
+            nombre = string.Empty;
         }
 
-        public static PartidoDTO FromCP(CircunscripcionPartido cp, bool oficiales, ConexionEntityFramework con)
+        public static PartidoDTO? FromCP(CircunscripcionPartido cp, bool oficiales, ConexionEntityFramework con)
         {
             PartidoDTO dto = new PartidoDTO(cp.codPartido, cp.escaniosHist, cp.numVotantes);
             Partido partido = PartidoController.GetInstance(con).FindById(cp.codPartido);

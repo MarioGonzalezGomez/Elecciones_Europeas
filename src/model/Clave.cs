@@ -8,8 +8,8 @@ namespace Elecciones.src.model.IPF
 {
     internal class Clave
     {
-        string codCircunscripcion { get; set; }
-        string codPartido { get; set; }
+        string codCircunscripcion { get; set; } = string.Empty;
+        string codPartido { get; set; } = string.Empty;
 
         public Clave() { }
     }

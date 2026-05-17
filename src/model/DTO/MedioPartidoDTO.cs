@@ -8,9 +8,9 @@ namespace Elecciones.src.model.DTO
 {
     public class MedioPartidoDTO
     {
-        public string codCircunscripcion { get; set; }
-        public string codMedio { get; set; }
-        public string codPartido { get; set; }
+        public string codCircunscripcion { get; set; } = string.Empty;
+        public string codMedio { get; set; } = string.Empty;
+        public string codPartido { get; set; } = string.Empty;
         public int escaniosDesde { get; set; }
         public int escaniosHasta { get; set; }
         public decimal votos { get; set; }
@@ -28,7 +28,7 @@ namespace Elecciones.src.model.DTO
             this.votos = votos;
         }
 
-        public static MedioPartidoDTO FromMedioPartido(MedioPartido medioPartido)
+        public static MedioPartidoDTO? FromMedioPartido(MedioPartido? medioPartido)
         {
             if (medioPartido == null) return null;
             return new MedioPartidoDTO(

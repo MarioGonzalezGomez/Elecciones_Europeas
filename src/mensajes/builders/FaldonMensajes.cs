@@ -325,7 +325,7 @@ namespace Elecciones.src.mensajes.builders
             return sb.ToString();
         }
 
-        public string TickerSale(bool oficial, BrainStormDTO dto = null)
+        public string TickerSale(bool oficial, BrainStormDTO? dto = null)
         {
             StringBuilder sb = new StringBuilder();
             string tipo = oficial ? "Escrutinio" : "Sondeo";
@@ -940,7 +940,7 @@ namespace Elecciones.src.mensajes.builders
 
                 if (siglasActivasSet.Contains(siglaRaw))
                 {
-                    PartidoDTO temp = dto.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
+                    PartidoDTO? temp = dto.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
                     int escanios = temp?.escanios ?? 0;
                     signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "0", 2, 0.2, 0) + "\n";
                     signal += EventBuild($"DatoTD/{siglaObj}", "MAP_INT_PAR", $"'{escanios}'", 2, 0.5, 0) + "\n";
@@ -1061,7 +1061,7 @@ namespace Elecciones.src.mensajes.builders
                         };
                         signal += EventBuild($"Partidos/{siglaObj}/Escaños", "OBJ_SCALE", escalaNuevo, 2, 0.5, 0) + "\n";
 
-                        PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
+                        PartidoDTO? temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
                         int escanios = temp?.escanios ?? 0;
                         signal += EventBuild($"DatoTD/{siglaObj}", "MAP_INT_PAR", $"'{escanios}'", 2, 0.5, 0) + "\n";
                         signal += EventBuild($"Partidos/{siglaObj}", "OBJ_CULL", "0", 2, 0.3, 0) + "\n";
@@ -1109,7 +1109,7 @@ namespace Elecciones.src.mensajes.builders
                             signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
                         }
 
-                        PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
+                        PartidoDTO? temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
                         int escanios = temp?.escanios ?? 0;
                         signal += EventBuild($"DatoTD/{siglaObj}", "MAP_INT_PAR", $"'{escanios}'", 2, 0.5, 0) + "\n";
                     }
@@ -1135,7 +1135,7 @@ namespace Elecciones.src.mensajes.builders
                         int newPos = layout.Positions[newPosIndex];
                         signal += EventBuild($"Partidos/{siglaObj}", "OBJ_DISPLACEMENT[0]", $"{newPos}", 2, 0.5, 0) + "\n";
 
-                        PartidoDTO temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
+                        PartidoDTO? temp = dtoNuevo.partidos.FirstOrDefault(x => x.siglas == siglaRaw);
                         int escanios = temp?.escanios ?? 0;
                         signal += EventBuild($"DatoTD/{siglaObj}", "MAP_INT_PAR", $"'{escanios}'", 2, 0.5, 0) + "\n";
                     }

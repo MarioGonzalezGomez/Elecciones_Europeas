@@ -8,8 +8,8 @@ namespace Elecciones.src.model.DTO
 {
     public class MedioDTO
     {
-        public string codigo { get; set; }
-        public string descripcion { get; set; }
+        public string codigo { get; set; } = string.Empty;
+        public string descripcion { get; set; } = string.Empty;
         public int comparar { get; set; }
 
         public MedioDTO() { }
@@ -21,7 +21,7 @@ namespace Elecciones.src.model.DTO
             this.comparar = comparar;
         }
 
-        public static MedioDTO FromMedio(Medio medio)
+        public static MedioDTO? FromMedio(Medio? medio)
         {
             if (medio == null) return null;
             return new MedioDTO(medio.codigo, medio.descripcion, medio.comparar);

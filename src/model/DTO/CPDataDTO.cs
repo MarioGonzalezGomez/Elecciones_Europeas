@@ -65,6 +65,19 @@ namespace Elecciones.src.model.IPF.DTO
 
         public CPDataDTO()
         {
+            codigo = string.Empty;
+            siglas = string.Empty;
+            escanios = string.Empty;
+            escaniosDesdeSondeo = string.Empty;
+            escaniosHastaSondeo = string.Empty;
+            escaniosHistoricos = string.Empty;
+            diferenciaEscanios = string.Empty;
+            votantes = string.Empty;
+            votantesHistoricos = string.Empty;
+            diferenciaVotantes = string.Empty;
+            porcentajeVoto = string.Empty;
+            porcentajeVotoHist = string.Empty;
+            restos = string.Empty;
         }
 
         public CPDataDTO(string codigo, string siglas, string escanios, string escaniosDesdeSondeo, string escaniosHastaSondeo, string escaniosHistoricos, string diferenciaEscanios, string votantes, string votantesHistoricos, string diferenciaVotantes, string porcentajeVoto, string porcentajeVotoHist, string restos)
@@ -102,11 +115,16 @@ namespace Elecciones.src.model.IPF.DTO
             return obj is CPDataDTO dto && (codigo == dto.codigo || codigo == cm.GetValue("codigoRegional") + dto.codigo.Substring(2));
         }
 
+        public override int GetHashCode()
+        {
+            return codigo?.GetHashCode(StringComparison.Ordinal) ?? 0;
+        }
+
         /// <summary>
         /// Actualiza los datos de este partido con los valores de otro CPDataDTO
         /// Útil para refrescar la UI sin reemplazar el objeto en las listas
         /// </summary>
-        public void ActualizarDatos(CPDataDTO datosNuevos)
+        public void ActualizarDatos(CPDataDTO? datosNuevos)
         {
             if (datosNuevos == null) return;
             

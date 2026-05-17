@@ -2,8 +2,8 @@ using Elecciones.src.conexion;
 using Elecciones.src.controller;
 using Elecciones.src.model.IPF;
 using Elecciones.src.repository;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
 
 
 namespace Elecciones.src.service
@@ -12,7 +12,7 @@ namespace Elecciones.src.service
     {
         public static PartidoService? instance;
 
-        private PartidoRepository _rep;
+        private readonly PartidoRepository _rep;
         private static ConexionEntityFramework? _con;
         private PartidoService(ConexionEntityFramework con)
         {
@@ -22,19 +22,27 @@ namespace Elecciones.src.service
 
         public static PartidoService GetInstance(ConexionEntityFramework con)
         {
-            if (instance == null)
+            if (instance == null || NeedsRecreation(con))
             {
                 instance = new PartidoService(con);
             }
-            else if (_con._tipoConexion != con._tipoConexion)
-            {
-                instance = new PartidoService(con);
-            }
-            else if (!_con._database.Equals(con._database))
-            {
-                instance = new PartidoService(con);
-            }
+
             return instance;
+        }
+
+        private static bool NeedsRecreation(ConexionEntityFramework con)
+        {
+            if (_con == null)
+            {
+                return true;
+            }
+
+            if (_con._tipoConexion != con._tipoConexion)
+            {
+                return true;
+            }
+
+            return !string.Equals(_con._database, con._database, StringComparison.Ordinal);
         }
 
         public List<Partido> FindAll()

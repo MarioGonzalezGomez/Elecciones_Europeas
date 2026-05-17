@@ -269,43 +269,17 @@ namespace Elecciones.src.conexion
                 portNumber = 3306;
             }
 
-            // Order of candidates: current _server (chosen tipo), then other configured servers, then localhost
-            var candidates = new System.Collections.Generic.List<(string server, int tipo)>();
-
-            // add current preference first
-            if (!string.IsNullOrWhiteSpace(_server))
-                candidates.Add((_server, _tipoConexion));
-
-            // add primary and backup explicitly if different
-            var primary = configuration.GetValue("dataServer");
-            var backup = configuration.GetValue("dataServerBackup");
-
-            if (!string.IsNullOrWhiteSpace(primary) && !string.Equals(primary, _server, StringComparison.OrdinalIgnoreCase))
-                candidates.Add((primary, 1));
-            if (!string.IsNullOrWhiteSpace(backup) && !string.Equals(backup, _server, StringComparison.OrdinalIgnoreCase))
-                candidates.Add((backup, 2));
-
-            // finally localhost
-            candidates.Add(("127.0.0.1", 3));
-
-            (string server, int tipo)? selected = null;
-
-            foreach (var cand in candidates)
+            string selectedServer = string.IsNullOrWhiteSpace(_server) ? "127.0.0.1" : _server.Trim();
+            if (!TestTcpConnection(selectedServer, portNumber, 1000))
             {
-                if (string.IsNullOrWhiteSpace(cand.server))
-                    continue;
-
-                if (TestTcpConnection(cand.server, portNumber, 1000))
+                string tipoLabel = _tipoConexion switch
                 {
-                    selected = cand;
-                    break;
-                }
-            }
-
-            if (selected == null)
-            {
-                // No server reachable
-                var message = "No se ha podido conectar a la BD en ninguna de las IPs configuradas. Revise la configuracion y el estado de las bases de datos.";
+                    1 => "PRINCIPAL",
+                    2 => "RESERVA",
+                    3 => "LOCAL",
+                    _ => "DESCONOCIDA"
+                };
+                var message = $"No se ha podido conectar a la BD seleccionada ({tipoLabel}: {selectedServer}:{portNumber}). Revise la configuracion y el estado del servidor.";
                 _logger.LogError(message, null);
 
                 // Show a single UI message if possible (fast, via dispatcher)
@@ -321,24 +295,11 @@ namespace Elecciones.src.conexion
                     // ignore dispatcher failures
                 }
 
-                throw new ApplicationException("Error al conectar con la base de datos. Ninguna IP responde.");
+                throw new ApplicationException("Error al conectar con la base de datos seleccionada.");
             }
 
-            // use selected
-            _server = selected.Value.server;
-            _tipoConexion = selected.Value.tipo;
+            _server = selectedServer;
             connectionServer = $"server={_server}";
-
-            // persist chosen default for UI connections if available
-            try
-            {
-                configuration.SetValue("conexionDefault1", _tipoConexion.ToString());
-                main?.Dispatcher.Invoke(() => main.EscribirConexiones());
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Failed persisting chosen DB connection type", ex);
-            }
 
             return connectionServer + connectionEnd;
         }

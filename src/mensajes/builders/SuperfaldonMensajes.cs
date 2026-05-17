@@ -368,7 +368,7 @@ namespace Elecciones.src.mensajes.builders
             }
 
             var ultimo = dto.partidos
-                .Where(p => p.esUltimoEscano == 1)
+                .Where(p => p.esUltimoEscano != 0)
                 .Select(IdPartido)
                 .Where(id => !string.IsNullOrEmpty(id))
                 .Distinct()
@@ -376,7 +376,7 @@ namespace Elecciones.src.mensajes.builders
                 .ToList();
 
             var lucha = dto.partidos
-                .Where(p => p.luchaUltimoEscano == 1)
+                .Where(p => p.luchaUltimoEscano != 0)
                 .Select(IdPartido)
                 .Where(id => !string.IsNullOrEmpty(id))
                 .Distinct()
